@@ -3,9 +3,8 @@
 #include <string.h>
 
 #define CANT_ESTADOS 7
-#define CANT_SIMBOLOS 5
+#define CANT_SIMBOLOS 6
 
-// Definición de los estados del AFD
 typedef enum {
     Q0,
     Q1,
@@ -17,71 +16,106 @@ typedef enum {
 } t_estado;
 
 typedef enum {
-   CERO,
-   UNO_SIETE,
-   OCHO_NUEVE,
-   A_F,
-   EQUIS   
+   CERO = 0,
+   UNO_SIETE = 1,
+   OCHO_NUEVE = 2,
+   A_F = 3,
+   EQUIS = 4,
+   OTROS = 5
 } t_columna;
 
-
-#define ESTADO_INICIAL Q0
-#define ESTADO_FINALD Q1 //solo un 0 DECIMAL
-#define ESTADO_FINALO1 Q2 //solo un 0 OCTAL
-#define ESTADO_FINAL02 Q5 //octal 0...
-#define ESTADO_FINALH Q4 //hexadecimal 0Xx 
+#define ESTADO_INICIAL Q0 //estado inicial
+#define ESTADO_FINAL_DECIMAL Q1 //DECIMAL
+#define ESTADO_FINAL_OCTAL_CERO Q2 //OCTAL (solo un 0 )
+#define ESTADO_FINAL_OCTAL Q3 //OCTAL
+#define ESTADO_TRANSITORIO Q4 //Ox,0X 
+#define ESTADO_FINAL_HEXA Q5 //HEXADECIMAL 
+#define ESTADO_ERROR Q6 //Caracter no reconocido 
 #define CENTINELA ','
 
-//Q6 es el estado final de error
 int tabla_transiciones[CANT_ESTADOS][CANT_SIMBOLOS] = {
-    {Q2, Q1, Q1, Q6, Q6},
-    {Q1, Q1, Q1, Q6, Q6},
-    {Q3, Q3, Q6, Q6, Q4},
-    {Q3, Q3, Q6, Q6, Q6},
-    {Q5, Q5, Q5, Q5, Q6},
-    {Q5, Q5, Q5, Q5, Q6},
-    {Q6, Q6, Q6, Q6, Q6}
+    {Q2, Q1, Q1, Q6, Q6, Q6}, //q0-
+    {Q1, Q1, Q1, Q6, Q6, Q6}, //q1+
+    {Q3, Q3, Q6, Q6, Q4, Q6}, //q2+
+    {Q3, Q3, Q6, Q6, Q6, Q6}, //q3+
+    {Q5, Q5, Q5, Q5, Q6, Q6}, //q4
+    {Q5, Q5, Q5, Q5, Q6, Q6}, //q5+
+    {Q6, Q6, Q6, Q6, Q6, Q6}  //q6
 };
 
-int cambiar_estado(int estado_actual, int tabla_transicion[CANT_ESTADOS][CANT_SIMBOLOS], int c){
-    if ((c>= 'a' && c<= 'f') || (c>= 'A' && c<= 'F'))
-        return tabla_transicion[estado_actual][A_F];
+int cambiar_estado(int estado_actual, int c){
     if (c == '0')
-        return tabla_transicion[estado_actual][CERO];
-    if (c == 'x' || c == 'X')
-        return tabla_transicion[estado_actual][EQUIS];
-    if (c>= 1 && c<= 7)
-        return tabla_transicion[estado_actual][UNO_SIETE];
-    if (c>= 8 && c<= 9)
-        return tabla_transicion[estado_actual][OCHO_NUEVE];
+        return tabla_transiciones[estado_actual][CERO];
+
+    else if (c>= '1' && c<= '7')
+        return tabla_transiciones[estado_actual][UNO_SIETE];
+
+    else if (c>= '8' && c<= '9')
+        return tabla_transiciones[estado_actual][OCHO_NUEVE];
+
+    else if ((c>= 'a' && c<= 'f') || (c>= 'A' && c<= 'F'))
+        return tabla_transiciones[estado_actual][A_F];
+
+    else if (c == 'x' || c == 'X')
+        return tabla_transiciones[estado_actual][EQUIS];
     
-    return tabla_transicion[estado_actual][OTROS];
+    else return tabla_transiciones[estado_actual][OTROS];
 }
 
-void lexer(FILE* input, FILE* output) {
-    int c; //getchar devuelve un entero
+void categorizar(int estado, FILE* output_file) {
+    switch (estado) {
+        case ESTADO_FINAL_DECIMAL:
+            fputs(" es una constante entera de tipo Decimal\n", output_file);
+            break;
+        case ESTADO_FINAL_OCTAL_CERO:
+            fputs(" es una constante entera de tipo Octal\n", output_file);
+            break;
+        case ESTADO_FINAL_OCTAL:
+            fputs(" es una constante entera de tipo Octal\n", output_file);
+            break;
+        case ESTADO_FINAL_HEXA:
+            fputs(" es una constante entera de tipo Hexadecimal\n", output_file);
+            break;
+        default:
+            fputs(" --> No reconocida\n", output_file);
+            break;
+    }
+}
+
+void lexer(FILE* input_file, FILE* output_file) {
+    int c;
     int estado = ESTADO_INICIAL;
-    while((c = getchar(input)) != EOF){
+    while((c = fgetc(input_file)) != EOF){
         if(c != CENTINELA){
-            fputc(c, output);
-            estado = tabla_transiciones[estado][char_to_enum(c)];
+            fputc(c, output_file);
+            estado = cambiar_estado(estado, c);
         }
         else{
-            fputs("    ", output);
-            if(estado == ESTADO_FINAL){
-                fputs("Aceptada\n", output);
-            }
-            else{
-                 fputs("No Aceptada\n", output);
-            }
+            categorizar(estado, output_file);
             estado = ESTADO_INICIAL;
         }
     }
-    fputs("    ", output);
-    if(estado == ESTADO_FINAL){
-                fputs("Acepatda", output);
-            }
-            else{
-                 fputs("No Aceptada", output);
-            }
+    categorizar(estado, output_file);
+}
+
+int main() {
+    // Intenta abrir el archivo para lectura
+    FILE* input_file = fopen("entrada.txt", "r");
+    if(input_file == NULL) {
+        printf("Error al intentar abrir el archivo entrada.txt");
+        return EXIT_FAILURE;
+    }
+
+    FILE* output_file = fopen("salida.txt", "w");
+    if(output_file == NULL) {
+        printf("Error al intentar crear el archivo salida.txt");
+        fclose(input_file); // Cerrar el archivo de entrada
+        return EXIT_FAILURE;
+    }
+    
+    lexer(input_file, output_file);
+
+    fclose(input_file);
+    fclose(output_file);
+    return EXIT_SUCCESS;
 }

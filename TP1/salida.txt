@@ -1,0 +1,223 @@
+0xFF es una constante entera de tipo Hexadecimal
+127 es una constante entera de tipo Decimal
+0159 --> No reconocida
+0xaBb1 es una constante entera de tipo Hexadecimal
+0Xx --> No reconocida
+0 es una constante entera de tipo Octal
+010 es una constante entera de tipo Octal
+09 --> No reconocida
+127A --> No reconocida
+120 es una constante entera de tipo Decimal
+0x5FE es una constante entera de tipo Hexadecimal
+hola --> No reconocida
+0xG --> No reconocida
+089 --> No reconocida
+1X --> No reconocida
+123 es una constante entera de tipo Decimal
+456 es una constante entera de tipo Decimal
+789 es una constante entera de tipo Decimal
+1000 es una constante entera de tipo Decimal
+2000 es una constante entera de tipo Decimal
+3000 es una constante entera de tipo Decimal
+4000 es una constante entera de tipo Decimal
+5000 es una constante entera de tipo Decimal
+6000 es una constante entera de tipo Decimal
+7000 es una constante entera de tipo Decimal
+0123 es una constante entera de tipo Octal
+0345 es una constante entera de tipo Octal
+0567 es una constante entera de tipo Octal
+01000 es una constante entera de tipo Octal
+02000 es una constante entera de tipo Octal
+03000 es una constante entera de tipo Octal
+04000 es una constante entera de tipo Octal
+05000 es una constante entera de tipo Octal
+06000 es una constante entera de tipo Octal
+07000 es una constante entera de tipo Octal
+0x123 es una constante entera de tipo Hexadecimal
+0x456 es una constante entera de tipo Hexadecimal
+0x789 es una constante entera de tipo Hexadecimal
+0xABC es una constante entera de tipo Hexadecimal
+0xDEF es una constante entera de tipo Hexadecimal
+0x1000 es una constante entera de tipo Hexadecimal
+0x2000 es una constante entera de tipo Hexadecimal
+0x3000 es una constante entera de tipo Hexadecimal
+0x4000 es una constante entera de tipo Hexadecimal
+0x5000 es una constante entera de tipo Hexadecimal
+0XABC es una constante entera de tipo Hexadecimal
+0XDEF es una constante entera de tipo Hexadecimal
+0X1000 es una constante entera de tipo Hexadecimal
+0X2000 es una constante entera de tipo Hexadecimal
+0X3000 es una constante entera de tipo Hexadecimal
+0X4000 es una constante entera de tipo Hexadecimal
+0X5000 es una constante entera de tipo Hexadecimal
+0X6000 es una constante entera de tipo Hexadecimal
+0X7000 es una constante entera de tipo Hexadecimal
+0X8000 es una constante entera de tipo Hexadecimal
+0o123 --> No reconocida
+0o456 --> No reconocida
+0o789 --> No reconocida
+0o1000 --> No reconocida
+0o2000 --> No reconocida
+0o3000 --> No reconocida
+0o4000 --> No reconocida
+0o5000 --> No reconocida
+0o6000 --> No reconocida
+0o7000 --> No reconocida
+0O123 --> No reconocida
+0O456 --> No reconocida
+0O789 --> No reconocida
+0OABC --> No reconocida
+0ODEF --> No reconocida
+0O1000 --> No reconocida
+0O2000 --> No reconocida
+0O3000 --> No reconocida
+0O4000 --> No reconocida
+0O5000 --> No reconocida
+0b101 --> No reconocida
+0b010 --> No reconocida
+0b001 --> No reconocida
+0b1000 --> No reconocida
+0b2000 --> No reconocida
+0b3000 --> No reconocida
+0b4000 --> No reconocida
+0b5000 --> No reconocida
+0b6000 --> No reconocida
+0b7000 --> No reconocida
+0B101 --> No reconocida
+0B010 --> No reconocida
+0B001 --> No reconocida
+0B1000 --> No reconocida
+0B2000 --> No reconocida
+0B3000 --> No reconocida
+0B4000 --> No reconocida
+0B5000 --> No reconocida
+0B6000 --> No reconocida
+0B7000 --> No reconocida
+745 es una constante entera de tipo Decimal
+746 es una constante entera de tipo Decimal
+747 es una constante entera de tipo Decimal
+748 es una constante entera de tipo Decimal
+749 es una constante entera de tipo Decimal
+750 es una constante entera de tipo Decimal
+751 es una constante entera de tipo Decimal
+752 es una constante entera de tipo Decimal
+753 es una constante entera de tipo Decimal
+754 es una constante entera de tipo Decimal
+867 es una constante entera de tipo Decimal
+868 es una constante entera de tipo Decimal
+869 es una constante entera de tipo Decimal
+870 es una constante entera de tipo Decimal
+871 es una constante entera de tipo Decimal
+872 es una constante entera de tipo Decimal
+873 es una constante entera de tipo Decimal
+874 es una constante entera de tipo Decimal
+875 es una constante entera de tipo Decimal
+876 es una constante entera de tipo Decimal
+989 es una constante entera de tipo Decimal
+990 es una constante entera de tipo Decimal
+991 es una constante entera de tipo Decimal
+992 es una constante entera de tipo Decimal
+993 es una constante entera de tipo Decimal
+994 es una constante entera de tipo Decimal
+995 es una constante entera de tipo Decimal
+996 es una constante entera de tipo Decimal
+997 es una constante entera de tipo Decimal
+998 es una constante entera de tipo Decimal
+1000 es una constante entera de tipo Decimal
+1001 es una constante entera de tipo Decimal
+1002 es una constante entera de tipo Decimal
+1003 es una constante entera de tipo Decimal
+1004 es una constante entera de tipo Decimal
+1005 es una constante entera de tipo Decimal
+1006 es una constante entera de tipo Decimal
+1007 es una constante entera de tipo Decimal
+1008 es una constante entera de tipo Decimal
+10090123 es una constante entera de tipo Decimal
+0124 es una constante entera de tipo Octal
+0125 es una constante entera de tipo Octal
+0126 es una constante entera de tipo Octal
+0127 es una constante entera de tipo Octal
+0130 es una constante entera de tipo Octal
+0131 es una constante entera de tipo Octal
+0132 es una constante entera de tipo Octal
+0133 es una constante entera de tipo Octal
+0134 es una constante entera de tipo Octal
+0245 es una constante entera de tipo Octal
+0246 es una constante entera de tipo Octal
+0247 es una constante entera de tipo Octal
+0250 es una constante entera de tipo Octal
+0251 es una constante entera de tipo Octal
+0252 es una constante entera de tipo Octal
+0253 es una constante entera de tipo Octal
+0254 es una constante entera de tipo Octal
+0255 es una constante entera de tipo Octal
+0256 es una constante entera de tipo Octal
+0367 es una constante entera de tipo Octal
+0368 --> No reconocida
+0369 --> No reconocida
+0370 es una constante entera de tipo Octal
+0371 es una constante entera de tipo Octal
+0372 es una constante entera de tipo Octal
+0373 es una constante entera de tipo Octal
+0374 es una constante entera de tipo Octal
+0375 es una constante entera de tipo Octal
+0376 es una constante entera de tipo Octal
+0489 --> No reconocida
+0490 --> No reconocida
+0491 --> No reconocida
+0492 --> No reconocida
+0493 --> No reconocida
+0494 --> No reconocida
+0495 --> No reconocida
+0496 --> No reconocida
+0497 --> No reconocida
+0498 --> No reconocida
+0x16B es una constante entera de tipo Hexadecimal
+0x16C es una constante entera de tipo Hexadecimal
+0x16D es una constante entera de tipo Hexadecimal
+0x16E es una constante entera de tipo Hexadecimal
+0x16F es una constante entera de tipo Hexadecimal
+0x170 es una constante entera de tipo Hexadecimal
+0x171 es una constante entera de tipo Hexadecimal
+0x172 es una constante entera de tipo Hexadecimal
+0x173 es una constante entera de tipo Hexadecimal
+0x174 es una constante entera de tipo Hexadecimal
+0x289 es una constante entera de tipo Hexadecimal
+0x28A es una constante entera de tipo Hexadecimal
+0x28B es una constante entera de tipo Hexadecimal
+0x28C es una constante entera de tipo Hexadecimal
+0x28D es una constante entera de tipo Hexadecimal
+0x28E es una constante entera de tipo Hexadecimal
+0x28F es una constante entera de tipo Hexadecimal
+0x290 es una constante entera de tipo Hexadecimal
+0x291 es una constante entera de tipo Hexadecimal
+0x2920x3A1 --> No reconocida
+0x3A2 es una constante entera de tipo Hexadecimal
+0x3A3 es una constante entera de tipo Hexadecimal
+0x3A4 es una constante entera de tipo Hexadecimal
+0x3A5 es una constante entera de tipo Hexadecimal
+0x3A6 es una constante entera de tipo Hexadecimal
+0x3A7 es una constante entera de tipo Hexadecimal
+0x3A8 es una constante entera de tipo Hexadecimal
+0x3A9 es una constante entera de tipo Hexadecimal
+0x3AA es una constante entera de tipo Hexadecimal
+0x4D3 es una constante entera de tipo Hexadecimal
+0x4D4 es una constante entera de tipo Hexadecimal
+0x4D5 es una constante entera de tipo Hexadecimal
+0x4D6 es una constante entera de tipo Hexadecimal
+0x4D7 es una constante entera de tipo Hexadecimal
+0x4D8 es una constante entera de tipo Hexadecimal
+0x4D9 es una constante entera de tipo Hexadecimal
+0x4DA es una constante entera de tipo Hexadecimal
+0x4DB es una constante entera de tipo Hexadecimal
+0x4DC es una constante entera de tipo Hexadecimal
+0x5F5 es una constante entera de tipo Hexadecimal
+0x5F6 es una constante entera de tipo Hexadecimal
+0x5F7 es una constante entera de tipo Hexadecimal
+0x5F8 es una constante entera de tipo Hexadecimal
+0x5F9 es una constante entera de tipo Hexadecimal
+0x5FA es una constante entera de tipo Hexadecimal
+0x5FB es una constante entera de tipo Hexadecimal
+0x5FC es una constante entera de tipo Hexadecimal
+0x5FD es una constante entera de tipo Hexadecimal
+0x5FE es una constante entera de tipo Hexadecimal
