@@ -2,10 +2,31 @@
 	"settings": {
 		"debug.onTaskErrors": "abort",
 		"files.associations": {
+			".fantomasignore": "ignore",
 			"*.h": "c",
-			"functional": "c"
+			"functional": "c",
+			"xiosbase": "c",
+			"xlocale": "c",
+			"xutility": "c",
+			"atomic": "c",
+			"bit": "c",
+			"compare": "c",
+			"cstddef": "c",
+			"iterator": "c",
+			"limits": "c",
+			"memory": "c",
+			"system_error": "c",
+			"type_traits": "c",
+			"xmemory": "c",
+			"xstring": "c"
 		},
 		"C_Cpp.errorSquiggles": "disabled",
+		"files.exclude": {
+			"**/.vscode": true,
+			"**/.gitignore": true,
+            "**/mkframework": true,
+			"**/README.md": true
+		}
 	},
 	"folders": [
 		{
