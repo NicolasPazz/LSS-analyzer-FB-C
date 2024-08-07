@@ -3,23 +3,16 @@
     /* 1. Cualquier texto sangrado o encerrado entre '%{' y '%}' (estos últimos dos sin sangrar en líneas ocupadas únicamente por ellos) se copia íntegramente al archivo de salida del analizador léxico (scanner) generado (*.lex.yy.c) */
         /* De esas formas podemos poner declaraciones y definiciones de C y directivas del preprocesador */
     /* 2. Los comentarios (sólo hay de múltiples líneas) sin sangría también se copian tal cual al archivo de salida del analizador léxico (scanner) generado (*.lex.yy.c) */
-
 %{
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
-
+#include "funciones.h"
 
 %}
-
     /* La siguiente línea define explícitamente a yytext como un puntero a un caracter ( char* yytext; ). Ésta es la opción por defecto si no se pone nada. */
 %pointer
     /* Con la siguiente opción la función de análisis int yylex(void); se comporta como si en la sección de usuario existiera la función int yywrap(void) return 1; la cual devuelve verdadero (no-cero), haciendo que una vez que la función de análisis int yylex(void) reciba una indicación de EOF desde YY_INPUT, asuma que no hay nada más para analizar de yyin y finalice (haciendo un return 0;) */
 %option noyywrap
-
 
     /* Condiciones de arranque inclusivas */
 /* %s */
@@ -38,31 +31,29 @@
 %%
 
 /* Palabras reservadas */
-"auto"|"const"|"extern"|"register"|"signed"|"sizeof"|"static"|"typedef"|"unsigned"|"volatile"    { imprimir_palabra_reservada(yytext); }
-"char"|"double"|"enum"|"float"|"int"|"long"|"short"|"struct"|"union"|"void"                      { imprimir_palabra_reservada(yytext); }
-"break"|"case"|"continue"|"default"|"do"|"else"|"for"|"goto"|"if"|"return"|"switch"|"while"      { imprimir_palabra_reservada(yytext); }
+"auto"|"const"|"extern"|"register"|"signed"|"sizeof"|"static"|"typedef"|"unsigned"|"volatile"    { guardar_palabra_reservada(yytext); }
+"char"|"double"|"enum"|"float"|"int"|"long"|"short"|"struct"|"union"|"void"                      { guardar_palabra_reservada(yytext); }
+"break"|"case"|"continue"|"default"|"do"|"else"|"for"|"goto"|"if"|"return"|"switch"|"while"      { guardar_palabra_reservada(yytext); }
 
 /* Constantes numéricas con sufijos */
-[0-9]+[uU]?[lL]{0,2}                                                               { imprimir_constante(yytext, "decimal"); }
-0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                                    { imprimir_constante(yytext, "hexadecimal"); }
-0[0-7]*[uU]?[lL]{0,2}                                                              { imprimir_constante(yytext, "octal"); }
-[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                            { imprimir_constante(yytext, "real"); }
-[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                                     { imprimir_constante(yytext, "real"); }
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'                      { imprimir_constante(yytext, "caracter"); }
-
-
+[0-9]+[uU]?[lL]{0,2}                                                               { guardar_constante(yytext, "decimal"); }
+0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                                    { guardar_constante(yytext, "hexadecimal"); }
+0[0-7]*[uU]?[lL]{0,2}                                                              { guardar_constante(yytext, "octal"); }
+[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                            { guardar_constante(yytext, "real"); }
+[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                                     { guardar_constante(yytext, "real"); }
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'                      { guardar_constante(yytext, "caracter"); }
 
 /* Literales cadena */
-\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"                   { imprimir_literal_cadena(yytext); }
+\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"                   { guardar_literal_cadena(yytext); }
 
 /* Identificadores */
-[a-zA-Z_][a-zA-Z0-9_]*                                                            { imprimir_identificador(yytext); }
+[a-zA-Z_][a-zA-Z0-9_]*                                                            { agregarIdentificador(yytext); }
 
 /* Operadores y caracteres de puntuación */
-[+\-*/%=<>&|!^~?:;,.\[\](){}]                                                     { imprimir_operador(yytext); }
+[+\-*/%=<>&|!^~?:;,.\[\](){}]                                                     { guardar_operador(yytext); }
 
 /* Cualquier otro carácter no reconocido */
-.                                                                                 { imprimir_no_reconocida(yytext); }
+.                                                                                 { guardar_no_reconocida(yytext); }
 
 
     /* Reglas por defecto de Flex: */
@@ -86,3 +77,22 @@
 
 
 /* Fin de la sección de código de usuario */
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Uso: %s archivo.i\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        perror("No se puede abrir el archivo");
+        return 1;
+    }
+
+    yyin = file;
+    yylex();
+    fclose(file);
+
+    return 0;
+}
