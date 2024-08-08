@@ -4,19 +4,11 @@ typedef struct NodoIdentificador {
     struct NodoIdentificador *siguiente;
 } NodoIdentificador;
 
-// Función para crear un nuevo NodoIdentificador
 NodoIdentificador* crearNodoIdentificador(const char *identificador);
 
-// Función para agregar una identificador a la lista
 void agregarIdentificador(NodoIdentificador **lista, const char *identificador);
 
-// Función para imprimir la lista
-void imprimirListaIdentificador(NodoIdentificador *lista);
-
-// Función para liberar la memoria de la lista
-void liberarListaIdentificador(NodoIdentificador *lista);
-
---
+//--
 
 typedef struct NodoLiteralCadena {
     char *literalCadena;
@@ -28,6 +20,35 @@ NodoLiteralCadena* crearNodoLiteralCadena(const char *literalCadena);
 
 void agregarLiteralCadena(NodoLiteralCadena **lista, const char *literalCadena);
 
-void imprimirListaLiteralCadena(NodoLiteralCadena *lista);
+//--
 
-void liberarListaLiteralCadena(NodoLiteralCadena *lista);
+typedef struct NodoPalabraReservada {
+    char *palabraReservada;
+    int linea;
+    int columna;
+    struct NodoPalabraReservada *siguiente;
+} NodoPalabraReservada;
+
+NodoPalabraReservada* crearNodoPalabraReservada(const char *palabraReservada, int linea, int columna);
+
+void agregarPalabraReservada(NodoPalabraReservada **lista, int linea, int columna, const char *palabraReservada);
+
+//--
+
+typedef struct NodoConstanteEntera {
+    char *constanteEntera;
+    struct NodoConstanteEntera *siguiente;
+} NodoConstanteEntera;
+
+NodoConstanteEntera* crearNodoConstanteEntera(const char *constanteEntera);
+
+void agregarConstanteEntera(NodoConstanteEntera **lista, const char *constanteEntera);
+
+void imprimirConstantesEnterasDecimales(NodoConstanteEntera *lista);
+
+void imprimirConstantesEnterasHexadecimales(NodoConstanteEntera *lista);
+
+void imprimirConstantesEnterasOctales(NodoConstanteEntera *lista);
+
+//--
+

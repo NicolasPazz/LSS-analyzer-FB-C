@@ -1,6 +1,5 @@
 #include "funciones.h"
 
-// Función para crear un nuevo NodoIdentificador
 NodoIdentificador* crearNodoIdentificador(const char *identificador) {
     NodoIdentificador *nuevoNodoIdentificador = (NodoIdentificador *)malloc(sizeof(NodoIdentificador)); 
     nuevoNodoIdentificador->identificador = strdup(identificador);
@@ -9,7 +8,6 @@ NodoIdentificador* crearNodoIdentificador(const char *identificador) {
     return nuevoNodoIdentificador;
 }
 
-// Función para agregar una identificador a la lista
 void agregarIdentificador(NodoIdentificador **lista, const char *identificador) {
     if (*lista == NULL) {
         *lista = crearNodoIdentificador(identificador);
@@ -28,25 +26,7 @@ void agregarIdentificador(NodoIdentificador **lista, const char *identificador) 
 
 }
 
-// Función para imprimir la lista
-void imprimirListaIdentificador(NodoIdentificador *lista) {
-    NodoIdentificador *actual = lista;
-    while (actual != NULL) {
-        printf("%s: %d\n", actual->identificador, actual->contador);
-        actual = actual->siguiente;
-    }
-}
-
-// Función para liberar la memoria de la lista
-void liberarListaIdentificador(NodoIdentificador *lista) {
-    NodoIdentificador *actual = lista;
-    while (actual != NULL) {
-        NodoIdentificador *temp = actual;
-        actual = actual->siguiente;
-        free(temp->identificador);
-        free(temp);
-    }
-}
+//--------
 
 NodoLiteralCadena* crearNodoLiteralCadena(const char *literalCadena) {
     NodoLiteralCadena *nuevoNodoLiteralCadena = (NodoLiteralCadena *)malloc(sizeof(NodoLiteralCadena));
@@ -81,20 +61,95 @@ void agregarLiteralCadena(NodoLiteralCadena **lista, const char *literalCadena) 
     anterior->siguiente = crearNodoLiteralCadena(literalCadena);
 }
 
-void imprimirListaLiteralCadena(NodoLiteralCadena *lista) {
-    NodoLiteralCadena *actual = lista;
+//--
+
+NodoPalabraReservada* crearNodoPalabraReservada(const char *palabraReservada, int linea, int columna) {
+    NodoPalabraReservada *nuevoNodoPalabraReservada = (NodoPalabraReservada *)malloc(sizeof(NodoPalabraReservada)); 
+    nuevoNodoPalabraReservada->palabraReservada = strdup(palabraReservada);
+    nuevoNodoPalabraReservada->linea = linea;
+    nuevoNodoPalabraReservada->columna = columna;
+    nuevoNodoPalabraReservada->siguiente = NULL;
+    return nuevoNodoPalabraReservada;
+}
+
+void agregarPalabraReservada(NodoPalabraReservada **lista, int linea, int columna, const char *palabraReservada) {
+    NodoPalabraReservada *actual = *lista;
+    NodoPalabraReservada *anterior = NULL;
+
     while (actual != NULL) {
-        printf("%s: %d\n", actual->literalCadena, actual->longitud);
+        anterior = actual; 
+        actual = actual->siguiente;
+    } 
+    
+    anterior->siguiente = crearNodoPalabraReservada(palabraReservada, linea, columna); 
+}
+
+//--
+
+NodoConstanteEntera* crearNodoConstanteEntera(int *constanteEntera) {
+    NodoConstanteEntera *nuevoNodoConstanteEntera = (NodoConstanteEntera *)malloc(sizeof(NodoConstanteEntera));
+    nuevoNodoConstanteEntera->constanteEntera = strdup(constanteEntera);
+    return nuevoNodoConstanteEntera;
+}
+
+void agregarConstanteEntera(NodoConstanteEntera **lista, const char *constanteEntera) {
+    NodoConstanteEntera *actual = *lista;
+    NodoConstanteEntera *anterior = NULL;
+
+    while (actual != NULL) {
+        anterior = actual; 
+        actual = actual->siguiente;
+    } 
+
+    anterior->siguiente = crearNodoConstanteEntera(constanteEntera);
+}
+void imprimirConstantesEnterasDecimales(NodoConstanteEntera *lista) {
+    NodoConstanteEntera *actual = lista;
+    int suma = 0;
+    printf("* Listado de constantes enteras decimales:\n");
+
+    if (actual == NULL) {
+        printf("- \n");
+        return;
+    }
+
+    while (actual != NULL) {
+        suma += atoi(actual->constanteEntera); 
+        printf("%s: valor %d\n", actual->constanteEntera, atoi(actual->constanteEntera)); 
+        actual = actual->siguiente;
+    }
+    printf("Total acumulado de sumar todas las constantes  decimales: %d\n", suma);
+}
+
+void imprimirConstantesEnterasHexadecimales(NodoConstanteEntera *lista) {
+    NodoConstanteEntera *actual = lista;
+    printf("* Listado de constantes enteras hexadecimales:\n");
+
+    if (actual == NULL) {
+        printf("- \n");
+        return;
+    }
+
+    while (actual != NULL) {
+        printf("%s: valor entero decimal %d\n", actual->constanteEntera, (int)strtol(actual->constanteEntera, NULL, 16));
         actual = actual->siguiente;
     }
 }
 
-void liberarListaLiteralCadena(NodoLiteralCadena *lista) {
-    NodoLiteralCadena *actual = lista;
+void imprimirConstantesEnterasOctales(NodoConstanteEntera *lista) {
+    NodoConstanteEntera *actual = lista;
+    printf("* Listado de constantes enteras octales:\n");
+
+    if (actual == NULL) {
+        printf("- \n");
+        return;
+    }
+    
     while (actual != NULL) {
-        NodoLiteralCadena *temp = actual;
+        printf("%s: valor entero decimal %d\n", actual->constanteEntera, (int)strtol(actual->constanteEntera, NULL, 8));
         actual = actual->siguiente;
-        free(temp->literalCadena);
-        free(temp);
     }
 }
+
+//--
+
