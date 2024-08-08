@@ -25,6 +25,7 @@ int sumaDecimales = 0;
 
 %}
 
+
 %%
 
     /* Palabras reservadas */
@@ -37,12 +38,12 @@ int sumaDecimales = 0;
 
     /* Constantes numéricas con sufijos */
 [0-9]+[uU]?[lL]{0,2}                                                    {agregarConstanteEntera(listaConstantesEnterasDecimales, yytext); INCREMENTAR_COLUMNA}
-0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                         {agregarConstanteEntera(listaConstantesEnterasHexadecimales); INCREMENTAR_COLUMNA}
-0[0-7]*[uU]?[lL]{0,2}                                                   {agregarConstanteEntera(listaConstantesEnterasOctales); INCREMENTAR_COLUMNA}
-[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                 {guardar_constante(yytext, "real"); INCREMENTAR_COLUMNA}
-[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                          {guardar_constante(yytext, "real entero"); INCREMENTAR_COLUMNA}
+0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                         {agregarConstanteEntera(listaConstantesEnterasHexadecimales, yytext); INCREMENTAR_COLUMNA}
+0[0-7]*[uU]?[lL]{0,2}                                                   {agregarConstanteEntera(listaConstantesEnterasOctales, yytext); INCREMENTAR_COLUMNA}
+[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                 {agregarConstanteReal(listaConstantesReales, yytext); INCREMENTAR_COLUMNA}
+[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                          {agregarConstanteReal(listaConstantesReales, yytext); INCREMENTAR_COLUMNA}
 \n                                                                      {INCREMENTAR_LINEA}      
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'          {guardar_constante(yytext, "caracter"); INCREMENTAR_COLUMNA}
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'          {agregarConstanteCaracter(listaConstantesCaracter, yytext); INCREMENTAR_COLUMNA}
 
     /* Literales cadena */
 \"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"         {agregarLiteralCadena(listaLiteralesCadena, yytext); INCREMENTAR_COLUMNA}
@@ -51,14 +52,12 @@ int sumaDecimales = 0;
 [a-zA-Z_][a-zA-Z0-9_]*                                                  {agregarIdentificador(listaIdentificadores, yytext); INCREMENTAR_COLUMNA}
 
     /* Operadores y caracteres de puntuación */
-[+\-*/%=<>&|!^~?:;,.\[\](){}]                                           {guardar_operador(yytext); INCREMENTAR_COLUMNA}
+[+\-*/%=<>&|!^~?:;,.\[\](){}]                                           {agregarOperadorYCaracteresDePuntuacion(listaOperadoresYCaracteresDePuntuacion, yytext); INCREMENTAR_COLUMNA}
 
     /* Cualquier otro carácter no reconocido */
-.                                                                       {guardar_no_reconocida(yytext); INCREMENTAR_COLUMNA}
+.                                                                       {agregarCadenaNoReconocida(listaCadenasNoReconocidas, yytext); INCREMENTAR_COLUMNA}
 
 %%
-
-
 
 
 int main(int argc, char *argv[]) {
@@ -99,6 +98,8 @@ int main(int argc, char *argv[]) {
 
     //6
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
+
+    //Funcion para liberar todos los nodos
 
     return 0;
 }
