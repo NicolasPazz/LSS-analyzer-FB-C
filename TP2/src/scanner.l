@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include "funciones.h"
+#include <stddef.h>
 
 NodoIdentificador* listaIdentificadores = NULL;
 NodoLiteralCadena* listaLiteralesCadena = NULL;

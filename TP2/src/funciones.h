@@ -87,7 +87,7 @@ typedef struct NodoOperadorYCaracteresDePuntuacion {
 
 NodoOperadorYCaracteresDePuntuacion* crearNodoOperadorYCaracteresDePuntuacion(const char *simbolo);
 
-void agregarOperadorYCaracteresDePuntuacion(NodoOperador **head, const char *simbolo);
+void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion **head, const char *simbolo);
 
 // Cadena No RECONOCIDA
 typedef struct NodoCadenaNoReconocida {

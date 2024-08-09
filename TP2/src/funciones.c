@@ -1,4 +1,8 @@
 #include "funciones.h"
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 NodoIdentificador* crearNodoIdentificador(const char *identificador) {
     NodoIdentificador *nuevoNodoIdentificador = (NodoIdentificador *)malloc(sizeof(NodoIdentificador)); 
@@ -86,7 +90,7 @@ void agregarPalabraReservada(NodoPalabraReservada **lista, int linea, int column
 
 //--
 
-NodoConstanteEntera* crearNodoConstanteEntera(int *constanteEntera) {
+NodoConstanteEntera* crearNodoConstanteEntera(const char *constanteEntera) {
     NodoConstanteEntera *nuevoNodoConstanteEntera = (NodoConstanteEntera *)malloc(sizeof(NodoConstanteEntera));
     nuevoNodoConstanteEntera->constanteEntera = strdup(constanteEntera);
     return nuevoNodoConstanteEntera;
@@ -298,7 +302,7 @@ NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *CadenaNoReconoci
     newNode->CadenaNoReconocida = strdup(CadenaNoReconocida);
     newNode->linea = linea;
     newNode->columna = columna;
-    newNode->next = NULL;
+    newNode->siguiente = NULL;
     return newNode;
 }
 
@@ -309,7 +313,7 @@ void agregarCadenaNoReconocida(NodoCadenaNoReconocida **head, const char *Cadena
     NodoCadenaNoReconocida *anterior = NULL;
 
     // Crear un nuevo nodo
-   NodoCadenaNoReconocida *newNode = crearCadenaNoReconocidaNode(CadenaNoReconocida, linea, columna);
+   NodoCadenaNoReconocida *newNode = crearNodoCadenaNoReconocida(CadenaNoReconocida, linea, columna);
 
     // agregar el nuevo nodo al final de la lista
     if (actual == NULL) {
@@ -318,7 +322,7 @@ void agregarCadenaNoReconocida(NodoCadenaNoReconocida **head, const char *Cadena
         while (actual->siguiente != NULL) {
             actual = actual->siguiente;
         }
-        actual->next = newNode;
+        actual->siguiente = newNode;
     }
 }
 // Función para imprimir la lista de cadenas no reconocidas
@@ -327,7 +331,7 @@ void  imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *head) {
     printf("Listado de cadenas no reconocidas encontradas:\n");
     while (actual != NULL) {
         printf("\"%s\": línea %d, columna %d\n", actual->CadenaNoReconocida, actual->linea, actual->columna);
-        actual = actual->next;
+        actual = actual->siguiente;
     }
 }
 
