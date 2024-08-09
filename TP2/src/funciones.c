@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 // IDENTIFICADORES
 
 NodoIdentificador* crearNodoIdentificador(const char *identificador) {
     NodoIdentificador *nuevoNodoIdentificador = (NodoIdentificador *)malloc(sizeof(NodoIdentificador)); 
-    nuevoNodoIdentificador->identificador = strdup(identificador);
+    nuevoNodoIdentificador->identificador = copiarCadena(identificador);
     nuevoNodoIdentificador->contador = 1;
     nuevoNodoIdentificador->siguiente = NULL;
     return nuevoNodoIdentificador;
@@ -76,7 +77,7 @@ void liberarIdentificadores(NodoIdentificador *lista) {
 
 NodoLiteralCadena* crearNodoLiteralCadena(const char *literalCadena) {
     NodoLiteralCadena *nuevoNodoLiteralCadena = (NodoLiteralCadena *)malloc(sizeof(NodoLiteralCadena));
-    nuevoNodoLiteralCadena->literalCadena = strdup(literalCadena);
+    nuevoNodoLiteralCadena->literalCadena = copiarCadena(literalCadena);
     nuevoNodoLiteralCadena->longitud = strlen(literalCadena); // a chequear
     nuevoNodoLiteralCadena->siguiente = NULL;
     return nuevoNodoLiteralCadena;
@@ -108,7 +109,7 @@ void agregarLiteralCadena(NodoLiteralCadena **lista, const char *literalCadena) 
 }
 
 void imprimirLiteralesCadena(NodoLiteralCadena *lista) {
-    NodoLiteralCadena *actual = listaLiteralesCadena;
+    NodoLiteralCadena *actual = lista;
     printf("* Listado de literales cadena encontrados:\n");
 
     if (actual == NULL) {
@@ -138,7 +139,7 @@ void liberarLiteralesCadena(NodoLiteralCadena *lista) {
 
 NodoPalabraReservada* crearNodoPalabraReservada(const char *palabraReservada, int linea, int columna) {
     NodoPalabraReservada *nuevoNodoPalabraReservada = (NodoPalabraReservada *)malloc(sizeof(NodoPalabraReservada)); 
-    nuevoNodoPalabraReservada->palabraReservada = strdup(palabraReservada);
+    nuevoNodoPalabraReservada->palabraReservada = copiarCadena(palabraReservada);
     nuevoNodoPalabraReservada->linea = linea;
     nuevoNodoPalabraReservada->columna = columna;
     nuevoNodoPalabraReservada->siguiente = NULL;
@@ -214,7 +215,7 @@ void liberarPalabrasReservadas(NodoPalabraReservada *lista) {
 
 NodoConstanteEntera* crearNodoConstanteEntera(const char *constanteEntera) {
     NodoConstanteEntera *nuevoNodoConstanteEntera = (NodoConstanteEntera *)malloc(sizeof(NodoConstanteEntera));
-    nuevoNodoConstanteEntera->constanteEntera = strdup(constanteEntera);
+    nuevoNodoConstanteEntera->constanteEntera = copiarCadena(constanteEntera);
     return nuevoNodoConstanteEntera;
 }
 
@@ -294,9 +295,9 @@ void liberarConstantesEnteras(NodoConstanteEntera *lista) {
 
 NodoConstanteReal* crearNodoConstanteReal(const char *numero) {
     NodoConstanteReal *nuevoNodoConstanteReal = (NodoConstanteReal *)malloc(sizeof(NodoConstanteReal));
-    nuevoNodoConstanteReal->constanteReal = strdup(numero);    
-    nuevoNodoConstanteReal->parteEntera = 0.0;
-    nuevoNodoConstanteReal->mantisa = 0.0;
+    nuevoNodoConstanteReal->constanteReal = copiarCadena(numero);    
+    nuevoNodoConstanteReal->parteEntera = 0.00000;
+    nuevoNodoConstanteReal->mantisa = 0.000000;
     nuevoNodoConstanteReal->siguiente = NULL;
     
     return nuevoNodoConstanteReal;
@@ -305,15 +306,8 @@ NodoConstanteReal* crearNodoConstanteReal(const char *numero) {
 void agregarConstanteReal(NodoConstanteReal **lista, const char *numero) {
     NodoConstanteReal *nuevo = crearNodoConstanteReal(numero);
 
-    const char *punto = strchr(numero, '.');
-
-    if (punto != NULL) {
-        nuevo->parteEntera = atof(strndup(numero, punto - numero));
-        nuevo->mantisa = atof(punto); // La mantisa comienza en el punto decimal
-    } else {
-        nuevo->parteEntera = atof(numero);
-        nuevo->mantisa = .0;
-    }
+    double numeroReal = atof(numero);
+    nuevo->mantisa = modf(numeroReal, &nuevo->parteEntera);
 
     if (*lista == NULL) {
         *lista = nuevo;
@@ -358,7 +352,7 @@ void liberarConstantesReales(NodoConstanteReal *lista) {
 
 NodoConstanteCaracter* crearNodoConstanteCaracter(const char *constante) {
     NodoConstanteCaracter *nuevoNodoConstanteCaracter = (NodoConstanteCaracter *)malloc(sizeof(NodoConstanteCaracter));
-    nuevoNodoConstanteCaracter->constanteCaracter = strdup(constante);
+    nuevoNodoConstanteCaracter->constanteCaracter = copiarCadena(constante);
     nuevoNodoConstanteCaracter->siguiente = NULL;
     return nuevoNodoConstanteCaracter;
 }
@@ -408,17 +402,17 @@ void liberarConstantesCaracteres(NodoConstanteCaracter *lista) {
 
 // OPERADORES Y CARACTERES DE PUNTUACION
 
-NodoOperadorYCaracteresDePuntuacion* crearNodoOperadorYCaracteresDePuntuacion(const char *simbolo) {
-    NodoOperadorYCaracteresDePuntuacion *nuevo = (NodoOperadorYCaracteresDePuntuacion *)malloc(sizeof(NodoOperadorYCaracteresDePuntuacion));
-    nuevo->simbolo = strdup(simbolo);
+NodoOperadorYCaracterDePuntuacion* crearNodoOperadorYCaracterDePuntuacion(const char *simbolo) {
+    NodoOperadorYCaracterDePuntuacion *nuevo = (NodoOperadorYCaracterDePuntuacion *)malloc(sizeof(NodoOperadorYCaracterDePuntuacion));
+    nuevo->simbolo = copiarCadena(simbolo);
     nuevo->contador = 1;
     nuevo->siguiente = NULL;
     return nuevo;
 }
 
-void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion **lista, const char *simbolo) {
-    NodoOperadorYCaracteresDePuntuacion *actual = *lista;
-    NodoOperadorYCaracteresDePuntuacion *anterior = NULL;
+void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion **lista, const char *simbolo) {
+    NodoOperadorYCaracterDePuntuacion *actual = *lista;
+    NodoOperadorYCaracterDePuntuacion *anterior = NULL;
 
     while (actual != NULL) {
         //Si lo encuentra en la lista aumenta el contador
@@ -431,7 +425,7 @@ void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion 
     }
 
     //Si no lo encuentra en la lista lo agrega al final
-    NodoOperadorYCaracteresDePuntuacion *nuevo = crearNodoOperadorYCaracteresDePuntuacion(simbolo);
+    NodoOperadorYCaracterDePuntuacion *nuevo = crearNodoOperadorYCaracterDePuntuacion(simbolo);
 
     if (*lista == NULL) {
         *lista = nuevo;
@@ -444,8 +438,8 @@ void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion 
     }
 }
 
-void imprimirOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion *lista) {
-    NodoOperadorYCaracteresDePuntuacion *actual = lista;
+void imprimirOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion *lista) {
+    NodoOperadorYCaracterDePuntuacion *actual = lista;
     printf("Listado de operadores/caracteres de puntuación :\n");
 
     if (actual == NULL) {
@@ -459,9 +453,9 @@ void imprimirOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuaci
     }
 }
 
-void liberarOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion *lista) {
-    NodoOperadorYCaracteresDePuntuacion *actual = lista;
-    NodoOperadorYCaracteresDePuntuacion *siguiente = NULL;
+void liberarOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion *lista) {
+    NodoOperadorYCaracterDePuntuacion *actual = lista;
+    NodoOperadorYCaracterDePuntuacion *siguiente = NULL;
 
     while (actual != NULL) {
         siguiente = actual->siguiente;
@@ -475,7 +469,7 @@ void liberarOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacio
 
 NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *cadenaNoReconocida, int linea, int columna) {
     NodoCadenaNoReconocida *nuevo = (NodoCadenaNoReconocida *)malloc(sizeof(NodoCadenaNoReconocida));
-    nuevo->cadenaNoReconocida = strdup(CadenaNoReconocida);
+    nuevo->cadenaNoReconocida = copiarCadena(cadenaNoReconocida);
     nuevo->linea = linea;
     nuevo->columna = columna;
     nuevo->siguiente = NULL;
@@ -504,7 +498,7 @@ void  imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
 }
 
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
-    NodoCadenaNoReconocida *actual = lista;
+        NodoCadenaNoReconocida *actual = lista;
     NodoCadenaNoReconocida *siguiente = NULL;
 
     while (actual != NULL) {
@@ -513,4 +507,15 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
         free(actual);
         actual = siguiente;
     }
+}
+
+// FUNCIONES
+
+char* copiarCadena(const char *str) {
+    size_t len = strlen(str);  // Obtiene la longitud de la cadena de entrada
+    char *copiado = (char *)malloc(len + 1);  // Asigna memoria para la nueva cadena
+    if (copiado != NULL) {
+        strcpy(copiado, str);  // Copia el contenido de la cadena de entrada a la nueva cadena
+    }
+    return copiado;  // Devuelve el puntero a la nueva cadena copiada
 }

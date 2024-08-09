@@ -98,23 +98,23 @@ void imprimirConstantesCaracteres(NodoConstanteCaracter *lista);
 void liberarConstantesCaracteres(NodoConstanteCaracter *lista);
 
 // OPERADORES Y CARACTERES DE PUNTUACIÓN
-typedef struct NodoOperadorYCaracteresDePuntuacion {
+typedef struct NodoOperadorYCaracterDePuntuacion {
     char *simbolo;
     int contador;
-    struct NodoOperador *siguiente;
-} NodoOperadorYCaracteresDePuntuacion;
+    struct NodoOperadorYCaracterDePuntuacion *siguiente;
+} NodoOperadorYCaracterDePuntuacion;
 
-NodoOperadorYCaracteresDePuntuacion* crearNodoOperadorYCaracteresDePuntuacion(const char *simbolo);
+NodoOperadorYCaracterDePuntuacion* crearNodoOperadorYCaracterDePuntuacion(const char *simbolo);
 
-void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion **lista, const char *simbolo);
+void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion **lista, const char *simbolo);
 
-void imprimirOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion *lista);
+void imprimirOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion *lista);
 
-void liberarOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion *lista);
+void liberarOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion *lista);
 
 // CADENAS NO RECONOCIDAS
 typedef struct NodoCadenaNoReconocida {
-    char *CadenaNoReconocida;
+    char *cadenaNoReconocida;
     int linea;
     int columna;
     struct NodoCadenaNoReconocida *siguiente;
@@ -127,3 +127,7 @@ void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *caden
 void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
+
+// FUNCIONES
+
+char* copiarCadena(const char *str);
