@@ -177,32 +177,32 @@ int sumaDecimales = 0;
 
     /* Palabras reservadas */
     /*Tipos de datos*/
-"char"|"double"|"enum"|"float"|"int"|"long"|"short"|"struct"|"union"|"void"                      {printf("1\n"); agregarPalabraReservada(&listaPalabrasReservadasPorTipoDeDato, linea, columna, yytext); INCREMENTAR_COLUMNA;}
+"char"|"double"|"enum"|"float"|"int"|"long"|"short"|"struct"|"union"|"void"                      {agregarPalabraReservada(&listaPalabrasReservadasPorTipoDeDato, linea, columna, yytext); INCREMENTAR_COLUMNA;}
      /*Estructuras de control*/
-"break"|"case"|"continue"|"default"|"do"|"else"|"for"|"goto"|"if"|"return"|"switch"|"while"      {printf("2\n"); agregarPalabraReservada(&listaPalabrasReservadasPorEstructuraDeControl, linea, columna, yytext); INCREMENTAR_COLUMNA;}
+"break"|"case"|"continue"|"default"|"do"|"else"|"for"|"goto"|"if"|"return"|"switch"|"while"      {agregarPalabraReservada(&listaPalabrasReservadasPorEstructuraDeControl, linea, columna, yytext); INCREMENTAR_COLUMNA;}
     /*Otros*/
-"auto"|"const"|"extern"|"register"|"signed"|"sizeof"|"static"|"typedef"|"unsigned"|"volatile"    {printf("3\n"); agregarPalabraReservada(&listaOtrasPalabrasReservadas, linea, columna, yytext); INCREMENTAR_COLUMNA;}
+"auto"|"const"|"extern"|"register"|"signed"|"sizeof"|"static"|"typedef"|"unsigned"|"volatile"    {agregarPalabraReservada(&listaOtrasPalabrasReservadas, linea, columna, yytext); INCREMENTAR_COLUMNA;}
 
     /* Constantes numéricas con sufijos */
-[0-9]+[uU]?[lL]{0,2}                                                    {printf("4\n"); agregarConstanteEntera(&listaConstantesEnterasDecimales, yytext); INCREMENTAR_COLUMNA;}
-0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                         {printf("5\n"); agregarConstanteEntera(&listaConstantesEnterasHexadecimales, yytext); INCREMENTAR_COLUMNA;}
-0[0-7]*[uU]?[lL]{0,2}                                                   {printf("6\n"); agregarConstanteEntera(&listaConstantesEnterasOctales, yytext); INCREMENTAR_COLUMNA;}
-[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                 {printf("7\n"); agregarConstanteReal(&listaConstantesReales, yytext); INCREMENTAR_COLUMNA;}
-[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                          {printf("8\n"); agregarConstanteReal(&listaConstantesReales, yytext); INCREMENTAR_COLUMNA;}
-\n                                                                      {printf("9\n"); INCREMENTAR_LINEA;}      
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'          {printf("10\n"); agregarConstanteCaracter(&listaConstantesCaracter, yytext); INCREMENTAR_COLUMNA;}
+[0-9]+[uU]?[lL]{0,2}                                                    {agregarConstanteEntera(&listaConstantesEnterasDecimales, yytext); INCREMENTAR_COLUMNA;}
+0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                         {agregarConstanteEntera(&listaConstantesEnterasHexadecimales, yytext); INCREMENTAR_COLUMNA;}
+0[0-7]*[uU]?[lL]{0,2}                                                   {agregarConstanteEntera(&listaConstantesEnterasOctales, yytext); INCREMENTAR_COLUMNA;}
+[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                 {agregarConstanteReal(&listaConstantesReales, yytext); INCREMENTAR_COLUMNA;}
+[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                          {agregarConstanteReal(&listaConstantesReales, yytext); INCREMENTAR_COLUMNA;}
+\n                                                                      {INCREMENTAR_LINEA;}      
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'          {agregarConstanteCaracter(&listaConstantesCaracter, yytext); INCREMENTAR_COLUMNA;}
 
     /* Literales cadena */
-\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"         {printf("11\n"); agregarLiteralCadena(&listaLiteralesCadena, yytext); INCREMENTAR_COLUMNA;}
+\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"         {agregarLiteralCadena(&listaLiteralesCadena, yytext); INCREMENTAR_COLUMNA;}
 
     /* Identificadores */
-[a-zA-Z_][a-zA-Z0-9_]*                                                  {printf("12\n"); agregarIdentificador(&listaIdentificadores, yytext); INCREMENTAR_COLUMNA;}
+[a-zA-Z_][a-zA-Z0-9_]*                                                  {agregarIdentificador(&listaIdentificadores, yytext); INCREMENTAR_COLUMNA;}
 
     /* Operadores y caracteres de puntuación */
-[+\-*/%=<>&|!^~?:;,.\[\](){}]                                           {printf("13\n"); agregarOperadorYCaracteresDePuntuacion(&listaOperadoresYCaracteresDePuntuacion, yytext); INCREMENTAR_COLUMNA;}
+[+\-*/%=<>&|!^~?:;,.\[\](){}]                                           {agregarOperadorYCaracteresDePuntuacion(&listaOperadoresYCaracteresDePuntuacion, yytext); INCREMENTAR_COLUMNA;}
 
     /* Cualquier otro carácter no reconocido */
-.                                                                       {printf("14\n"); agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, linea, columna); INCREMENTAR_COLUMNA;}
+.                                                                       {agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, linea, columna); INCREMENTAR_COLUMNA;}
 
 %%
 
@@ -228,32 +228,41 @@ int main(int argc, char *argv[]) {
     //1
     imprimirIdentificadores(listaIdentificadores);
     liberarIdentificadores(listaIdentificadores);
+    printf("\n");
     //2
     imprimirLiteralesCadena(listaLiteralesCadena);
     liberarLiteralesCadena(listaLiteralesCadena);
+    printf("\n");
     //3
     imprimirPalabrasReservadas(listaPalabrasReservadasPorTipoDeDato, listaPalabrasReservadasPorEstructuraDeControl, listaOtrasPalabrasReservadas);
     liberarPalabrasReservadas(listaPalabrasReservadasPorTipoDeDato);
     liberarPalabrasReservadas(listaPalabrasReservadasPorEstructuraDeControl);
     liberarPalabrasReservadas(listaOtrasPalabrasReservadas);
+    printf("\n");
     //4
     imprimirConstantesEnterasDecimales(listaConstantesEnterasDecimales);
     liberarConstantesEnteras(listaConstantesEnterasDecimales);
+    printf("\n");
 
     imprimirConstantesEnterasHexadecimales(listaConstantesEnterasHexadecimales);
     liberarConstantesEnteras(listaConstantesEnterasHexadecimales);
+    printf("\n");
 
     imprimirConstantesEnterasOctales(listaConstantesEnterasOctales);  
     liberarConstantesEnteras(listaConstantesEnterasOctales);
+    printf("\n");
 
     imprimirConstantesReales(listaConstantesReales);
     liberarConstantesReales(listaConstantesReales);
+    printf("\n");
 
     imprimirConstantesCaracteres(listaConstantesCaracter);
     liberarConstantesCaracteres(listaConstantesCaracter);
+    printf("\n");
     //5
     imprimirOperadoresYCaracteresDePuntuacion(listaOperadoresYCaracteresDePuntuacion);
     liberarOperadoresYCaracteresDePuntuacion(listaOperadoresYCaracteresDePuntuacion);
+    printf("\n");
     //6
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
@@ -335,13 +344,14 @@ void liberarIdentificadores(NodoIdentificador *lista) {
 NodoLiteralCadena* crearNodoLiteralCadena(const char *literalCadena) {
     NodoLiteralCadena *nuevoNodoLiteralCadena = (NodoLiteralCadena *)malloc(sizeof(NodoLiteralCadena));
     nuevoNodoLiteralCadena->literalCadena = copiarCadena(literalCadena);
-    nuevoNodoLiteralCadena->longitud = strlen(literalCadena); // a chequear
+    nuevoNodoLiteralCadena->longitud = (strlen(literalCadena) - 2);
     nuevoNodoLiteralCadena->siguiente = NULL;
     return nuevoNodoLiteralCadena;
 }
 
 void agregarLiteralCadena(NodoLiteralCadena **lista, const char *literalCadena) {
     if (*lista == NULL) {
+        // Lista vacía, simplemente crea el primer nodo
         *lista = crearNodoLiteralCadena(literalCadena);
         return;
     }
@@ -349,21 +359,26 @@ void agregarLiteralCadena(NodoLiteralCadena **lista, const char *literalCadena) 
     NodoLiteralCadena *actual = *lista;
     NodoLiteralCadena *anterior = NULL;
 
-    //iterar sobre la lista hasta que longitud de nodo actual sea mayor a la longitud del literal cadena
-    while (actual != NULL) {
-        if (actual->longitud > strlen(literalCadena)) {
-            //agregar nodo literal cadena entre anterior y actual
-            NodoLiteralCadena *nuevoNodo = crearNodoLiteralCadena(literalCadena);
-            nuevoNodo->siguiente = actual;
-            anterior->siguiente = nuevoNodo;
-            return;            ;
-        }
+    // Iterar sobre la lista hasta encontrar el lugar adecuado para insertar
+    while (actual != NULL && actual->longitud <= strlen(literalCadena)) {
         anterior = actual;
         actual = actual->siguiente;
     }
 
-    anterior->siguiente = crearNodoLiteralCadena(literalCadena);
+    // Crear el nuevo nodo
+    NodoLiteralCadena *nuevoNodo = crearNodoLiteralCadena(literalCadena);
+
+    if (anterior == NULL) {
+        // Inserción al principio de la lista
+        nuevoNodo->siguiente = *lista;
+        *lista = nuevoNodo;
+    } else {
+        // Inserción en medio o al final de la lista
+        anterior->siguiente = nuevoNodo;
+        nuevoNodo->siguiente = actual;
+    }
 }
+
 
 void imprimirLiteralesCadena(NodoLiteralCadena *lista) {
     NodoLiteralCadena *actual = lista;
@@ -375,7 +390,7 @@ void imprimirLiteralesCadena(NodoLiteralCadena *lista) {
     }
     
     while (actual != NULL) {
-        printf("\"%s\": longitud %d\n", actual->literalCadena, actual->longitud);
+        printf("%s: longitud %d\n", actual->literalCadena, actual->longitud);
         actual = actual->siguiente;
     }
 }
@@ -404,16 +419,30 @@ NodoPalabraReservada* crearNodoPalabraReservada(const char *palabraReservada, in
 }
 
 void agregarPalabraReservada(NodoPalabraReservada **lista, int linea, int columna, const char *palabraReservada) {
-    NodoPalabraReservada *actual = *lista;
-    NodoPalabraReservada *anterior = NULL;
+    NodoPalabraReservada *nuevoNodo = crearNodoPalabraReservada(palabraReservada, linea, columna);
+    if (nuevoNodo == NULL) {
+        // Manejo de error en la creación del nuevo nodo
+        fprintf(stderr, "Error al crear un nuevo nodo.\n");
+        return;
+    }
 
-    while (actual != NULL) {
-        anterior = actual; 
-        actual = actual->siguiente;
-    } 
-    
-    anterior->siguiente = crearNodoPalabraReservada(palabraReservada, linea, columna); 
+    if (*lista == NULL) {
+        // Si la lista está vacía, el nuevo nodo será el primer nodo
+        *lista = nuevoNodo;
+    } else {
+        NodoPalabraReservada *actual = *lista;
+        NodoPalabraReservada *anterior = NULL;
+
+        while (actual != NULL) {
+            anterior = actual;
+            actual = actual->siguiente;
+        }
+
+        // Insertar el nuevo nodo al final de la lista
+        anterior->siguiente = nuevoNodo;
+    }
 }
+
 
 void imprimirPalabrasReservadas(NodoPalabraReservada *listaPalabrasReservadasPorTipoDeDato, NodoPalabraReservada *listaPalabrasReservadasPorEstructuraDeControl, NodoPalabraReservada *listaOtrasPalabrasReservadas){
     NodoPalabraReservada *actual = listaPalabrasReservadasPorTipoDeDato;
@@ -443,7 +472,7 @@ void imprimirPalabrasReservadas(NodoPalabraReservada *listaPalabrasReservadasPor
     }
 
     actual = listaOtrasPalabrasReservadas;
-    printf("* Listado de palabras reservadas  (otros):\n");
+    printf("* Listado de palabras reservadas (otros):\n");
 
     if (actual == NULL) {
         printf("-\n");
@@ -477,15 +506,23 @@ NodoConstanteEntera* crearNodoConstanteEntera(const char *constanteEntera) {
 }
 
 void agregarConstanteEntera(NodoConstanteEntera **lista, const char *constanteEntera) {
-    NodoConstanteEntera *actual = *lista;
-    NodoConstanteEntera *anterior = NULL;
+    NodoConstanteEntera *nuevoNodo = crearNodoConstanteEntera(constanteEntera);
 
-    while (actual != NULL) {
-        anterior = actual; 
-        actual = actual->siguiente;
-    } 
+    // Si la lista está vacía, el nuevo nodo será el primer nodo
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+    } else {
+        NodoConstanteEntera *actual = *lista;
+        NodoConstanteEntera *anterior = NULL;
 
-    anterior->siguiente = crearNodoConstanteEntera(constanteEntera);
+        while (actual != NULL) {
+            anterior = actual;
+            actual = actual->siguiente;
+        }
+
+        // En este punto, 'anterior' es el último nodo de la lista
+        anterior->siguiente = nuevoNodo;
+    }
 }
 
 void imprimirConstantesEnterasDecimales(NodoConstanteEntera *lista) {
@@ -588,7 +625,7 @@ void imprimirConstantesReales(NodoConstanteReal *lista) {
     }
 
     while (actual != NULL) {
-        printf("%s: parte entera %.6f, mantisa 0%.6f\n", actual->constanteReal, actual->parteEntera, actual->mantisa);
+        printf("%s: parte entera %.6f, mantisa %.6f\n", actual->constanteReal, actual->parteEntera, actual->mantisa);
         actual = actual->siguiente;
     }
 }
@@ -697,7 +734,7 @@ void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion **
 
 void imprimirOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion *lista) {
     NodoOperadorYCaracterDePuntuacion *actual = lista;
-    printf("Listado de operadores/caracteres de puntuación :\n");
+    printf("* Listado de operadores/caracteres de puntuación :\n");
 
     if (actual == NULL) {
         printf("-\n");
@@ -734,20 +771,29 @@ NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *cadenaNoReconoci
 }
 
 void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *cadenaNoReconocida, int linea, int columna){
-    NodoCadenaNoReconocida *actual = *lista;
-    NodoCadenaNoReconocida *anterior = NULL;
+    // Crear el nuevo nodo
+    NodoCadenaNoReconocida *nuevoNodo = crearNodoCadenaNoReconocida(cadenaNoReconocida, linea, columna);
 
-    while (actual != NULL) {
-        anterior = actual; 
+    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+        return;
+    }
+
+    // Si la lista no está vacía, recorrer hasta el final
+    NodoCadenaNoReconocida *actual = *lista;
+    while (actual->siguiente != NULL) {
         actual = actual->siguiente;
-    } 
-    
-    anterior->siguiente = crearNodoCadenaNoReconocida(cadenaNoReconocida, linea, columna); 
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodo;
 }
+
 
 void  imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
    NodoCadenaNoReconocida *actual = lista;
-    printf("Listado de cadenas no reconocidas:\n");
+    printf("* Listado de cadenas no reconocidas:\n");
     while (actual != NULL) {
         printf("%s: linea %d, columna %d\n", actual->cadenaNoReconocida, actual->linea, actual->columna);
         actual = actual->siguiente;
