@@ -80,28 +80,42 @@ int main(int argc, char *argv[]) {
     //Reporte
     //1
     imprimirIdentificadores(listaIdentificadores);
+    liberarIdentificadores(listaIdentificadores);
     
     //2
     imprimirLiteralesCadena(listaLiteralesCadena);
+    liberarLiteralesCadena(listaLiteralesCadena);
 
     //3
     imprimirPalabrasReservadas(listaPalabrasReservadasPorTipoDeDato, listaPalabrasReservadasPorEstructuraDeControl, listaOtrasPalabrasReservadas);
+    liberarPalabrasReservadas(listaPalabrasReservadasPorTipoDeDato);
+    liberarPalabrasReservadas(listaPalabrasReservadasPorEstructuraDeControl);
+    liberarPalabrasReservadas(listaOtrasPalabrasReservadas);
 
     //4
     imprimirConstantesEnterasDecimales(listaConstantesEnterasDecimales);
+    liberarConstantesEnteras(listaConstantesEnterasDecimales);
+
     imprimirConstantesEnterasHexadecimales(listaConstantesEnterasHexadecimales);
+    liberarConstantesEnteras(listaConstantesEnterasHexadecimales);
+
     imprimirConstantesEnterasOctales(listaConstantesEnterasOctales);  
+    liberarConstantesEnteras(listaConstantesEnterasOctales);
+
     imprimirConstantesReales(listaConstantesReales);
+    liberarConstantesReales(listaConstantesReales);
+
     imprimirConstantesCaracter(listaConstantesCaracter);
+    liberarConstantesCaracter(listaConstantesCaracter);
 
     //5
     imprimirOperadoresYCaracteresDePuntuacion(listaOperadoresYCaracteresDePuntuacion);
+    liberarOperadoresYCaracteresDePuntuacion(listaOperadoresYCaracteresDePuntuacion);
 
     //6
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
-
-    //Funcion para liberar todos los nodos
-
+    liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
+    
     return 0;
 }
 

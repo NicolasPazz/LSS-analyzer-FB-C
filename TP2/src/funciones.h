@@ -1,3 +1,4 @@
+// IDENTIFICADORES
 typedef struct NodoIdentificador {
     char *identificador;
     int contador;
@@ -8,7 +9,11 @@ NodoIdentificador* crearNodoIdentificador(const char *identificador);
 
 void agregarIdentificador(NodoIdentificador **lista, const char *identificador);
 
-//--
+void imprimirIdentificadores(NodoIdentificador *lista);
+
+void liberarIdentificadores(NodoIdentificador *lista);
+
+// LITERALES CADENA
 
 typedef struct NodoLiteralCadena {
     char *literalCadena;
@@ -20,7 +25,11 @@ NodoLiteralCadena* crearNodoLiteralCadena(const char *literalCadena);
 
 void agregarLiteralCadena(NodoLiteralCadena **lista, const char *literalCadena);
 
-//--
+void imprimirLiteralesCadena(NodoLiteralCadena *lista);
+
+void liberarLiteralesCadena(NodoLiteralCadena *lista);
+
+// PALABRAS RESERVADAS
 
 typedef struct NodoPalabraReservada {
     char *palabraReservada;
@@ -33,7 +42,11 @@ NodoPalabraReservada* crearNodoPalabraReservada(const char *palabraReservada, in
 
 void agregarPalabraReservada(NodoPalabraReservada **lista, int linea, int columna, const char *palabraReservada);
 
-//--
+void imprimirPalabrasReservadas(NodoPalabraReservada *listaPalabrasReservadasPorTipoDeDato, NodoPalabraReservada *listaPalabrasReservadasPorEstructuraDeControl, NodoPalabraReservada *listaOtrasPalabrasReservadas);
+
+void liberarPalabrasReservadas(NodoPalabraReservada *lista);
+
+// CONSTANTES ENTERAS
 
 typedef struct NodoConstanteEntera {
     char *constanteEntera;
@@ -50,7 +63,9 @@ void imprimirConstantesEnterasHexadecimales(NodoConstanteEntera *lista);
 
 void imprimirConstantesEnterasOctales(NodoConstanteEntera *lista);
 
-//--
+void liberarConstantesEnteras(NodoConstanteEntera *lista);
+
+// CONSTANTES REALES
 
 typedef struct NodoConstanteReal {
     char *constanteReal;             
@@ -65,7 +80,9 @@ void agregarConstanteReal(NodoConstanteReal **lista, const char *numero);
 
 void imprimirConstantesReales(NodoConstanteReal *lista);
 
-//--
+void liberarConstantesReales(NodoConstanteReal *lista);
+
+// CONSTANTES CARACTERES
 
 typedef struct NodoConstanteCaracter {
     char *constanteCaracter;
@@ -78,7 +95,9 @@ void agregarConstanteCaracter(NodoConstanteCaracter **lista, const char *constan
 
 void imprimirConstantesCaracteres(NodoConstanteCaracter *lista);
 
-// OPERADOR
+void liberarConstantesCaracteres(NodoConstanteCaracter *lista);
+
+// OPERADORES Y CARACTERES DE PUNTUACIÓN
 typedef struct NodoOperadorYCaracteresDePuntuacion {
     char *simbolo;
     int contador;
@@ -87,9 +106,13 @@ typedef struct NodoOperadorYCaracteresDePuntuacion {
 
 NodoOperadorYCaracteresDePuntuacion* crearNodoOperadorYCaracteresDePuntuacion(const char *simbolo);
 
-void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion **head, const char *simbolo);
+void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion **lista, const char *simbolo);
 
-// Cadena No RECONOCIDA
+void imprimirOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion *lista);
+
+void liberarOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracteresDePuntuacion *lista);
+
+// CADENAS NO RECONOCIDAS
 typedef struct NodoCadenaNoReconocida {
     char *CadenaNoReconocida;
     int linea;
@@ -97,6 +120,10 @@ typedef struct NodoCadenaNoReconocida {
     struct NodoCadenaNoReconocida *siguiente;
 } NodoCadenaNoReconocida;
 
-NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *CadenaNoReconocida, int linea, int columna);
+NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *cadenaNoReconocida, int linea, int columna);
 
-void agregarCadenaNoReconocida(NodoCadenaNoReconocida **head, const char *CadenaNoReconocida, int linea, int columna);
+void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *cadenaNoReconocida, int linea, int columna);
+
+void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
+
+void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
