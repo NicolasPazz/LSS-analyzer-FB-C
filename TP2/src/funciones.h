@@ -1,3 +1,4 @@
+
 // IDENTIFICADORES
 typedef struct NodoIdentificador {
     char *identificador;
