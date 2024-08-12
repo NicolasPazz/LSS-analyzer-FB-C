@@ -738,7 +738,7 @@ void agregarOperadorYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion **
 
 void imprimirOperadoresYCaracteresDePuntuacion(NodoOperadorYCaracterDePuntuacion *lista) {
     NodoOperadorYCaracterDePuntuacion *actual = lista;
-    printf("* Listado de operadores/caracteres de puntuación :\n");
+    printf("* Listado de operadores/caracteres de puntuación:\n");
 
     if (actual == NULL) {
         printf("-\n");
