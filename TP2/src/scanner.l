@@ -1,7 +1,6 @@
 %{
 
 #include <stdio.h>
-//#include "funciones.h"
 #include <stddef.h>
 #include <stddef.h>
 #include <stdio.h>
