@@ -45,24 +45,78 @@ void yyerror(const char*);
 /* Inicio de la sección de reglas gramaticales */
 %%
 
-input
-        : /* intencionalmente se deja el resto de esta línea vacía: es la producción nula */
-        | input line
-        ;
+sentenciaif:
+    "if" expresionentreparentesis sentenciacompuesta
+    ;
 
-line
-        : '\n'
-        | exp '\n'  { printf ("El resultado de la expresion es: %lu\n", $1); YYACCEPT; } /* la macro 'YYACEPT;' produce que la función yyparse() retorne inmediatamente con valor 0 */
-        ;
+sentenciaifelse:
+    "if" expresionentreparentesis sentenciacompuesta
+    "else" sentenciacompuesta
+    ;
 
-exp
-        : NUM             { $$ = $1; }
-        | exp exp '+'     { $$ = $1 + $2; }
-        | exp exp '-'     { $$ = $1 - $2; }
-        | exp exp '*'     { $$ = $1 * $2; }
-        | exp exp '/'     { $$ = $1 / $2; }
-        | exp exp '^'     { $$ = pow($1, $2); }
-        ;
+sentenciaswitch:
+    "switch" expresionentreparentesis '{' cases '}'
+    | "switch" expresionentreparentesis '{' cases default '}' //fijarme si el default puede ir en otra parte que no sea el final 
+    ;
+
+sentenciawhile:
+    "while" expresionentreparentesis sentenciacompuesta
+    ;
+
+sentenciadowhile:
+    "do" sentenciacompuesta
+    "while" expresionentreparentesis ';'
+    ;
+
+sentenciafor:
+    "for" expresionentreparentesis sentenciacompuesta //modificar, no puede ser cualquier expresión entre paréntesis
+    ;
+
+sentencia:
+    //posibles sentencias
+    ;
+
+sentencias:
+    sentencia
+    | sentencias sentencia
+    ;
+
+sentenciacompuesta:
+    '{' sentencias '}'
+    ;
+
+expresion:
+    //posibles expresiones
+    | expresionentreparentesis
+    ;
+
+expresionentreparentesis:
+    '(' expresion ')'
+    ;
+
+case:
+    "case" expresion ':' sentencias
+    ;
+
+cases:
+    cases case
+    ;
+
+continue:
+    "continue;"
+    ;
+
+break:
+    "break;"
+    ;
+
+return:
+    "return" expresion ';'
+    ;
+
+default:
+    "default:"
+    ;
 
 %%
 /* Fin de la sección de reglas gramaticales */

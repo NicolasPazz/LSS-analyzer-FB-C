@@ -34,45 +34,19 @@ digito [0-9]
     /* 2. NO pueden hacerse comentarios sin sangría, ya que estos no se copian literalmente al archivo de salida del analizador léxico (scanner) generado (*.lex.yy.c) */
 %%
 
-    reinicializarUbicacion();
-
-{digito}+ {
-        yylloc.last_column += yyleng;
-        yylval.unsigned_long_type = strtoul(yytext, NULL, 0);
-        return NUM;
-    }
-
-"+" { yylloc.last_column += yyleng; return '+'; }
-
-"-" { yylloc.last_column += yyleng; return '-'; }
-
-"*" { yylloc.last_column += yyleng; return '*'; }
-
-"/" { yylloc.last_column += yyleng; return '/'; }
-
-"^" { yylloc.last_column += yyleng; return '^'; }
-
-[ \t]+ { yylloc.first_column = yylloc.last_column += yyleng; }
-
-\n {
-        yylloc.first_line = yylloc.last_line += yyleng;
-        yylloc.first_column = yylloc.last_column = INICIO_CONTEO_COLUMNA;
-        return '\n';
-    }
-
-[^ \t\n] { yylloc.last_column += yyleng; fprintf(stderr, "Flex: %d:%d: Error lexico: token no reconocido: %s", yylloc.first_line, yylloc.first_column, yytext); BEGIN(tokenNoReconocido); }
-<tokenNoReconocido>{
-    " "|\t|\n {
-        yyless(0);
-        fprintf(stderr, "\n");
-        BEGIN(INITIAL);
-    }
-    [^ \t\n]+ {
-        yylloc.last_column += yyleng;
-        fprintf(stderr, "%s\n", yytext);
-        BEGIN(INITIAL);
-    }
-}
+[a-zA-Z_][a-zA-Z0-9_]*                                          {return IDENTIFICADOR;}
+0[0-7]*[uU]?[lL]{0,2}                                           {return OCTAL;}
+0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                 {return HEXADECIMAL;}
+[1-9][0-9]*[uU]?[lL]{0,2}                                       {return DECIMAL;}
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'  {return CARACTER;}
+\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\" {return LITERALCADENA;}
+\+\+|--                                                         {return MASMASOMENOSMENOS;}
+\*|/                                                            {return MULTIPLICATIVAS;}
+\+|-                                                            {return ADITIVAS;}
+<|>|<=|>=                                                       {return RELACIONALES;}
+==|!=                                                           {return DEIGUALDAD;}
+=|\+=|-=|\*=|/=                                                 {return DEASIGNACION;}
+char|double|enum|float|int|long|short|struct|union|void         {return TIPODEDATO;}
 
     /* Reglas por defecto de Flex: */
         /* <*>.|\n { ECHO; } */
