@@ -1,5 +1,3 @@
-/* Calculadora de notación polaca inversa */
-
 /* Inicio de la seccion de prólogo (declaraciones y definiciones de C y directivas del preprocesador) */
 %{
 #include <stdio.h>
@@ -28,14 +26,43 @@ void yyerror(const char*);
 
 	/* Para especificar la colección completa de posibles tipos de datos para los valores semánticos */
 %union {
-	unsigned long unsigned_long_type;
+    char cadena[30];
+    int entero;
 }
 
         /* */
-%token <unsigned_long_type> NUM
+%token IDENTIFICADOR
+%token <entero> OCTAL
+%token <entero> HEXADECIMAL
+%token <entero> DECIMAL
+%token CARACTER
+%token LITERALCADENA
+%token MASMASOMENOSMENOS
+%token MULTIPLICATIVAS
+%token ADITIVAS
+%token RELACIONALES
+%token DEIGUALDAD
+%token DEASIGNACION
+%token TIPODEDATO
 
 	/* */
-%type <unsigned_long_type> exp
+%type sentenciaif
+%type sentenciaifelse
+%type sentenciaswitch
+%type sentenciawhile
+%type sentenciadowhile
+%type sentenciafor
+%type sentencia
+%type sentencias
+%type sentenciacompuesta
+%type expresion
+%type expresionentreparentesis
+%type case
+%type cases
+%type continue
+%type break
+%type return
+%type default
 
 	/* Para especificar el no-terminal de inicio de la gramática (el axioma). Si esto se omitiera, se asumiría que es el no-terminal de la primera regla */
 %start input
@@ -99,7 +126,8 @@ case:
     ;
 
 cases:
-    cases case
+    case
+    | cases case
     ;
 
 continue:
