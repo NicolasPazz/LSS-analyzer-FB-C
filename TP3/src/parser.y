@@ -8,17 +8,18 @@
 	/* Declaración de la funcion yylex del analizador léxico, necesaria para que la funcion yyparse del analizador sintáctico pueda invocarla cada vez que solicite un nuevo token */
 extern int yylex(void);
 	/* Declaracion de la función yyerror para reportar errores, necesaria para que la función yyparse del analizador sintáctico pueda invocarla para reportar un error */
-void yyerror(const char*);
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+}
+FILE *output_file;
 %}
 /* Fin de la sección de prólogo (declaraciones y definiciones de C y directivas del preprocesador) */
 
 /* Inicio de la sección de declaraciones de Bison */
 
-	/* Para requirle a Bison que describa más detalladamente los mensajes de error al invocar a yyerror */
-%define parse.error verbose
-
 	/* Para activar el seguimiento de las ubicaciones de los tokens (número de linea, número de columna) */
 %locations
+
 
 	/* Para especificar la colección completa de posibles tipos de datos para los valores semánticos */
 %union {
@@ -55,6 +56,7 @@ void yyerror(const char*);
 %token DEIGUALDAD
 %token DEASIGNACION
 %token TIPODEDATO
+%token TEXTO
 
 	/* Para especificar el no-terminal de inicio de la gramática (el axioma). Si esto se omitiera, se asumiría que es el no-terminal de la primera regla */
 %start input
@@ -178,7 +180,7 @@ int main(int argc, char **argv) {
 }
 
 	/* Definición de la funcion yyerror para reportar errores, necesaria para que la funcion yyparse del analizador sintáctico pueda invocarla para reportar un error */
-void yyerror(const char* literalCadena)
+/*void yyerror(const char* literalCadena)
 {
         fprintf(stderr, "Bison: %d:%d: %s\n", yylloc.first_line, yylloc.first_column, literalCadena);
 }

@@ -37,19 +37,22 @@ break                                                           {return BREAK;}
 return                                                          {return RETURN;}
 default                                                         {return DEFAULT;}
 
-[a-zA-Z_][a-zA-Z0-9_]+                                          {yylval.cadena = strdup(yytext); return IDENTIFICADOR;}
-0[0-7]*[uU]?[lL]{0,2}                                           {return ENTERO;}
-0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                 {return ENTERO;}
-[1-9][0-9]*[uU]?[lL]{0,2}                                       {return ENTERO;}
+    /*0[0-7]*[uU]?[lL]{0,2}                                           {return ENTERO;}
+    0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                 {return ENTERO;}
+    [1-9][0-9]*[uU]?[lL]{0,2}                                       {return ENTERO;}*/
+[0-9]+                                                     {return ENTERO;} /*para pruebas*/
+[a-zA-Z_][a-zA-Z0-9_]*                                          {yylval.cadena = strdup(yytext); return IDENTIFICADOR;}
 \'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'  {return TEXTO;}
 \"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\" {return TEXTO;}
 \+\+|--                                                         {return MASMASOMENOSMENOS;}
-\*|/                                                            {return MULTIPLICATIVAS;}
-\+|-                                                            {return ADITIVAS;}
-<|>|<=|>=                                                       {return RELACIONALES;}
-==|!=                                                           {return DEIGUALDAD;}
-=|\+=|-=|\*=|/=                                                 {return DEASIGNACION;}
-char|double|enum|float|int|long|short|struct|union|void         {return TIPODEDATO;}
+[*/]                                                            {return MULTIPLICATIVAS;}
+[+-]                                                            {return ADITIVAS;}
+[ \t\n]+                                                        {}
+.                                                               {}
+    /*<|>|<=|>=                                                       {return RELACIONALES;}
+    ==|!=                                                           {return DEIGUALDAD;}
+    =|\+=|-=|\*=|/=                                                 {return DEASIGNACION;}
+    char|double|enum|float|int|long|short|struct|union|void         {return TIPODEDATO;}*/
 
 %%
 /* Fin de la sección de reglas */ 
