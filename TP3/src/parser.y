@@ -26,15 +26,32 @@ void yyerror(const char*);
 
 	/* Para especificar la colección completa de posibles tipos de datos para los valores semánticos */
 %union {
-    char cadena[30];
-    int entero;
+    char* cadena;
 }
 
         /* */
-%token IDENTIFICADOR
-%token <entero> OCTAL
-%token <entero> HEXADECIMAL
-%token <entero> DECIMAL
+
+%token ENTERO
+
+%token IF
+%token ELSE
+%token SWITCH
+%token WHILE
+%token DO
+%token FOR
+%token ABROPARENTESIS
+%token CIERROPARENTESIS
+%token ABROLLAVE
+%token CIERROLLAVE
+%token DOSPUNTOS
+%token PUNTOYCOMA
+%token CASE
+%token CONTINUE
+%token BREAK
+%token RETURN
+%token DEFAULT
+
+%token <cadena> IDENTIFICADOR
 %token CARACTER
 %token LITERALCADENA
 %token MASMASOMENOSMENOS
@@ -46,23 +63,6 @@ void yyerror(const char*);
 %token TIPODEDATO
 
 	/* */
-%type sentenciaif
-%type sentenciaifelse
-%type sentenciaswitch
-%type sentenciawhile
-%type sentenciadowhile
-%type sentenciafor
-%type sentencia
-%type sentencias
-%type sentenciacompuesta
-%type expresion
-%type expresionentreparentesis
-%type case
-%type cases
-%type continue
-%type break
-%type return
-%type default
 
 	/* Para especificar el no-terminal de inicio de la gramática (el axioma). Si esto se omitiera, se asumiría que es el no-terminal de la primera regla */
 %start input
@@ -72,35 +72,55 @@ void yyerror(const char*);
 /* Inicio de la sección de reglas gramaticales */
 %%
 
+input:
+
+    | input sentenciaif
+    | input sentenciaifelse
+    | input sentenciaswitch
+    | input sentenciawhile
+    | input sentenciadowhile
+    | input sentenciafor
+    | input sentenciacompuesta
+    | input expresionentreparentesis
+    | input case
+    | input continue
+    | input break
+    | input return
+    | input default
+    | input error { yyerror("Error de sintaxis, avanzando..."); yyclearin; yyerrok; }
+    ;
+
 sentenciaif:
-    "if" expresionentreparentesis sentenciacompuesta
+    IF expresionentreparentesis sentenciacompuesta {fprintf(output_file, "sentenciaif\n");}
     ;
 
 sentenciaifelse:
-    "if" expresionentreparentesis sentenciacompuesta
-    "else" sentenciacompuesta
+    IF expresionentreparentesis sentenciacompuesta
+    ELSE sentenciacompuesta {fprintf(output_file, "sentenciaifelse\n");}
     ;
 
 sentenciaswitch:
-    "switch" expresionentreparentesis '{' cases '}'
-    | "switch" expresionentreparentesis '{' cases default '}' //fijarme si el default puede ir en otra parte que no sea el final 
+    SWITCH expresionentreparentesis ABROLLAVE cases CIERROLLAVE {fprintf(output_file, "sentenciaswitch\n");}
+    | SWITCH expresionentreparentesis ABROLLAVE cases default CIERROLLAVE {fprintf(output_file, "sentenciaifelse\n");}
+    //fijarme si el default puede ir en otra parte que no sea el final 
     ;
 
 sentenciawhile:
-    "while" expresionentreparentesis sentenciacompuesta
+    WHILE expresionentreparentesis sentenciacompuesta {fprintf(output_file, "sentenciawhile\n");}
     ;
 
 sentenciadowhile:
-    "do" sentenciacompuesta
-    "while" expresionentreparentesis ';'
+    DO sentenciacompuesta
+    WHILE expresionentreparentesis PUNTOYCOMA {fprintf(output_file, "sentenciadowhile\n");}
     ;
 
 sentenciafor:
-    "for" expresionentreparentesis sentenciacompuesta //modificar, no puede ser cualquier expresión entre paréntesis
+    FOR expresionentreparentesis sentenciacompuesta {fprintf(output_file, "sentenciafor\n");}
+    //modificar, no puede ser cualquier expresión entre paréntesis
     ;
 
 sentencia:
-    //posibles sentencias
+    ENTERO
     ;
 
 sentencias:
@@ -109,20 +129,20 @@ sentencias:
     ;
 
 sentenciacompuesta:
-    '{' sentencias '}'
+    ABROLLAVE sentencias CIERROLLAVE {fprintf(output_file, "sentenciacompuesta\n");}
     ;
 
 expresion:
-    //posibles expresiones
+    ENTERO
     | expresionentreparentesis
     ;
 
 expresionentreparentesis:
-    '(' expresion ')'
+    ABROPARENTESIS expresion CIERROPARENTESIS {fprintf(output_file, "expresionentreparentesis\n");}
     ;
 
 case:
-    "case" expresion ':' sentencias
+    CASE expresion DOSPUNTOS sentencias {fprintf(output_file, "case\n");}
     ;
 
 cases:
@@ -131,19 +151,19 @@ cases:
     ;
 
 continue:
-    "continue;"
+    CONTINUE {fprintf(output_file, "continue\n");}
     ;
 
 break:
-    "break;"
+    BREAK {fprintf(output_file, "break\n");}
     ;
 
 return:
-    "return" expresion ';'
+    RETURN expresion PUNTOYCOMA {fprintf(output_file, "return\n");}
     ;
 
 default:
-    "default:"
+    DEFAULT {fprintf(output_file, "default\n");}
     ;
 
 %%
