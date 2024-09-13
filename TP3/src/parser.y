@@ -11,12 +11,13 @@ extern int yylex(void);
 void yyerror(const char *s) {
     fprintf(stderr, "Error: %s\n", s);
 }
+void menu(void);
 FILE *output_file;
 %}
 /* Fin de la sección de prólogo (declaraciones y definiciones de C y directivas del preprocesador) */
 
 /* Inicio de la sección de declaraciones de Bison */
-
+%define parse.error verbose
 	/* Para activar el seguimiento de las ubicaciones de los tokens (número de linea, número de columna) */
 %locations
 
@@ -27,7 +28,6 @@ FILE *output_file;
 }
 
 %token ENTERO
-
 %token IF
 %token ELSE
 %token SWITCH
@@ -58,6 +58,11 @@ FILE *output_file;
 %token TIPODEDATO
 %token TEXTO
 
+%left '+' '-'
+%left '*' '/'
+%left '^'
+%left '(' ')'
+
 	/* Para especificar el no-terminal de inicio de la gramática (el axioma). Si esto se omitiera, se asumiría que es el no-terminal de la primera regla */
 %start input
 
@@ -67,21 +72,38 @@ FILE *output_file;
 %%
 
 input:
+     /* produccion nula */
+    | input line
+    ;
 
-    | input sentenciaif
-    | input sentenciaifelse
-    | input sentenciaswitch
-    | input sentenciawhile
-    | input sentenciadowhile
-    | input sentenciafor
-    | input sentenciacompuesta
-    | input expresionentreparentesis
-    | input case
-    | input continue
-    | input break
-    | input return
-    | input default
-    | input error { yyerror("Error de sintaxis, avanzando..."); yyclearin; yyerrok; }
+line: 
+      '\n'
+    | expresion '\n'
+    | sentencia '\n'
+    | error '\n' { yyerror("Error de sintaxis, avanzando..."); yyclearin; yyerrok; }
+    ;
+
+expresion:
+    
+
+sentencia:
+    | sentenciadeexpresion '\n'
+    | sentenciacompuesta '\n'
+
+    | sentenciaif '\n'
+    | sentenciaifelse '\n'
+    | sentenciaswitch '\n'
+
+    | sentenciawhile '\n'
+    | sentenciadowhile '\n'
+    | sentenciafor '\n'
+
+    | case '\n'
+    | default '\n'
+
+    | continue '\n'
+    | break '\n'
+    | return '\n'
     ;
 
 sentenciaif:

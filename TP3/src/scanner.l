@@ -1,58 +1,90 @@
 /* Inicio de la sección de definiciones. Aquí: */
 
 %{
-
+#include <string.h>
+#include <stdlib.h>
 #include "general.h"
 
 /* Es indispensable que incluyamos el archivo de cabecera con las definiciones de YACC (*.tab.h) que se genera a partir del archivo fuente de YACC (*.y) */
 #include "parser.tab.h"
-#include <string.h>
-#include <stdlib.h>
 
 %}
 
-/* Declaraciones con cada nombre y su definición; se utilizan para simplificar las reglas */
+%pointer
 
+%option noyywrap
+
+/* Declaraciones con cada nombre y su definición; se utilizan para simplificar las reglas */
+digito [0-9]
+digitoOctal [0-7]
+digitoHexa [0-9a-fA-F]
 /* Fin de la sección de definiciones */
 
 /* Inicio de la sección de reglas. Aquí: */
 
 %%
 
-if                                                              {return IF;}
-else                                                            {return ELSE;}
-switch                                                          {return SWITCH;}
-while                                                           {return WHILE;}
-do                                                              {return DO;}
-for                                                             {return FOR;}
-"("                                                             {return ABROPARENTESIS;}
-")"                                                             {return CIERROPARENTESIS;}
-"{"                                                             {return ABROLLAVE;}
-"}"                                                             {return CIERROLLAVE;}
-":"                                                             {return DOSPUNTOS;}
-";"                                                             {return PUNTOYCOMA;}
-case                                                            {return CASE;}
-continue                                                        {return CONTINUE;}
-break                                                           {return BREAK;}
-return                                                          {return RETURN;}
-default                                                         {return DEFAULT;}
+if                                                                          {yylloc.last_column += yyleng; return IF;}
 
-    /*0[0-7]*[uU]?[lL]{0,2}                                           {return ENTERO;}
-    0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                 {return ENTERO;}
-    [1-9][0-9]*[uU]?[lL]{0,2}                                       {return ENTERO;}*/
-[0-9]+                                                     {return ENTERO;} /*para pruebas*/
-[a-zA-Z_][a-zA-Z0-9_]*                                          {yylval.cadena = strdup(yytext); return IDENTIFICADOR;}
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'  {return TEXTO;}
-\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\" {return TEXTO;}
-\+\+|--                                                         {return MASMASOMENOSMENOS;}
-[*/]                                                            {return MULTIPLICATIVAS;}
-[+-]                                                            {return ADITIVAS;}
-[ \t\n]+                                                        {}
-.                                                               {}
-    /*<|>|<=|>=                                                       {return RELACIONALES;}
-    ==|!=                                                           {return DEIGUALDAD;}
-    =|\+=|-=|\*=|/=                                                 {return DEASIGNACION;}
-    char|double|enum|float|int|long|short|struct|union|void         {return TIPODEDATO;}*/
+else                                                                        {yylloc.last_column += yyleng; return ELSE;}
+
+switch                                                                      {yylloc.last_column += yyleng; return SWITCH;}
+
+while                                                                       {yylloc.last_column += yyleng; return WHILE;}
+
+do                                                                          {yylloc.last_column += yyleng; return DO;}
+
+for                                                                         {yylloc.last_column += yyleng; return FOR;}
+
+"("                                                                         {yylloc.last_column += yyleng; return ABROPARENTESIS;}
+
+")"                                                                         {yylloc.last_column += yyleng; return CIERROPARENTESIS;}
+
+"{"                                                                         {yylloc.last_column += yyleng; return ABROLLAVE;}
+
+"}"                                                                         {yylloc.last_column += yyleng; return CIERROLLAVE;}
+
+":"                                                                         {yylloc.last_column += yyleng; return DOSPUNTOS;}
+
+";"                                                                         {yylloc.last_column += yyleng; return PUNTOYCOMA;}
+
+case                                                                        {yylloc.last_column += yyleng; return CASE;}
+
+continue                                                                    {yylloc.last_column += yyleng; return CONTINUE;}
+
+break                                                                       {yylloc.last_column += yyleng; return BREAK;}
+
+return                                                                      {yylloc.last_column += yyleng; return RETURN;}
+
+default                                                                     {yylloc.last_column += yyleng; return DEFAULT;}
+
+{digito}+                                                                   {yylloc.last_column += yyleng; return ENTERO;} /*para pruebas*/
+
+[a-zA-Z_][a-zA-Z0-9_]*                                                      {yylloc.last_column += yyleng; yylval.cadena = strdup
+
+(yytext); return IDENTIFICADOR;}
+
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\{digitoOctal}{1,3}|\\x{digitoHexa}+)\'     {yylloc.last_column += yyleng; return TEXTO;}
+
+\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\{digitoOctal}{1,3}|\\x{digitoHexa}+)*\"    {yylloc.last_column += yyleng; return TEXTO;}
+
+\+\+|--                                                                     {yylloc.last_column += yyleng; return MASMASOMENOSMENOS;}
+
+[*/]                                                                        {yylloc.last_column += yyleng; return MULTIPLICATIVAS;}
+
+[+-]                                                                        {yylloc.last_column += yyleng; return ADITIVAS;}
+
+[ \t\n]+                                                                    {yylloc.last_column += yyleng;}
+
+.                                                                           {yylloc.last_column += yyleng;}
+
+<|>|<=|>=                                                                   {yylloc.last_column += yyleng; return RELACIONALES;}
+
+==|!=                                                                       {yylloc.last_column += yyleng; return DEIGUALDAD;}
+
+=|\+=|-=|\*=|/=                                                             {yylloc.last_column += yyleng; return DEASIGNACION;}
+
+char|double|enum|float|int|long|short|struct|union|void                     {yylloc.last_column += yyleng; return TIPODEDATO;}
 
 %%
 /* Fin de la sección de reglas */ 
