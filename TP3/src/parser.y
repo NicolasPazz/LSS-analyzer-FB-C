@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
 
 //Reporte
     //1
-    imprimirVariablesDeclaradas(listaVariablesDeclaradas);
+    /*imprimirVariablesDeclaradas(listaVariablesDeclaradas);
     liberarVariablesDeclaradas(listaVariablesDeclaradas);
     printf("\n");
 
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
     printf("\n");
-
+*/
     return 0;
 }
 

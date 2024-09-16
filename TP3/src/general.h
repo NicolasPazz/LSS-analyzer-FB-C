@@ -21,7 +21,7 @@ void pausa(void);
 void inicializarUbicacion(void);
 void reinicializarUbicacion(void);
 
-
+/*
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
     char *variableDeclarada;
@@ -36,7 +36,7 @@ void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista);
 
-NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
+extern NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
 
 
 // FUNCIONES
@@ -53,7 +53,7 @@ void imprimirFunciones(NodoFuncion *lista);
 
 void liberarFunciones(NodoFuncion *lista);
 
-NodoFuncion* listaFunciones = NULL;
+extern NodoFuncion* listaFunciones = NULL;
 
 
 // SENTENCIAS
@@ -70,7 +70,7 @@ void imprimirSentencias(NodoSentencia *lista);
 
 void liberarSentencias(NodoSentencia *lista);
 
-NodoSentencia* listaSentencias = NULL;
+extern NodoSentencia* listaSentencias = NULL;
 
 
 // ESTRUCTURAS NO RECONOCIDAS
@@ -87,7 +87,7 @@ void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
 
 void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
 
-NodoEstructuraNoReconocida* listaEstructurasNoReconocidas = NULL;
+extern NodoEstructuraNoReconocida* listaEstructurasNoReconocidas = NULL;
 
 
 // CADENAS NO RECONOCIDAS
@@ -104,11 +104,11 @@ void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
-NodoCadenaNoReconocida* listaCadenasNoReconocidas = NULL;
+extern NodoCadenaNoReconocida* listaCadenasNoReconocidas = NULL;
 
 
 // FUNCIONES
 
 char* copiarCadena(const char *str);
-
+*/
 #endif

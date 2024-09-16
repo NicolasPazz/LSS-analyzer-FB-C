@@ -68,17 +68,17 @@ default                                                                     {yyl
 
 \"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\{digitoOctal}{1,3}|\\x{digitoHexa}+)*\"    {yylloc.last_column += yyleng; return TEXTO;}
 
-\+\+|--                                                                     {yylloc.last_column += yyleng; return MASMASOMENOSMENOS;}
+"++"|"--"                                                                     {yylloc.last_column += yyleng; return MASMASOMENOSMENOS;}
 
 [*/]                                                                        {yylloc.last_column += yyleng; return MULTIPLICATIVAS;}
 
 [+-]                                                                        {yylloc.last_column += yyleng; return ADITIVAS;}
 
-<|>|<=|>=                                                                   {yylloc.last_column += yyleng; return RELACIONALES;}
+\<|\>|"<="|">="                                                                   {yylloc.last_column += yyleng; return RELACIONALES;}
 
-==|!=                                                                       {yylloc.last_column += yyleng; return DEIGUALDAD;}
+"=="|"!="                                                                       {yylloc.last_column += yyleng; return DEIGUALDAD;}
 
-=|\+=|-=|\*=|/=                                                             {yylloc.last_column += yyleng; return DEASIGNACION;}
+\=|\+=|"-="|"*="|"/="                                                             {yylloc.last_column += yyleng; return DEASIGNACION;}
 
 char|double|enum|float|int|long|short|struct|union|void                     {yylloc.last_column += yyleng; return TIPODEDATO;}
 
@@ -100,7 +100,7 @@ char|double|enum|float|int|long|short|struct|union|void                     {yyl
                     BEGIN(INITIAL);
                 }   
     [^ \t\n]+   {
-                    agregarCadenaNoReconocida(&listaCadenasNoReconocidas);
+                    //agregarCadenaNoReconocida(&listaCadenasNoReconocidas);
                     yylloc.last_column += yyleng;;
                     BEGIN(INITIAL);
                 }
