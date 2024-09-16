@@ -11,8 +11,8 @@
 %}
 
 %pointer
-
 %option noyywrap
+%x tokenNoReconocido
 
 /* Declaraciones con cada nombre y su definición; se utilizan para simplificar las reglas */
 digito [0-9]
@@ -74,10 +74,6 @@ default                                                                     {yyl
 
 [+-]                                                                        {yylloc.last_column += yyleng; return ADITIVAS;}
 
-[ \t\n]+                                                                    {yylloc.last_column += yyleng;}
-
-.                                                                           {yylloc.last_column += yyleng;}
-
 <|>|<=|>=                                                                   {yylloc.last_column += yyleng; return RELACIONALES;}
 
 ==|!=                                                                       {yylloc.last_column += yyleng; return DEIGUALDAD;}
@@ -85,6 +81,31 @@ default                                                                     {yyl
 =|\+=|-=|\*=|/=                                                             {yylloc.last_column += yyleng; return DEASIGNACION;}
 
 char|double|enum|float|int|long|short|struct|union|void                     {yylloc.last_column += yyleng; return TIPODEDATO;}
+
+[ \t]                                                                       {yylloc.last_column += yyleng;}
+
+\n                                                                          {yylloc.last_column += yyleng;}
+
+[^ \t\n] {unput(yytext[0]); BEGIN(tokenNoReconocido);}
+
+<tokenNoReconocido>{
+    " "|\t      {  
+                    yyless(0);
+                    yylloc.last_column += yyleng;
+                    BEGIN(INITIAL);
+                }
+    \n          {
+                    yyless(0);
+                    yylloc.last_column += yyleng;
+                    BEGIN(INITIAL);
+                }   
+    [^ \t\n]+   {
+                    agregarCadenaNoReconocida(&listaCadenasNoReconocidas);
+                    yylloc.last_column += yyleng;;
+                    BEGIN(INITIAL);
+                }
+}
+
 
 %%
 /* Fin de la sección de reglas */ 

@@ -2,7 +2,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <stddef.h>
+#include <string.h>
+#include <math.h>
 #include "general.h"
 
 	/* Declaración de la funcion yylex del analizador léxico, necesaria para que la funcion yyparse del analizador sintáctico pueda invocarla cada vez que solicite un nuevo token */
@@ -11,8 +13,6 @@ extern int yylex(void);
 void yyerror(const char *s) {
     fprintf(stderr, "Error: %s\n", s);
 }
-void menu(void);
-FILE *output_file;
 %}
 /* Fin de la sección de prólogo (declaraciones y definiciones de C y directivas del preprocesador) */
 
@@ -25,9 +25,10 @@ FILE *output_file;
 	/* Para especificar la colección completa de posibles tipos de datos para los valores semánticos */
 %union {
     char* cadena;
+    int entero;
 }
 
-%token ENTERO
+%token <entero> ENTERO
 %token IF
 %token ELSE
 %token SWITCH
@@ -57,6 +58,8 @@ FILE *output_file;
 %token DEASIGNACION
 %token TIPODEDATO
 %token TEXTO
+
+%type 
 
 %left '+' '-'
 %left '*' '/'
@@ -187,17 +190,47 @@ default:
 
 /* Inicio de la sección de epílogo (código de usuario) */
 
-int main(int argc, char **argv) {
-    // Abrir archivo de salida
-    output_file = fopen("output.txt", "w");
-    if (!output_file) {
-        perror("No se pudo abrir output.txt");
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Uso: %s archivoAAnalizar.i\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        perror("No se puede abrir el archivo");
         return 1;
     }
 
     yyparse();
+    fclose(file);
 
-    fclose(output_file);
+//Reporte
+    //1
+    imprimirVariablesDeclaradas(listaVariablesDeclaradas);
+    liberarVariablesDeclaradas(listaVariablesDeclaradas);
+    printf("\n");
+
+    //2
+    imprimirFunciones(listaFunciones);
+    liberarFunciones(listaFunciones);
+    printf("\n");
+
+    //3
+    imprimirSentencias(listaSentencias);
+    liberarSentencias(listaSentencias);
+    printf("\n");
+
+    //4
+    imprimirEstructurasNoReconocidas(listaEstructurasNoReconocidas);
+    liberarEstructurasNoReconocidas(listaEstructurasNoReconocidas);
+    printf("\n");
+
+    //5
+    imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
+    liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
+    printf("\n");
+
     return 0;
 }
 

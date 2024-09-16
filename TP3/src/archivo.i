@@ -1,6 +1,3 @@
-
-if(0){1}
-
 float potencia(float base, long exp) {
     float acumulador = 1.0;
     for (long i = 0; i < exp; i++) {
@@ -44,9 +41,9 @@ void rutina(int x) {
         x+=1;
     } while (x < 5);
 
-if(0){1}
-else {
+    if (x == 5 || x > 10) {
+        printf("x es 5 o mayor que 10 \n");
+    } else {
         printf("x tiene un valor entre 6 y 9 inclusive \n");
     }
-    continue;
 }
