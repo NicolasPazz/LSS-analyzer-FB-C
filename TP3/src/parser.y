@@ -89,6 +89,11 @@ line:
 expresion:
     
 
+
+expresionentreparentesis:
+    ABROPARENTESIS expresion CIERROPARENTESIS {fprintf(output_file, "expresionentreparentesis\n");}
+    ;
+
 sentencia:
     | sentenciadeexpresion '\n'
     | sentenciacompuesta '\n'
@@ -101,12 +106,22 @@ sentencia:
     | sentenciadowhile '\n'
     | sentenciafor '\n'
 
-    | case '\n'
-    | default '\n'
-
     | continue '\n'
     | break '\n'
     | return '\n'
+    ;
+
+sentenciadeexpresion:
+    expresion PUNTOYCOMA
+    ;
+
+sentenciacompuesta:
+    ABROLLAVE sentencias CIERROLLAVE {fprintf(output_file, "sentenciacompuesta\n");}
+    ;
+
+sentencias:
+    sentencia
+    | sentencias sentencia
     ;
 
 sentenciaif:
@@ -124,6 +139,10 @@ sentenciaswitch:
     //fijarme si el default puede ir en otra parte que no sea el final 
     ;
 
+default:
+    DEFAULT {fprintf(output_file, "default\n");}
+    ;
+
 sentenciawhile:
     WHILE expresionentreparentesis sentenciacompuesta {fprintf(output_file, "sentenciawhile\n");}
     ;
@@ -136,28 +155,6 @@ sentenciadowhile:
 sentenciafor:
     FOR expresionentreparentesis sentenciacompuesta {fprintf(output_file, "sentenciafor\n");}
     //modificar, no puede ser cualquier expresión entre paréntesis
-    ;
-
-sentencia:
-    ENTERO
-    ;
-
-sentencias:
-    sentencia
-    | sentencias sentencia
-    ;
-
-sentenciacompuesta:
-    ABROLLAVE sentencias CIERROLLAVE {fprintf(output_file, "sentenciacompuesta\n");}
-    ;
-
-expresion:
-    ENTERO
-    | expresionentreparentesis
-    ;
-
-expresionentreparentesis:
-    ABROPARENTESIS expresion CIERROPARENTESIS {fprintf(output_file, "expresionentreparentesis\n");}
     ;
 
 case:
@@ -179,10 +176,6 @@ break:
 
 return:
     RETURN expresion PUNTOYCOMA {fprintf(output_file, "return\n");}
-    ;
-
-default:
-    DEFAULT {fprintf(output_file, "default\n");}
     ;
 
 %%
