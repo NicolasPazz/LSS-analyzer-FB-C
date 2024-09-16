@@ -17,7 +17,7 @@ void yyerror(const char *s) {
 /* Fin de la sección de prólogo (declaraciones y definiciones de C y directivas del preprocesador) */
 
 /* Inicio de la sección de declaraciones de Bison */
-%define parse.error verbose
+//%define parse.error verbose
 	/* Para activar el seguimiento de las ubicaciones de los tokens (número de linea, número de columna) */
 %locations
 
@@ -59,7 +59,7 @@ void yyerror(const char *s) {
 %token TIPODEDATO
 %token TEXTO
 
-%type 
+//%type 
 
 %left '+' '-'
 %left '*' '/'
@@ -91,7 +91,7 @@ expresion:
 
 
 expresionentreparentesis:
-    ABROPARENTESIS expresion CIERROPARENTESIS {fprintf(output_file, "expresionentreparentesis\n");}
+    ABROPARENTESIS expresion CIERROPARENTESIS {printf("expresionentreparentesis\n");}
     ;
 
 sentencia:
@@ -116,7 +116,7 @@ sentenciadeexpresion:
     ;
 
 sentenciacompuesta:
-    ABROLLAVE sentencias CIERROLLAVE {fprintf(output_file, "sentenciacompuesta\n");}
+    ABROLLAVE sentencias CIERROLLAVE {printf("sentenciacompuesta\n");}
     ;
 
 sentencias:
@@ -125,40 +125,40 @@ sentencias:
     ;
 
 sentenciaif:
-    IF expresionentreparentesis sentenciacompuesta {fprintf(output_file, "sentenciaif\n");}
+    IF expresionentreparentesis sentenciacompuesta {printf("sentenciaif\n");}
     ;
 
 sentenciaifelse:
     IF expresionentreparentesis sentenciacompuesta
-    ELSE sentenciacompuesta {fprintf(output_file, "sentenciaifelse\n");}
+    ELSE sentenciacompuesta {printf("sentenciaifelse\n");}
     ;
 
 sentenciaswitch:
-    SWITCH expresionentreparentesis ABROLLAVE cases CIERROLLAVE {fprintf(output_file, "sentenciaswitch\n");}
-    | SWITCH expresionentreparentesis ABROLLAVE cases default CIERROLLAVE {fprintf(output_file, "sentenciaifelse\n");}
+    SWITCH expresionentreparentesis ABROLLAVE cases CIERROLLAVE {printf("sentenciaswitch\n");}
+    | SWITCH expresionentreparentesis ABROLLAVE cases default CIERROLLAVE {printf("sentenciaifelse\n");}
     //fijarme si el default puede ir en otra parte que no sea el final 
     ;
 
 default:
-    DEFAULT {fprintf(output_file, "default\n");}
+    DEFAULT {printf("default\n");}
     ;
 
 sentenciawhile:
-    WHILE expresionentreparentesis sentenciacompuesta {fprintf(output_file, "sentenciawhile\n");}
+    WHILE expresionentreparentesis sentenciacompuesta {printf("sentenciawhile\n");}
     ;
 
 sentenciadowhile:
     DO sentenciacompuesta
-    WHILE expresionentreparentesis PUNTOYCOMA {fprintf(output_file, "sentenciadowhile\n");}
+    WHILE expresionentreparentesis PUNTOYCOMA {printf("sentenciadowhile\n");}
     ;
 
 sentenciafor:
-    FOR expresionentreparentesis sentenciacompuesta {fprintf(output_file, "sentenciafor\n");}
+    FOR expresionentreparentesis sentenciacompuesta {printf("sentenciafor\n");}
     //modificar, no puede ser cualquier expresión entre paréntesis
     ;
 
 case:
-    CASE expresion DOSPUNTOS sentencias {fprintf(output_file, "case\n");}
+    CASE expresion DOSPUNTOS sentencias {printf("case\n");}
     ;
 
 cases:
@@ -167,15 +167,15 @@ cases:
     ;
 
 continue:
-    CONTINUE {fprintf(output_file, "continue\n");}
+    CONTINUE {printf("continue\n");}
     ;
 
 break:
-    BREAK {fprintf(output_file, "break\n");}
+    BREAK {printf("break\n");}
     ;
 
 return:
-    RETURN expresion PUNTOYCOMA {fprintf(output_file, "return\n");}
+    RETURN expresion PUNTOYCOMA {printf("return\n");}
     ;
 
 %%
