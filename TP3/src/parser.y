@@ -13,6 +13,7 @@ extern int yylex(void);
 void yyerror(const char *s) {
     fprintf(stderr, "Error: %s\n", s);
 }
+FILE *output_file;
 %}
 /* Fin de la sección de prólogo (declaraciones y definiciones de C y directivas del preprocesador) */
 
@@ -87,6 +88,8 @@ line:
     ;
 
 expresion:
+    ENTERO
+    ;
     
 
 
@@ -95,24 +98,24 @@ expresionentreparentesis:
     ;
 
 sentencia:
-    | sentenciadeexpresion '\n'
-    | sentenciacompuesta '\n'
+    | sentenciadeexpresion
+    | sentenciacompuesta
 
-    | sentenciaif '\n'
-    | sentenciaifelse '\n'
-    | sentenciaswitch '\n'
+    | sentenciaif
+    | sentenciaifelse
+    | sentenciaswitch
 
-    | sentenciawhile '\n'
-    | sentenciadowhile '\n'
-    | sentenciafor '\n'
+    | sentenciawhile
+    | sentenciadowhile
+    | sentenciafor
 
-    | continue '\n'
-    | break '\n'
-    | return '\n'
+    | continue
+    | break
+    | return
     ;
 
 sentenciadeexpresion:
-    expresion PUNTOYCOMA
+    expresion PUNTOYCOMA {printf("sentenciadeexpresion\n");}
     ;
 
 sentenciacompuesta:
@@ -183,20 +186,19 @@ return:
 
 /* Inicio de la sección de epílogo (código de usuario) */
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Uso: %s archivoAAnalizar.i\n", argv[0]);
-        return 1;
-    }
-
-    FILE *file = fopen(argv[1], "r");
-    if (!file) {
-        perror("No se puede abrir el archivo");
+int main(int argc, char **argv) {
+    // Abrir archivo de salida
+    output_file = fopen("output.txt", "w");
+    if (!output_file) {
+        perror("No se pudo abrir output.txt");
         return 1;
     }
 
     yyparse();
-    fclose(file);
+
+    fclose(output_file);
+    return 0;
+}
 
 //Reporte
     //1
@@ -224,8 +226,6 @@ int main(int argc, char *argv[]) {
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
     printf("\n");
 */
-    return 0;
-}
 
 	/* Definición de la funcion yyerror para reportar errores, necesaria para que la funcion yyparse del analizador sintáctico pueda invocarla para reportar un error */
 /*void yyerror(const char* literalCadena)
