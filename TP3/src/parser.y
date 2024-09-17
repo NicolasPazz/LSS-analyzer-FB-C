@@ -135,6 +135,7 @@ sentenciaif:
     ;
 
 sentenciaifelse:
+//revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
     IF expresionentreparentesis sentenciacompuesta
     ELSE sentenciacompuesta {printf("sentenciaifelse\n");}
     ;
@@ -146,7 +147,7 @@ sentenciaswitch:
     ;
 
 default:
-    DEFAULT {printf("default\n");}
+    DEFAULT  DOSPUNTOS sentencias {printf("default\n");}
     ;
 
 sentenciawhile:
@@ -159,8 +160,9 @@ sentenciadowhile:
     ;
 
 sentenciafor:
-    FOR expresionentreparentesis sentenciacompuesta {printf("sentenciafor\n");}
-    //modificar, no puede ser cualquier expresión entre paréntesis
+    FOR ABROPARENTESIS primerapartefor PUNTOYCOMA expresion PUNTOYCOMA expresion CIERROPARENTESIS 
+    sentenciacompuesta {printf("sentenciafor\n");}
+    //Definir primerapartefor - es una declaracion e inicializacion de variable
     ;
 
 case:
@@ -173,14 +175,15 @@ cases:
     ;
 
 continue:
-    CONTINUE {printf("continue\n");}
+    CONTINUE PUNTOYCOMA {printf("continue\n");}
     ;
 
 break:
-    BREAK {printf("break\n");}
+    BREAK PUNTOYCOMA {printf("break\n");}
     ;
 
 return:
+    //podria ir tambien expresionentreparentesis
     RETURN expresion PUNTOYCOMA {printf("return\n");}
     ;
 
@@ -189,6 +192,7 @@ declaracion:
     ;
 
 listadeclaradores:
+    //creo que falta PUNTOYCOMA
     IDENTIFICADOR { printf("lista_declaradores\n"); }
     | listadeclaradores COMA IDENTIFICADOR { printf("lista_declaradores\n"); }
     ;
