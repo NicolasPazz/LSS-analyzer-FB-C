@@ -48,6 +48,8 @@ for                                                                         {yyl
 
 ";"                                                                         {yylloc.last_column += yyleng; return PUNTOYCOMA;}
 
+","                                                                         {yylloc.last_column += yyleng; return COMA;}
+
 case                                                                        {yylloc.last_column += yyleng; return CASE;}
 
 continue                                                                    {yylloc.last_column += yyleng; return CONTINUE;}
@@ -80,7 +82,7 @@ default                                                                     {yyl
 
 \=|\+=|"-="|"*="|"/="                                                             {yylloc.last_column += yyleng; return DEASIGNACION;}
 
-char|double|enum|float|int|long|short|struct|union|void                     {yylloc.last_column += yyleng; return TIPODEDATO;}
+"char"|"double"|"enum"|"float"|"int"|"long"|"short"|"struct"|"union"|"void"                    {yylloc.last_column += yyleng; return TIPODEDATO;}
 
 [ \t]                                                                       {yylloc.last_column += yyleng;}
 

@@ -42,6 +42,7 @@ FILE *output_file;
 %token CIERROLLAVE
 %token DOSPUNTOS
 %token PUNTOYCOMA
+%token COMA
 %token CASE
 %token CONTINUE
 %token BREAK
@@ -112,6 +113,8 @@ sentencia:
     | continue
     | break
     | return
+
+    | declaracion
     ;
 
 sentenciadeexpresion:
@@ -179,6 +182,15 @@ break:
 
 return:
     RETURN expresion PUNTOYCOMA {printf("return\n");}
+    ;
+
+declaracion:
+    TIPODEDATO listadeclaradores PUNTOYCOMA { printf("declaracion\n"); }
+    ;
+
+listadeclaradores:
+    IDENTIFICADOR { printf("lista_declaradores\n"); }
+    | listadeclaradores COMA IDENTIFICADOR { printf("lista_declaradores\n"); }
     ;
 
 %%
