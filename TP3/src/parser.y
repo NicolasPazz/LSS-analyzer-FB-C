@@ -55,7 +55,7 @@ expresion:
     | CONSTANTE_REAL                            { printf("expresionprimaria - CONSTANTE_REAL: %f\n", $1); } //
     | CONSTANTE_CARACTER                        { printf("expresionprimaria - CONSTANTE_CARACTER: %s\n", $1); free($1); } //
     | LITERAL_CADENA                            { printf("expresionprimaria - LITERAL_CADENA: %s\n", $1); free($1); } //
-    | '(' expresion ')'                         { printf("expresionprimaria - (EXPRESION)\n")} //
+    | '(' expresion ')'                         { printf("expresionprimaria - (EXPRESION)\n");} //
     | IDENTIFICADOR '(' lista_argumentos ')'    { printf("expresionpostfija - INVOCACION FUNCION: %s\n", $1); free($1); } //
     | IDENTIFICADOR OP_INCREMENTO_DECREMENTO    { printf("expresionpostfija - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); free($1); free($2); } //
     | OP_INCREMENTO_DECREMENTO IDENTIFICADOR    { printf("expresionunaria - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); free($1); free($2); } //
