@@ -146,11 +146,24 @@ return:
 declaracion:
     TIPODEDATO listadeclaradores ';' { printf("declaracion\n"); }
     ;
+
 listadeclaradores:
     //creo que falta ';'
-    IDENTIFICADOR { printf("lista_declaradores\n"); }
-    | listadeclaradores ',' IDENTIFICADOR { printf("lista_declaradores\n"); }
+    declarador { printf("lista_declaradores\n"); }
+    | listadeclaradores ',' declarador { printf("lista_declaradores\n"); }
     ;
+
+declarador:
+    IDENTIFICADOR
+    | IDENTIFICADOR OP_ASIGNACION inicializacion
+    ;
+
+inicializacion:
+    CONSTANTE_ENTERA
+    | CONSTANTE_REAL
+    | CONSTANTE_CARACTER
+    ;
+
 %%
 
 int main(int argc, char *argv[]) {
