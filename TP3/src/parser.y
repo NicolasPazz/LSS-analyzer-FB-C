@@ -166,6 +166,72 @@ inicializacion:
 
 %%
 
+
+// Define variable puntero que apunta a la tabla de símbolos 
+
+
+
+
+
+struct init
+
+{
+
+  char const *fname;
+
+ 
+
+};
+
+
+
+// Declaramos una vector de tipo init llamado no_nec_declaracion para almacenar todas las funciones de las bibliotecas de c en la Tabla de Simbolos.
+
+struct init const no_nec_declaracion[]=
+
+{
+
+  {"printf",printf},
+
+  {"scanf",scanf},
+
+  {"getchar",getchar},
+
+  {"putchar",putchar},
+
+  {"malloc",malloc},
+
+  {"free",free},
+
+  {"fopen",fopen},
+
+  {"fclose",fclose},
+
+  {"fprintf",fprintf},
+
+  {"fscanf",fscanf},
+
+  {"fgets",fgets},
+
+  {"fputs",fputs},
+
+  {"fgetc",fgetc},
+
+  {"fputc",fputc},
+
+  {"feof",feof},
+
+  {"perror",perror},  
+
+  {"exit",exit},
+
+  {"atoi",atoi},
+
+
+
+};
+
+
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Uso: %s archivoAAnalizar.i\n", argv[0]);
