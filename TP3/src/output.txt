@@ -1,4 +1,0 @@
-expresionentreparentesis
-sentenciadeexpresion
-sentenciacompuesta
-sentenciaif

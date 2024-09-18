@@ -1,5 +1,5 @@
-/* Inicio de la seccion de prólogo (declaraciones y definiciones de C y directivas del preprocesador) */
 %{
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -7,214 +7,172 @@
 #include <math.h>
 #include "general.h"
 
-	/* Declaración de la funcion yylex del analizador léxico, necesaria para que la funcion yyparse del analizador sintáctico pueda invocarla cada vez que solicite un nuevo token */
-extern int yylex(void);
-	/* Declaracion de la función yyerror para reportar errores, necesaria para que la función yyparse del analizador sintáctico pueda invocarla para reportar un error */
-void yyerror(const char *s) {
-    fprintf(stderr, "Error: %s\n", s);
-}
-FILE *output_file;
-%}
-/* Fin de la sección de prólogo (declaraciones y definiciones de C y directivas del preprocesador) */
+extern FILE *yyin;
 
-/* Inicio de la sección de declaraciones de Bison */
-//%define parse.error verbose
-	/* Para activar el seguimiento de las ubicaciones de los tokens (número de linea, número de columna) */
+extern int yylex(void);
+
+void yyerror(const char *s) {fprintf(stderr, "Error: %s\n", s);}
+
+%}
+
+%error-verbose
 %locations
 
-
-	/* Para especificar la colección completa de posibles tipos de datos para los valores semánticos */
 %union {
-    char* cadena;
     int entero;
+    float real;
+    char* cadena;
 }
 
-%token <entero> ENTERO
-%token IF
-%token ELSE
-%token SWITCH
-%token WHILE
-%token DO
-%token FOR
-%token ABROPARENTESIS
-%token CIERROPARENTESIS
-%token ABROLLAVE
-%token CIERROLLAVE
-%token DOSPUNTOS
-%token PUNTOYCOMA
-%token COMA
-%token CASE
-%token CONTINUE
-%token BREAK
-%token RETURN
-%token DEFAULT
+%token <entero> CONSTANTE_ENTERA CONSTANTE_CARACTER
+%token <real> CONSTANTE_REAL
+%token <cadena> IDENTIFICADOR LITERAL_CADENA NO_RECONOCIDO OP_ASIGNACION OP_RELACIONAL OP_INCREMENTO_DECREMENTO OP_MULTIPLICATIVO OP_ADITIVO OP_IGUALDAD
+%token OP_AND OP_OR TIPODEDATO BREAK CASE CONTINUE DEFAULT DO ELSE FOR GOTO IF RETURN SWITCH WHILE SUFIJO
 
-%token <cadena> IDENTIFICADOR
-%token CARACTER
-%token LITERALCADENA
-%token MASMASOMENOSMENOS
-%token MULTIPLICATIVAS
-%token ADITIVAS
-%token RELACIONALES
-%token DEIGUALDAD
-%token DEASIGNACION
-%token TIPODEDATO
-%token TEXTO
-
-//%type 
+%type <cadena> expresion
 
 %left '+' '-'
 %left '*' '/'
 %left '^'
 %left '(' ')'
 
-	/* Para especificar el no-terminal de inicio de la gramática (el axioma). Si esto se omitiera, se asumiría que es el no-terminal de la primera regla */
 %start input
 
-/* Fin de la sección de declaraciones de Bison */
-
-/* Inicio de la sección de reglas gramaticales */
 %%
 
 input:
-     /* produccion nula */
     | input line
     ;
-
 line: 
       '\n'
     | expresion '\n'
     | sentencia '\n'
-    | error '\n' { yyerror("Error de sintaxis, avanzando..."); yyclearin; yyerrok; }
+    | error '\n' { yyclearin; yyerrok; }
     ;
-
 expresion:
-    ENTERO
+      IDENTIFICADOR                             { printf("expresionprimaria - IDENTIFICADOR: %s\n", $1); free($1); } //
+    | CONSTANTE_ENTERA                          { printf("expresionprimaria - CONSTANTE_ENTERA: %d\n", $1); } //
+    | CONSTANTE_REAL                            { printf("expresionprimaria - CONSTANTE_REAL: %f\n", $1); } //
+    | CONSTANTE_CARACTER                        { printf("expresionprimaria - CONSTANTE_CARACTER: %s\n", $1); free($1); } //
+    | LITERAL_CADENA                            { printf("expresionprimaria - LITERAL_CADENA: %s\n", $1); free($1); } //
+    | '(' expresion ')'                         { printf("expresionprimaria - (EXPRESION)\n")} //
+    | IDENTIFICADOR '(' lista_argumentos ')'    { printf("expresionpostfija - INVOCACION FUNCION: %s\n", $1); free($1); } //
+    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO    { printf("expresionpostfija - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); free($1); free($2); } //
+    | OP_INCREMENTO_DECREMENTO IDENTIFICADOR    { printf("expresionunaria - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); free($1); free($2); } //
+    | expresion OP_MULTIPLICATIVO expresion     { printf("expresionmultiplicativa: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
+    | expresion OP_ADITIVO expresion            { printf("expresionaditiva: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
+    | expresion OP_RELACIONAL expresion         { printf("expresionrelacional: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
+    | expresion OP_IGUALDAD expresion           { printf("expresiondeigualdad: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
+    | expresion OP_AND expresion                { printf("expresionand\n"); } //
+    | expresion OP_OR expresion                 { printf("expresionor\n"); } //
+    | IDENTIFICADOR OP_ASIGNACION expresion     { printf("expresiondeasignacion: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
     ;
-    
-
-
-expresionentreparentesis:
-    ABROPARENTESIS expresion CIERROPARENTESIS {printf("expresionentreparentesis\n");}
+lista_argumentos:
+    | expresion                         { printf("ARGUMENTO\n"); } //
+    | lista_argumentos ',' expresion    { printf("ARGUMENTO\n"); } //
     ;
 
 sentencia:
     | sentenciadeexpresion
     | sentenciacompuesta
-
     | sentenciaif
     | sentenciaifelse
     | sentenciaswitch
-
     | sentenciawhile
     | sentenciadowhile
     | sentenciafor
-
     | continue
     | break
     | return
-
     | declaracion
     ;
-
 sentenciadeexpresion:
-    expresion PUNTOYCOMA {printf("sentenciadeexpresion\n");}
+    expresion ';' {printf("sentenciadeexpresion\n");}
     ;
-
 sentenciacompuesta:
-    ABROLLAVE sentencias CIERROLLAVE {printf("sentenciacompuesta\n");}
+    '{' sentencias '}' {printf("sentenciacompuesta\n");}
     ;
-
 sentencias:
     sentencia
     | sentencias sentencia
     ;
-
 sentenciaif:
-    IF expresionentreparentesis sentenciacompuesta {printf("sentenciaif\n");}
+    IF '(' expresion ')' sentenciacompuesta {printf("sentenciaif\n");}
     ;
-
 sentenciaifelse:
 //revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
-    IF expresionentreparentesis sentenciacompuesta
+    IF '(' expresion ')' sentenciacompuesta
     ELSE sentenciacompuesta {printf("sentenciaifelse\n");}
     ;
-
 sentenciaswitch:
-    SWITCH expresionentreparentesis ABROLLAVE cases CIERROLLAVE {printf("sentenciaswitch\n");}
-    | SWITCH expresionentreparentesis ABROLLAVE cases default CIERROLLAVE {printf("sentenciaifelse\n");}
+    SWITCH '(' expresion ')' '{' cases '}' {printf("sentenciaswitch\n");}
+    | SWITCH '(' expresion ')' '{' cases default '}' {printf("sentenciaifelse\n");}
     //fijarme si el default puede ir en otra parte que no sea el final 
     ;
-
 default:
-    DEFAULT  DOSPUNTOS sentencias {printf("default\n");}
+    DEFAULT  ':' sentencias {printf("default\n");}
     ;
-
 sentenciawhile:
-    WHILE expresionentreparentesis sentenciacompuesta {printf("sentenciawhile\n");}
+    WHILE '(' expresion ')' sentenciacompuesta {printf("sentenciawhile\n");}
     ;
-
 sentenciadowhile:
     DO sentenciacompuesta
-    WHILE expresionentreparentesis PUNTOYCOMA {printf("sentenciadowhile\n");}
+    WHILE '(' expresion ')' ';' {printf("sentenciadowhile\n");}
     ;
-
 sentenciafor:
-    FOR ABROPARENTESIS primerapartefor PUNTOYCOMA expresion PUNTOYCOMA expresion CIERROPARENTESIS 
+    //FOR '(' primerapartefor ';' expresion ';' expresion ')' 
     sentenciacompuesta {printf("sentenciafor\n");}
     //Definir primerapartefor - es una declaracion e inicializacion de variable
     ;
-
 case:
-    CASE expresion DOSPUNTOS sentencias {printf("case\n");}
+    CASE expresion ':' sentencias {printf("case\n");}
     ;
 
 cases:
     case
     | cases case
     ;
-
 continue:
-    CONTINUE PUNTOYCOMA {printf("continue\n");}
+    CONTINUE ';' {printf("continue\n");}
     ;
-
 break:
-    BREAK PUNTOYCOMA {printf("break\n");}
+    BREAK ';' {printf("break\n");}
     ;
-
 return:
-    //podria ir tambien expresionentreparentesis
-    RETURN expresion PUNTOYCOMA {printf("return\n");}
+    //podria ir tambien '(' expresion ')'
+    RETURN expresion ';' {printf("return\n");}
     ;
 
 declaracion:
-    TIPODEDATO listadeclaradores PUNTOYCOMA { printf("declaracion\n"); }
+    TIPODEDATO listadeclaradores ';' { printf("declaracion\n"); }
     ;
-
 listadeclaradores:
-    //creo que falta PUNTOYCOMA
+    //creo que falta ';'
     IDENTIFICADOR { printf("lista_declaradores\n"); }
-    | listadeclaradores COMA IDENTIFICADOR { printf("lista_declaradores\n"); }
+    | listadeclaradores ',' IDENTIFICADOR { printf("lista_declaradores\n"); }
     ;
-
 %%
-/* Fin de la sección de reglas gramaticales */
 
-/* Inicio de la sección de epílogo (código de usuario) */
-
-int main(int argc, char **argv) {
-    // Abrir archivo de salida
-    output_file = fopen("output.txt", "w");
-    if (!output_file) {
-        perror("No se pudo abrir output.txt");
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Uso: %s archivoAAnalizar.i\n", argv[0]);
         return 1;
     }
 
-    yyparse();
+    FILE *file = fopen(argv[1], "r");
 
-    fclose(output_file);
-    return 0;
-}
+    if (!file) {
+        perror("No se puede abrir el archivo");
+        return 1;
+    }
+
+    //init_table();     
+
+    yyin = file;
+
+    yyparse();   
+
+    fclose(file);
 
 //Reporte
     //1
@@ -242,11 +200,5 @@ int main(int argc, char **argv) {
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
     printf("\n");
 */
-
-	/* Definición de la funcion yyerror para reportar errores, necesaria para que la funcion yyparse del analizador sintáctico pueda invocarla para reportar un error */
-/*void yyerror(const char* literalCadena)
-{
-        fprintf(stderr, "Bison: %d:%d: %s\n", yylloc.first_line, yylloc.first_column, literalCadena);
+    return 0;
 }
-
-/* Fin de la sección de epílogo (código de usuario) */
