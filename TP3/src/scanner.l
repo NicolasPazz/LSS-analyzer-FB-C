@@ -26,7 +26,7 @@
 "||"                                                                        {yylloc.last_column += yyleng; return OP_OR;}
 "++"|"--"                                                                   {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_INCREMENTO_DECREMENTO;}
 [*/]                                                                        {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_MULTIPLICATIVO;}
-[+-]                                                                        {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_ADITIVO;}
+[+-]                                                                        {yylloc.last_column += yyleng; return OP_ADITIVO;}
 "=="|"!="                                                                   {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
     /*Tipos de datos*/
@@ -58,8 +58,8 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
 [0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                     {yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
 [0-9]+([eE][+-]?[0-9]+)[fFlL]?                                              {yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
 
-    /*Constantes de caracter*/
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {yylval.entero = yytext[1]; yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}
+    /*Constantes de caracter
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}*/
 
     /*Literal cadena*/
 \"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
@@ -71,7 +71,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
 [ \t]                                                                       {yylloc.last_column += yyleng;}
 
     /*Salto de linea*/
-\n                                                                          {yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; return '\n'; /*yylloc.last_line += 1;*/}
+\n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; return '\n'; printf("\n"); /*yylloc.last_line += 1;*/}
 
 [^ \t\n]                                                                    {unput(yytext[0]); BEGIN(tokenNoReconocido);}
 

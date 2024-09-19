@@ -13,6 +13,7 @@ extern int yylex(void);
 
 void yyerror(const char *s) {fprintf(stderr, "Error: %s\n", s);}
 
+
 %}
 
 %error-verbose
@@ -24,12 +25,13 @@ void yyerror(const char *s) {fprintf(stderr, "Error: %s\n", s);}
     char* cadena;
 }
 
-%token <entero> CONSTANTE_ENTERA CONSTANTE_CARACTER
+%token <entero> CONSTANTE_ENTERA
 %token <real> CONSTANTE_REAL
-%token <cadena> IDENTIFICADOR LITERAL_CADENA NO_RECONOCIDO OP_ASIGNACION OP_RELACIONAL OP_INCREMENTO_DECREMENTO OP_MULTIPLICATIVO OP_ADITIVO OP_IGUALDAD
-%token OP_AND OP_OR TIPODEDATO BREAK CASE CONTINUE DEFAULT DO ELSE FOR GOTO IF RETURN SWITCH WHILE SUFIJO
+%token <cadena> IDENTIFICADOR SUFIJO TIPODEDATO LITERAL_CADENA NO_RECONOCIDO OP_ASIGNACION OP_RELACIONAL OP_INCREMENTO_DECREMENTO OP_MULTIPLICATIVO OP_ADITIVO OP_IGUALDAD
+%token OP_AND OP_OR  BREAK CASE CONTINUE DEFAULT DO ELSE FOR GOTO IF RETURN SWITCH WHILE 
 
-%type <cadena> expresion
+//%type <cadena> expresion
+%type <cadena> sufijo
 
 %left '+' '-'
 %left '*' '/'
@@ -47,31 +49,63 @@ line:
       '\n'
     | expresion '\n'
     | sentencia '\n'
-    | error '\n' { yyclearin; yyerrok; }
-    ;
-expresion:
-      IDENTIFICADOR                             { printf("expresionprimaria - IDENTIFICADOR: %s\n", $1); free($1); } //
-    | CONSTANTE_ENTERA                          { printf("expresionprimaria - CONSTANTE_ENTERA: %d\n", $1); } //
-    | CONSTANTE_REAL                            { printf("expresionprimaria - CONSTANTE_REAL: %f\n", $1); } //
-    | CONSTANTE_CARACTER                        { printf("expresionprimaria - CONSTANTE_CARACTER: %s\n", $1); free($1); } //
-    | LITERAL_CADENA                            { printf("expresionprimaria - LITERAL_CADENA: %s\n", $1); free($1); } //
-    | '(' expresion ')'                         { printf("expresionprimaria - (EXPRESION)\n");} //
-    | IDENTIFICADOR '(' lista_argumentos ')'    { printf("expresionpostfija - INVOCACION FUNCION: %s\n", $1); free($1); } //
-    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO    { printf("expresionpostfija - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); free($1); free($2); } //
-    | OP_INCREMENTO_DECREMENTO IDENTIFICADOR    { printf("expresionunaria - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); free($1); free($2); } //
-    | expresion OP_MULTIPLICATIVO expresion     { printf("expresionmultiplicativa: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
-    | expresion OP_ADITIVO expresion            { printf("expresionaditiva: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
-    | expresion OP_RELACIONAL expresion         { printf("expresionrelacional: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
-    | expresion OP_IGUALDAD expresion           { printf("expresiondeigualdad: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
-    | expresion OP_AND expresion                { printf("expresionand\n"); } //
-    | expresion OP_OR expresion                 { printf("expresionor\n"); } //
-    | IDENTIFICADOR OP_ASIGNACION expresion     { printf("expresiondeasignacion: %s %s %s\n", $1, $2, $3); free($1); free($2); free($3); } //
-    ;
-lista_argumentos:
-    | expresion                         { printf("ARGUMENTO\n"); } //
-    | lista_argumentos ',' expresion    { printf("ARGUMENTO\n"); } //
+    | declaracion '\n'
+    | error '\n' { yyclearin; yyerrok; printf("\n");}
     ;
 
+expresion:
+      expresionprimaria                        { printf("expresion - EXPRESIONPRIMARIA\n"); } //
+    | expresionpostfija                         { printf("expresion - EXPRESIONPOSTFIJA\n"); } //
+    | expresionunaria                           { printf("expresion - EXPRESIONUNARIA\n"); } //
+    | expresionmultiplicativa                   { printf("expresion - EXPRESIONMULTIPLICATIVA\n"); } //
+    | expresionaditiva                          { printf("expresion - EXPRESIONADITIVA\n"); } //
+    | expresionrelacional                       { printf("expresion - EXPRESIONRELACIONAL\n"); } //
+    | expresiondeigualdad                       { printf("expresion - EXPRESIONDEIGUALDAD\n"); } //
+    | expresionand                              { printf("expresion - EXPRESIONAND\n"); } //
+    | expresionor                               { printf("expresion - EXPRESIONOR\n"); } //
+    | expresiondeasignacion                     { printf("expresion - EXPRESIONDEASIGNACION\n"); } //
+    ;
+expresionprimaria:
+      IDENTIFICADOR                             { printf("expresionprimaria - IDENTIFICADOR: %s\n", $1); } //
+    | CONSTANTE_ENTERA                          { printf("expresionprimaria - CONSTANTE_ENTERA: %d\n", yylval.entero); } //
+    | CONSTANTE_REAL                            { printf("expresionprimaria - CONSTANTE_REAL: %f\n", yylval.real); } //
+    //| CONSTANTE_CARACTER                        { printf("expresionprimaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); } //
+    | LITERAL_CADENA                            { printf("expresionprimaria - LITERAL_CADENA: %s\n", yylval.cadena); } //
+    | '(' expresion ')'                         { printf("expresionprimaria - (EXP)\n");} //
+    ;
+expresionpostfija:
+      IDENTIFICADOR '(' lista_argumentos_invocacion ')'    { printf("expresionpostfija - INVOCACION FUNCION: %s(argumentos)\n", $1); } //
+    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO    { printf("expresionpostfija - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); } //
+    ;
+expresionunaria:
+      OP_INCREMENTO_DECREMENTO IDENTIFICADOR    { printf("expresionunaria - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); } //
+    ;
+expresionmultiplicativa:
+      expresion OP_MULTIPLICATIVO expresion     { printf("expresionmultiplicativa: EXP1 %s EXP2\n", $2); } //
+    ;
+expresionaditiva:
+      expresion OP_ADITIVO expresion            { printf("expresionaditiva: EXP1 +/- EXP2\n"); } //
+    ;
+expresionrelacional:
+      expresion OP_RELACIONAL expresion         { printf("expresionrelacional: EXP1 %s EXP2\n", $2); } //
+    ;
+expresiondeigualdad:
+      expresion OP_IGUALDAD expresion           { printf("expresiondeigualdad: EXP1 %s EXP2\n", $2); } //
+    ;
+expresionand:
+      expresion OP_AND expresion                { printf("expresionand\n"); } //
+    ;
+expresionor:
+      expresion OP_OR expresion                 { printf("expresionor\n"); } //
+    ;
+expresiondeasignacion:
+      IDENTIFICADOR OP_ASIGNACION expresion     { printf("expresiondeasignacion: %s %s EXP\n", $1, $2); } //
+    ;
+lista_argumentos_invocacion:
+    | expresion                                     { printf("ARGUMENTO\n"); } //
+    | lista_argumentos_invocacion ',' expresion     { printf("ARGUMENTO\n"); } //
+    ;
+/*-----------------------------------------------------------------------------------------------------------*/
 sentencia:
     | sentenciadeexpresion
     | sentenciacompuesta
@@ -127,7 +161,6 @@ sentenciafor:
 case:
     CASE expresion ':' sentencias {printf("case\n");}
     ;
-
 cases:
     case
     | cases case
@@ -142,28 +175,42 @@ return:
     //podria ir tambien '(' expresion ')'
     RETURN expresion ';' {printf("return\n");}
     ;
-
+/*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
-    TIPODEDATO listadeclaradores ';' { printf("declaracion\n"); }
+      sufijo TIPODEDATO listadeclaradoresvariable ';' { printf("declaracion de variable %s\n", $<cadena>2); }
+    | sufijo TIPODEDATO listadeclaradoresfuncion ';' { printf("declaracion de funcion %s\n", $<cadena>2); }
     ;
 
-listadeclaradores:
-    //creo que falta ';'
-    declarador { printf("lista_declaradores\n"); }
-    | listadeclaradores ',' declarador { printf("lista_declaradores\n"); }
+listadeclaradoresvariable:
+    declaradorvariable { printf("listadeclaradoresvariable\n"); }
+    | listadeclaradoresvariable ',' declaradorvariable { printf("listadeclaradoresvariable\n"); }
+    ;
+declaradorvariable:
+    IDENTIFICADOR inicializacionvariable { printf("declarador_variable %s\n", $1); }
+    ;
+inicializacionvariable:
+    | OP_ASIGNACION expresion { printf("inicializacion de variable %s\n", $1); }
     ;
 
-declarador:
-    IDENTIFICADOR
-    | IDENTIFICADOR OP_ASIGNACION inicializacion
+listadeclaradoresfuncion:
+    declaradorfuncion { printf("lista_declaradores_funcion\n"); }
+    | listadeclaradoresfuncion ',' declaradorfuncion { printf("lista_declaradores_funcion\n"); }
+    ;
+declaradorfuncion:
+      IDENTIFICADOR '(' lista_argumentos_prototipo ')' { printf("declarador_funcion %s\n", $1); }
+    ;
+lista_argumentos_prototipo:
+    | argumento_prototipo { printf("argumento_prototipo\n"); }
+    | lista_argumentos_prototipo ',' argumento_prototipo { printf("argumento_prototipo\n"); }
+    ;
+argumento_prototipo:
+     declaradorvariable
+    | TIPODEDATO declaradorvariable
     ;
 
-inicializacion:
-    CONSTANTE_ENTERA
-    | CONSTANTE_REAL
-    | CONSTANTE_CARACTER
+sufijo:
+    | SUFIJO { printf("sufijo %s\n", $<cadena>1); }
     ;
-
 %%
 
 
@@ -200,8 +247,6 @@ struct init const no_nec_declaracion[]=
   {"putchar",putchar},
 
   {"malloc",malloc},
-
-  {"free",free},
 
   {"fopen",fopen},
 
