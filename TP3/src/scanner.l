@@ -84,7 +84,8 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
                     BEGIN(INITIAL);
                 }   
     [^ \t\n]+   {
-                    yylval.cadena = strdup(yytext); 
+                    yylval.cadena = strdup(yytext);
+                    agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.last_column); 
                     yylloc.last_column += yyleng;
                     BEGIN(INITIAL); 
                     return NO_RECONOCIDO;

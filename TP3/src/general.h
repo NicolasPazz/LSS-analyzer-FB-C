@@ -21,22 +21,23 @@ void pausa(void);
 void inicializarUbicacion(void);
 void reinicializarUbicacion(void);
 
-/*
+
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
     char *variableDeclarada;
+    char *tipoDato;
     struct NodoVariableDeclarada *siguiente;
 } NodoVariableDeclarada;
 
 NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista);
 
-extern NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
+extern NodoVariableDeclarada* listaVariablesDeclaradas;
 
 
 // FUNCIONES
@@ -53,7 +54,7 @@ void imprimirFunciones(NodoFuncion *lista);
 
 void liberarFunciones(NodoFuncion *lista);
 
-extern NodoFuncion* listaFunciones = NULL;
+extern NodoFuncion* listaFunciones;
 
 
 // SENTENCIAS
@@ -70,7 +71,7 @@ void imprimirSentencias(NodoSentencia *lista);
 
 void liberarSentencias(NodoSentencia *lista);
 
-extern NodoSentencia* listaSentencias = NULL;
+extern NodoSentencia* listaSentencias;
 
 
 // ESTRUCTURAS NO RECONOCIDAS
@@ -87,28 +88,30 @@ void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
 
 void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
 
-extern NodoEstructuraNoReconocida* listaEstructurasNoReconocidas = NULL;
+extern NodoEstructuraNoReconocida* listaEstructurasNoReconocidas;
 
 
 // CADENAS NO RECONOCIDAS
 typedef struct NodoCadenaNoReconocida {
     char *cadenaNoReconocida;
+    int linea;
+    int columna;
     struct NodoCadenaNoReconocida *siguiente;
 } NodoCadenaNoReconocida;
 
-NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *cadenaNoReconocida);
+NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *cadenaNoReconocida, int linea, int columna);
 
-void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *cadenaNoReconocida);
+void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *cadenaNoReconocida, int linea, int columna);
 
 void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
-extern NodoCadenaNoReconocida* listaCadenasNoReconocidas = NULL;
+extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
 
 
 // FUNCIONES
 
 char* copiarCadena(const char *str);
-*/
+
 #endif

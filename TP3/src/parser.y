@@ -50,7 +50,7 @@ line:
     | expresion '\n'
     | sentencia '\n'
     | declaracion '\n'
-    | error '\n' { yyclearin; yyerrok; printf("\n");}
+    | error '\n' { /*agregarEstructuraNoReconocida(lista,estructura,linea)*/ yyclearin; yyerrok; printf("\n");}
     ;
 
 expresion:
@@ -66,7 +66,7 @@ expresion:
     | expresiondeasignacion                     { printf("expresion - EXPRESIONDEASIGNACION\n"); } //
     ;
 expresionprimaria:
-      IDENTIFICADOR                             { printf("expresionprimaria - IDENTIFICADOR: %s\n", $1); } //
+      IDENTIFICADOR                             { /*verificar declaracion en ts*/ printf("expresionprimaria - IDENTIFICADOR: %s\n", $1); } //
     | CONSTANTE_ENTERA                          { printf("expresionprimaria - CONSTANTE_ENTERA: %d\n", yylval.entero); } //
     | CONSTANTE_REAL                            { printf("expresionprimaria - CONSTANTE_REAL: %f\n", yylval.real); } //
     //| CONSTANTE_CARACTER                        { printf("expresionprimaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); } //
@@ -131,54 +131,54 @@ sentencias:
     | sentencias sentencia
     ;
 sentenciaif:
-    IF '(' expresion ')' sentenciacompuesta {printf("sentenciaif\n");}
+    IF '(' expresion ')' sentenciacompuesta { /*agregarSentencia(lista,"if",linea,columna)*/ printf("sentenciaif\n");}
     ;
 sentenciaifelse:
 //revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
     IF '(' expresion ')' sentenciacompuesta
-    ELSE sentenciacompuesta {printf("sentenciaifelse\n");}
+    ELSE sentenciacompuesta { /*agregarSentencia(lista,"if/else",linea,columna)*/ printf("sentenciaifelse\n");}
     ;
 sentenciaswitch:
-    SWITCH '(' expresion ')' '{' cases '}' {printf("sentenciaswitch\n");}
-    | SWITCH '(' expresion ')' '{' cases default '}' {printf("sentenciaifelse\n");}
+    SWITCH '(' expresion ')' '{' cases '}' { /*agregarSentencia(lista,"switch",linea,columna)*/ printf("sentenciaswitch\n");}
+    | SWITCH '(' expresion ')' '{' cases default '}' { /*agregarSentencia(lista,"switch",linea,columna)*/ printf("sentenciaifelse\n");}
     //fijarme si el default puede ir en otra parte que no sea el final 
     ;
 default:
-    DEFAULT  ':' sentencias {printf("default\n");}
+    DEFAULT  ':' sentencias { /*agregarSentencia(lista,"default",linea,columna)*/ printf("default\n");}
     ;
 sentenciawhile:
-    WHILE '(' expresion ')' sentenciacompuesta {printf("sentenciawhile\n");}
+    WHILE '(' expresion ')' sentenciacompuesta { /*agregarSentencia(lista,"while",linea,columna)*/ printf("sentenciawhile\n");}
     ;
 sentenciadowhile:
     DO sentenciacompuesta
-    WHILE '(' expresion ')' ';' {printf("sentenciadowhile\n");}
+    WHILE '(' expresion ')' ';' { /*agregarSentencia(lista,"do/while",linea,columna)*/ printf("sentenciadowhile\n");}
     ;
 sentenciafor:
     //FOR '(' primerapartefor ';' expresion ';' expresion ')' 
-    sentenciacompuesta {printf("sentenciafor\n");}
+    sentenciacompuesta { /*agregarSentencia(lista,"for",linea,columna)*/ printf("sentenciafor\n");}
     //Definir primerapartefor - es una declaracion e inicializacion de variable
     ;
 case:
-    CASE expresion ':' sentencias {printf("case\n");}
+    CASE expresion ':' sentencias { /*agregarSentencia(lista,"case",linea,columna)*/ printf("case\n");}
     ;
 cases:
     case
     | cases case
     ;
 continue:
-    CONTINUE ';' {printf("continue\n");}
+    CONTINUE ';' { /*agregarSentencia(lista,"continue",linea,columna)*/ printf("continue\n");}
     ;
 break:
-    BREAK ';' {printf("break\n");}
+    BREAK ';' { /*agregarSentencia(lista,"break",linea,columna)*/ printf("break\n");}
     ;
 return:
     //podria ir tambien '(' expresion ')'
-    RETURN expresion ';' {printf("return\n");}
+    RETURN expresion ';' { /*agregarSentencia(lista,"return",linea,columna)*/ printf("return\n");}
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
-      sufijo TIPODEDATO listadeclaradoresvariable ';' { printf("declaracion de variable %s\n", $<cadena>2); }
-    | sufijo TIPODEDATO listadeclaradoresfuncion ';' { printf("declaracion de funcion %s\n", $<cadena>2); }
+      sufijo TIPODEDATO listadeclaradoresvariable ';'   { printf("declaracion de variable %s\n", $<cadena>2); }
+    | sufijo TIPODEDATO listadeclaradoresfuncion ';'    { printf("declaracion de funcion %s\n", $<cadena>2); }
     ;
 
 listadeclaradoresvariable:
@@ -186,7 +186,7 @@ listadeclaradoresvariable:
     | listadeclaradoresvariable ',' declaradorvariable { printf("listadeclaradoresvariable\n"); }
     ;
 declaradorvariable:
-    IDENTIFICADOR inicializacionvariable { printf("declarador_variable %s\n", $1); }
+    IDENTIFICADOR inicializacionvariable { /*verificar declaracion en ts*/; /*agregarVariableDeclarada(lista,identificador,sufijo,tipodedato,linea)*/; printf("declarador_variable %s\n", $1); }
     ;
 inicializacionvariable:
     | OP_ASIGNACION expresion { printf("inicializacion de variable %s\n", $1); }
@@ -197,7 +197,7 @@ listadeclaradoresfuncion:
     | listadeclaradoresfuncion ',' declaradorfuncion { printf("lista_declaradores_funcion\n"); }
     ;
 declaradorfuncion:
-      IDENTIFICADOR '(' lista_argumentos_prototipo ')' { printf("declarador_funcion %s\n", $1); }
+      IDENTIFICADOR '(' lista_argumentos_prototipo ')' { /*verificar declaracion en ts*/; /*agregarFuncion(lista,identificador,declaracion,listadodeparametros,tipodedato,linea)*/; printf("declarador_funcion %s\n", $1); }
     ;
 lista_argumentos_prototipo:
     | argumento_prototipo { printf("argumento_prototipo\n"); }
@@ -206,6 +206,7 @@ lista_argumentos_prototipo:
 argumento_prototipo:
      declaradorvariable
     | TIPODEDATO declaradorvariable
+    | TIPODEDATO
     ;
 
 sufijo:
@@ -294,6 +295,8 @@ int main(int argc, char *argv[]) {
 
     yyin = file;
 
+    inicializarUbicacion();
+
     yyparse();   
 
     fclose(file);
@@ -318,11 +321,11 @@ int main(int argc, char *argv[]) {
     imprimirEstructurasNoReconocidas(listaEstructurasNoReconocidas);
     liberarEstructurasNoReconocidas(listaEstructurasNoReconocidas);
     printf("\n");
-
+*/
     //5
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
     printf("\n");
-*/
+
     return 0;
 }
