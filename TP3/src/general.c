@@ -54,13 +54,62 @@ NodoFuncion* listaFunciones = NULL;
 
 // SENTENCIAS
 
-NodoSentencia* crearNodoSentencia(const char *sentencia){};
+NodoSentencia* crearNodoSentencia(const char *sentencia, const char *tipoSentencia, const int linea, const int columna){
+    NodoSentencia *nuevo = (NodoSentencia *)malloc(sizeof(NodoSentencia));
+    nuevo->sentencia = copiarCadena(sentencia);
+    nuevo->tipoSentencia = copiarCadena(tipoSentencia);
+    nuevo->linea = linea;
+    nuevo->columna = columna;
+    nuevo->siguiente = NULL;
+    return nuevo;
+};
 
-void agregarSentencia(NodoSentencia **lista, const char *sentencia){};
+void agregarSentencia(NodoSentencia **lista, const char *sentencia, const char *tipoSentencia, const int linea, const int columna){
+     // Crear el nuevo nodo
+    NodoSentencia *nuevoNodo = crearNodoSentencia(sentencia, tipoSentencia, linea, columna);
 
-void imprimirSentencias(NodoSentencia *lista){};
+    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+        return;
+    }
 
-void liberarSentencias(NodoSentencia *lista){};
+    // Si la lista no está vacía, recorrer hasta el final
+    NodoSentencia *actual = *lista;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodo;
+};
+
+void imprimirSentencias(NodoSentencia *lista){
+    NodoSentencia *actual = lista;
+    printf("* Listado de sentencias:\n");
+    
+    if (actual == NULL) {
+        printf("-\n");
+        return;
+    }
+
+    while (actual != NULL) {
+        printf("%s: linea %d, columna %d\n", actual->tipoSentencia, actual->linea, actual->columna);
+        actual = actual->siguiente;
+    }
+};
+
+void liberarSentencias(NodoSentencia *lista){
+    NodoSentencia *actual = lista;
+    NodoSentencia *siguiente = NULL;
+
+    while (actual != NULL) {
+        siguiente = actual->siguiente;
+        free(actual->sentencia);
+        free(actual);
+        actual = siguiente;
+    }
+};
 
 NodoSentencia* listaSentencias = NULL;
 

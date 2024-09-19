@@ -60,12 +60,15 @@ extern NodoFuncion* listaFunciones;
 // SENTENCIAS
 typedef struct NodoSentencia {
     char *sentencia;
+    char *tipoSentencia;
+    int linea;
+    int columna;
     struct NodoSentencia *siguiente;
 } NodoSentencia;
 
-NodoSentencia* crearNodoSentencia(const char *sentencia);
+NodoSentencia* crearNodoSentencia(const char *sentencia, const char *tipoSentencia, const int linea, const int columna);
 
-void agregarSentencia(NodoSentencia **lista, const char *sentencia);
+void agregarSentencia(NodoSentencia **lista, const char *sentencia, const char *tipoSentencia, const int linea, const int columna);
 
 void imprimirSentencias(NodoSentencia *lista);
 
