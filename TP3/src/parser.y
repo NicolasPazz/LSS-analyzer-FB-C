@@ -131,49 +131,49 @@ sentencias:
     | sentencias sentencia
     ;
 sentenciaif:
-    IF '(' expresion ')' sentenciacompuesta { /*agregarSentencia(lista,"if",linea,columna)*/ printf("sentenciaif\n");}
+    IF '(' expresion ')' sentenciacompuesta { /*agregarSentencia(listaSentencias,"if",linea,columna)*/ printf("sentenciaif\n");}
     ;
 sentenciaifelse:
 //revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
     IF '(' expresion ')' sentenciacompuesta
-    ELSE sentenciacompuesta { /*agregarSentencia(lista,"if/else",linea,columna)*/ printf("sentenciaifelse\n");}
+    ELSE sentenciacompuesta { /*agregarSentencia(listaSentencias,"if/else",linea,columna)*/ printf("sentenciaifelse\n");}
     ;
 sentenciaswitch:
-    SWITCH '(' expresion ')' '{' cases '}' { /*agregarSentencia(lista,"switch",linea,columna)*/ printf("sentenciaswitch\n");}
-    | SWITCH '(' expresion ')' '{' cases default '}' { /*agregarSentencia(lista,"switch",linea,columna)*/ printf("sentenciaifelse\n");}
+    SWITCH '(' expresion ')' '{' cases '}' { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaswitch\n");}
+    | SWITCH '(' expresion ')' '{' cases default '}' { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaifelse\n");}
     //fijarme si el default puede ir en otra parte que no sea el final 
     ;
 default:
-    DEFAULT  ':' sentencias { /*agregarSentencia(lista,"default",linea,columna)*/ printf("default\n");}
+    DEFAULT  ':' sentencias { /*agregarSentencia(listaSentencias,"default",linea,columna)*/ printf("default\n");}
     ;
 sentenciawhile:
-    WHILE '(' expresion ')' sentenciacompuesta { /*agregarSentencia(lista,"while",linea,columna)*/ printf("sentenciawhile\n");}
+    WHILE '(' expresion ')' sentenciacompuesta { /*agregarSentencia(listaSentencias,"while",linea,columna)*/ printf("sentenciawhile\n");}
     ;
 sentenciadowhile:
     DO sentenciacompuesta
-    WHILE '(' expresion ')' ';' { /*agregarSentencia(lista,"do/while",linea,columna)*/ printf("sentenciadowhile\n");}
+    WHILE '(' expresion ')' ';' { /*agregarSentencia(listaSentencias,"do/while",linea,columna)*/ printf("sentenciadowhile\n");}
     ;
 sentenciafor:
     //FOR '(' primerapartefor ';' expresion ';' expresion ')' 
-    sentenciacompuesta { /*agregarSentencia(lista,"for",linea,columna)*/ printf("sentenciafor\n");}
+    sentenciacompuesta { /*agregarSentencia(listaSentencias,"for",linea,columna)*/ printf("sentenciafor\n");}
     //Definir primerapartefor - es una declaracion e inicializacion de variable
     ;
 case:
-    CASE expresion ':' sentencias { /*agregarSentencia(lista,"case",linea,columna)*/ printf("case\n");}
+    CASE expresion ':' sentencias { /*agregarSentencia(listaSentencias,"case",linea,columna)*/ printf("case\n");}
     ;
 cases:
     case
     | cases case
     ;
 continue:
-    CONTINUE ';' { /*agregarSentencia(lista,"continue",linea,columna)*/ printf("continue\n");}
+    CONTINUE ';' { /*agregarSentencia(listaSentencias,"continue",linea,columna)*/ printf("continue\n");}
     ;
 break:
-    BREAK ';' { /*agregarSentencia(lista,"break",linea,columna)*/ printf("break\n");}
+    BREAK ';' { /*agregarSentencia(listaSentencias,"break",linea,columna)*/ printf("break\n");}
     ;
 return:
     //podria ir tambien '(' expresion ')'
-    RETURN expresion ';' { /*agregarSentencia(lista,"return",linea,columna)*/ printf("return\n");}
+    RETURN expresion ';' { /*agregarSentencia(listaSentencias,"return",linea,columna)*/ printf("return\n");}
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
