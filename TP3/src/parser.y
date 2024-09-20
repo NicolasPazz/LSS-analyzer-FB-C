@@ -215,6 +215,65 @@ sufijo:
 %%
 
 
+{-
+
+/* Definiciones externas */
+definicionexterna:
+      declaracion { printf("definicionexterna - DECLARACION\n"); }
+    | definicionfuncion { printf("definicionexterna - DEFINICION DE FUNCION\n"); }
+    ;
+
+definicionexternas:
+      definicionexterna
+    | definicionexternas definicionexterna
+    ;
+/*-----------------------------------------------------------------------------------------------------------*/
+/* Definiciones de funciones */
+definicionfuncion:
+      TIPODEDATO declaradorfuncion cuerpo_funcion { printf("definicionfuncion - FUNCION: %s\n", $2); }
+    ;
+
+/* Cuerpo de la función */
+cuerpo_funcion:
+      '{' sentencias '}' { printf("cuerpo_funcion\n"); }
+    ;
+
+/* Declaración de prototipo de función */
+prototipofuncion:
+      TIPODEDATO declaradorfuncion ';' { printf("prototipofuncion\n"); }
+    ;
+    -}
+-----------------------------------------------------------------------------------------------------------*/
+{-/* Declaraciones */
+declaracion:
+      TIPODEDATO listadeclaradoresvariable ';' { printf("declaracion de variable global %s\n", $2); }
+    ;
+
+listadeclaradoresvariable:
+      declaradorvariable { printf("listadeclaradoresvariable\n"); }
+    | listadeclaradoresvariable ',' declaradorvariable { printf("listadeclaradoresvariable\n"); }
+    ;
+
+declaradorvariable:
+      IDENTIFICADOR inicializacionvariable { printf("declarador_variable %s\n", $1); }
+    ;
+
+inicializacionvariable:
+    | OP_ASIGNACION expresion { printf("inicializacion de variable %s\n", $1); }
+    ;
+
+-}
+
+
+
+
+
+
+
+
+
+
+
 // Define variable puntero que apunta a la tabla de símbolos 
 
 
