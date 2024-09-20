@@ -215,60 +215,51 @@ sufijo:
 %%
 
 
+
 {-
-
-/* Definiciones externas */
-definicionexterna:
-      declaracion { printf("definicionexterna - DECLARACION\n"); }
-    | definicionfuncion { printf("definicionexterna - DEFINICION DE FUNCION\n"); }
+declaracion_funcion:
+      TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' ';'
+      {
+          printf("Declaración de función: %s, retorna: %s\n", $2, $1);
+      }
     ;
 
-definicionexternas:
-      definicionexterna
-    | definicionexternas definicionexterna
-    ;
-/*-----------------------------------------------------------------------------------------------------------*/
-/* Definiciones de funciones */
-definicionfuncion:
-      TIPODEDATO declaradorfuncion cuerpo_funcion { printf("definicionfuncion - FUNCION: %s\n", $2); }
+definicion_funcion:
+      TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' '{' cuerpo_funcion '}'
+      {
+          printf("Definición de función: %s, retorna: %s\n", $2, $1);
+      }
     ;
 
-/* Cuerpo de la función */
+lista_parametros:
+      /* Ningún parámetro */
+    | TIPODEDATO IDENTIFICADOR
+      {
+          printf("Parámetro: %s %s\n", $1, $2);
+      }
+    | lista_parametros ',' TIPODEDATO IDENTIFICADOR
+      {
+          printf("Parámetro: %s %s\n", $3, $4);
+      }
+    ;
+
 cuerpo_funcion:
-      '{' sentencias '}' { printf("cuerpo_funcion\n"); }
+      /* Secuencia de sentencias en la función */
+    | cuerpo_funcion sentencia
     ;
 
-/* Declaración de prototipo de función */
-prototipofuncion:
-      TIPODEDATO declaradorfuncion ';' { printf("prototipofuncion\n"); }
-    ;
-    -}
------------------------------------------------------------------------------------------------------------*/
-{-/* Declaraciones */
 declaracion:
-      TIPODEDATO listadeclaradoresvariable ';' { printf("declaracion de variable global %s\n", $2); }
-    ;
-
-listadeclaradoresvariable:
-      declaradorvariable { printf("listadeclaradoresvariable\n"); }
-    | listadeclaradoresvariable ',' declaradorvariable { printf("listadeclaradoresvariable\n"); }
-    ;
-
-declaradorvariable:
-      IDENTIFICADOR inicializacionvariable { printf("declarador_variable %s\n", $1); }
-    ;
-
-inicializacionvariable:
-    | OP_ASIGNACION expresion { printf("inicializacion de variable %s\n", $1); }
+    TIPODEDATO IDENTIFICADOR ';'
+    {
+        printf("Declaración de variable: %s, tipo: %s\n", $2, $1);
+    }
+    | TIPODEDATO IDENTIFICADOR '=' expresion ';'
+    {
+        printf("Declaración e inicialización de variable: %s, tipo: %s\n", $2, $1);
+    }
     ;
 
 -}
-
-
-
-
-
-
 
 
 
