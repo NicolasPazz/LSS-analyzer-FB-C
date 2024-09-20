@@ -2,7 +2,8 @@
 /* Recordar solamente indicar archivos *.h en las directivas de preprocesador #include, nunca archivos *.c */
 
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <string.h>
 #include "general.h"
 
 YYLTYPE yylloc;
@@ -27,16 +28,67 @@ void reinicializarUbicacion(void)
 
 
 // VARIABLES DECLARADAS
-
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada){};
-
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato){};
-
-void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){};
-
-void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){};
-
+/*
 NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
+
+
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea){
+    NodoVariableDeclarada *nuevo = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
+    nuevo->variableDeclarada = copiarCadena(variableDeclarada);
+    nuevo->linea = linea;
+    nuevo->tipoDato = copiarCadena(tipoDato);
+    nuevo->siguiente = NULL;
+    return nuevo;
+}
+
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea) {
+    // Crear el nuevo nodo
+    NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(variableDeclarada, tipoDato, linea);
+
+    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+        return;
+    }
+
+    // Si la lista no está vacía, recorrer hasta el final
+    NodoVariableDeclarada *actual = *lista;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodo;
+}
+
+void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
+    NodoVariableDeclarada *actual = lista;
+    printf("* Listado de variables declaradas:\n");
+    
+    if (actual == NULL) {
+        printf("-\n");
+        return;
+    }
+
+    while (actual != NULL) {
+        printf("%s: %s, linea %d\n", actual->variableDeclarada, actual->tipoDato, actual->linea);
+        actual = actual->siguiente;
+    }
+}
+
+void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
+    NodoVariableDeclarada *actual = lista;
+    NodoVariableDeclarada *siguiente = NULL;
+
+    while (actual != NULL) {
+        siguiente = actual->siguiente;
+        free(actual->variableDeclarada);
+        free(actual->tipoDato);
+        free(actual);
+        actual = siguiente;
+    }
+}
+*/
 
 
 // FUNCIONES
@@ -61,7 +113,7 @@ NodoSentencia* crearNodoSentencia(const char *sentencia, const int linea, const 
     nuevo->columna = columna;
     nuevo->siguiente = NULL;
     return nuevo;
-};
+}
 
 
 void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int linea, const int columna){
@@ -82,7 +134,7 @@ void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int li
 
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
-};
+}
 
 void imprimirSentencias(NodoSentencia *lista){
     NodoSentencia *actual = lista;
@@ -97,7 +149,7 @@ void imprimirSentencias(NodoSentencia *lista){
         printf("%s: linea %d, columna %d\n", actual->sentencia, actual->linea, actual->columna);
         actual = actual->siguiente;
     }
-};
+}
 
 void liberarSentencias(NodoSentencia *lista){
     NodoSentencia *actual = lista;
@@ -109,7 +161,7 @@ void liberarSentencias(NodoSentencia *lista){
         free(actual);
         actual = siguiente;
     }
-};
+}
 
 NodoSentencia* listaSentencias = NULL;
 
