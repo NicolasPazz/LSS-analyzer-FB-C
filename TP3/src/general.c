@@ -1,6 +1,3 @@
-/* En los archivos (*.c) se pueden poner tanto DECLARACIONES como DEFINICIONES de C, así como directivas de preprocesador */
-/* Recordar solamente indicar archivos *.h en las directivas de preprocesador #include, nunca archivos *.c */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,78 +25,27 @@ void reinicializarUbicacion(void)
 
 
 // VARIABLES DECLARADAS
-/*
+
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada){}
+
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato){}
+
+void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){}
+
+void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){}
+
 NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
-
-
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea){
-    NodoVariableDeclarada *nuevo = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
-    nuevo->variableDeclarada = copiarCadena(variableDeclarada);
-    nuevo->linea = linea;
-    nuevo->tipoDato = copiarCadena(tipoDato);
-    nuevo->siguiente = NULL;
-    return nuevo;
-}
-
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea) {
-    // Crear el nuevo nodo
-    NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(variableDeclarada, tipoDato, linea);
-
-    // Si la lista está vacía, el nuevo nodo es el primer nodo
-    if (*lista == NULL) {
-        *lista = nuevoNodo;
-        return;
-    }
-
-    // Si la lista no está vacía, recorrer hasta el final
-    NodoVariableDeclarada *actual = *lista;
-    while (actual->siguiente != NULL) {
-        actual = actual->siguiente;
-    }
-
-    // Enlazar el nuevo nodo al final de la lista
-    actual->siguiente = nuevoNodo;
-}
-
-void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
-    NodoVariableDeclarada *actual = lista;
-    printf("* Listado de variables declaradas:\n");
-    
-    if (actual == NULL) {
-        printf("-\n");
-        return;
-    }
-
-    while (actual != NULL) {
-        printf("%s: %s, linea %d\n", actual->variableDeclarada, actual->tipoDato, actual->linea);
-        actual = actual->siguiente;
-    }
-}
-
-void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
-    NodoVariableDeclarada *actual = lista;
-    NodoVariableDeclarada *siguiente = NULL;
-
-    while (actual != NULL) {
-        siguiente = actual->siguiente;
-        free(actual->variableDeclarada);
-        free(actual->tipoDato);
-        free(actual);
-        actual = siguiente;
-    }
-}
-*/
 
 
 // FUNCIONES
 
-NodoFuncion* crearNodoFuncion(const char *funcion){};
+NodoFuncion* crearNodoFuncion(const char *funcion){}
 
-void agregarFuncion(NodoFuncion **lista, const char *funcion){};
+void agregarFuncion(NodoFuncion **lista, const char *funcion){}
 
-void imprimirFunciones(NodoFuncion *lista){};
+void imprimirFunciones(NodoFuncion *lista){}
 
-void liberarFunciones(NodoFuncion *lista){};
+void liberarFunciones(NodoFuncion *lista){}
 
 NodoFuncion* listaFunciones = NULL;
 
@@ -114,7 +60,6 @@ NodoSentencia* crearNodoSentencia(const char *sentencia, const int linea, const 
     nuevo->siguiente = NULL;
     return nuevo;
 }
-
 
 void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int linea, const int columna){
      // Crear el nuevo nodo
@@ -168,13 +113,13 @@ NodoSentencia* listaSentencias = NULL;
 
 // ESTRUCTURAS NO RECONOCIDAS
 
-NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida){};
+NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida){}
 
-void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida){};
+void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida){}
 
-void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){};
+void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){}
 
-void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){};
+void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){}
 
 NodoEstructuraNoReconocida* listaEstructurasNoReconocidas = NULL;
 
@@ -238,126 +183,6 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
 }
 
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
-
-
-// DEFINICIONES EXTERNAS
-
-//ESTRUCTURAS DE DEFINICIONES EXTERNAS
-NodoFuncionExterna* crearNodoFuncionExterna(const char *nombreFuncion, const char *tipoRetorno){};
-
-void agregarParametro(NodoFuncionExterna *funcion, const char *tipoDeDato, const char *nombreParametro){};
-
-void agregarFuncion(NodoFuncionExterna **lista, const char *nombreFuncion, const char *tipoRetorno){};
-
-void imprimirFuncionesExterna(NodoFuncionExterna *lista){};
-
-void liberarFuncionesExterna(NodoFuncionExterna *lista){};
-
-NodoFuncionExterna* listaFuncionesExterna = NULL;
-
-//CREAR NODO DE FUNCION
-NodoFuncionExterna* crearNodoFuncionExterna(const char *nombreFuncion, const char *tipoRetorno) {
-    NodoFuncionExterna *nuevo = (NodoFuncionExterna *)malloc(sizeof(NodoFuncionExterna));
-    nuevo->nombreFuncion = copiarCadena(nombreFuncion);
-    nuevo->tipoRetorno = copiarCadena(tipoRetorno);
-    nuevo->parametros = NULL;
-    nuevo->siguiente = NULL;
-    return nuevo;
-}
-
-// AGREGAR PARAMETRO EN LA FUNCION
-void agregarParametro(NodoFuncionExterna *funcion, const char *tipoDeDato, const char *nombreParametro) {
-    NodoParametro *nuevoParametro = (NodoParametro *)malloc(sizeof(NodoParametro));
-    nuevoParametro->tipoDeDato = copiarCadena(tipoDeDato);
-    nuevoParametro->nombreParametro = copiarCadena(nombreParametro);
-    nuevoParametro->siguiente = NULL;
-
-    // Si no hay parámetros, este es el primero
-    if (funcion->parametros == NULL) {
-        funcion->parametros = nuevoParametro;
-    } else {
-        // Si ya hay parámetros, lo agregamos al final
-        NodoParametro *actual = funcion->parametros;
-        while (actual->siguiente != NULL) {
-            actual = actual->siguiente;
-        }
-        actual->siguiente = nuevoParametro;
-    }
-}
-
-// AGREGAR FUNCION EN UNA LISTA DE FUNCIONES 
-void agregarFuncionExterna(NodoFuncionExterna **lista, const char *nombreFuncion, const char *tipoRetorno) {
-    NodoFuncionExterna *nuevaFuncionExterna = crearNodoFuncionExterna(nombreFuncion, tipoRetorno);
-
-    // Si la lista está vacía, esta es la primera función
-    if (*lista == NULL) {
-        *lista = nuevaFuncionExterna;
-    } else {
-        // Si ya hay funciones, la agregamos al final
-        NodoFuncionExterna *actual = *lista;
-        while (actual->siguiente != NULL) {
-            actual = actual->siguiente;
-        }
-        actual->siguiente = nuevaFuncionExterna;
-    }
-}
-
-// IMPRIMIR FUNCIONES
-void imprimirFuncionesExterna(NodoFuncionExterna *lista) {
-    NodoFuncionExterna *actual = lista;
-    printf("* Listado de funciones declaradas/definidas:\n");
-    
-    if (actual == NULL) {
-        printf("-\n");
-        return;
-    }
-
-    while (actual != NULL) {
-        printf("Función: %s\n", actual->nombreFuncion);
-        printf("Tipo de retorno: %s\n", actual->tipoRetorno);
-        printf("Parámetros:\n");
-
-        NodoParametro *parametroActual = actual->parametros;
-        if (parametroActual == NULL) {
-            printf("Sin parámetros\n");
-        } else {
-            while (parametroActual != NULL) {
-                printf("  %s %s\n", parametroActual->tipoDeDato, parametroActual->nombreParametro);
-                parametroActual = parametroActual->siguiente;
-            }
-        }
-        actual = actual->siguiente;
-        printf("\n");
-    }
-}
-
-// LIBERAR FUNCIONES 
-void liberarFuncionesExterna(NodoFuncionExterna *lista) {
-    NodoFuncionExterna *actual = lista;
-    NodoFuncionExterna *siguiente = NULL;
-
-    while (actual != NULL) {
-        siguiente = actual->siguiente;
-
-        // Liberar los parámetros
-        NodoParametro *parametroActual = actual->parametros;
-        NodoParametro *paramSiguiente = NULL;
-        while (parametroActual != NULL) {
-            paramSiguiente = parametro->siguiente;
-            free(parametroActual->tipoDeDato);
-            free(parametroActual->nombreParametro);
-            free(parametroActual);
-            parametro = paramSiguiente;
-        }
-
-        // Liberar la función
-        free(actual->nombreFuncion);
-        free(actual->tipoRetorno);
-        free(actual);
-        actual = siguiente;
-    }
-}
-
 
 
 // FUNCIONES

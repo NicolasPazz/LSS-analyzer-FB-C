@@ -55,7 +55,7 @@ line:
     ;
 
 expresion:
-      expresionprimaria                        { printf("expresion - EXPRESIONPRIMARIA\n"); } //
+      expresionprimaria                         { printf("expresion - EXPRESIONPRIMARIA\n"); } //
     | expresionpostfija                         { printf("expresion - EXPRESIONPOSTFIJA\n"); } //
     | expresionunaria                           { printf("expresion - EXPRESIONUNARIA\n"); } //
     | expresionmultiplicativa                   { printf("expresion - EXPRESIONMULTIPLICATIVA\n"); } //
@@ -75,8 +75,8 @@ expresionprimaria:
     | '(' expresion ')'                         { printf("expresionprimaria - (EXP)\n");} //
     ;
 expresionpostfija:
-      IDENTIFICADOR '(' lista_argumentos_invocacion ')'    { printf("expresionpostfija - INVOCACION FUNCION: %s(argumentos)\n", $1); } //
-    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO    { printf("expresionpostfija - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); } //
+      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { printf("expresionpostfija - INVOCACION FUNCION: %s(argumentos)\n", $1); } //
+    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { printf("expresionpostfija - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); } //
     ;
 expresionunaria:
       OP_INCREMENTO_DECREMENTO IDENTIFICADOR    { printf("expresionunaria - INCREMENTO/DECREMENTO: %s %s\n", $1, $2); } //
@@ -124,7 +124,7 @@ sentencia:
     ;
 sentenciadeexpresion:
       expresion ';' {printf("sentenciadeexpresion\n");}
-    | ';' {printf("sentenciadeexpresion\n");}
+    | ';'           {printf("sentenciadeexpresion\n");}
     ;
 sentenciacompuesta:
     '{' declaraciones sentencias '}' {printf("sentenciacompuesta\n");}
@@ -145,8 +145,8 @@ sentenciaifelse:
     sentenciaif ELSE sentenciacompuesta { /*agregarSentencia(listaSentencias,"if/else",linea,columna)*/ printf("sentenciaifelse\n");}
     ;
 sentenciaswitch:
-    SWITCH '(' expresion ')' '{' cases '}' { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaswitch\n");}
-    | SWITCH '(' expresion ')' '{' cases default '}' { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaifelse\n");}
+    SWITCH '(' expresion ')' '{' cases '}'              { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaswitch\n");}
+    | SWITCH '(' expresion ')' '{' cases default '}'    { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaifelse\n");}
     //fijarme si el default puede ir en otra parte que no sea el final 
     ;
 sentenciawhile:
@@ -194,8 +194,8 @@ break:
     BREAK ';' { printf("break\n");}
     ;
 return:
-      RETURN expresion ';' { printf("return\n");}
-    | RETURN ';' { printf("return\n");}
+      RETURN expresion ';'  { printf("return\n");}
+    | RETURN ';'            { printf("return\n");}
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
@@ -204,8 +204,8 @@ declaracion:
     ;
 
 listadeclaradoresvariable:
-    declaradorvariable { printf("listadeclaradoresvariable\n"); }
-    | listadeclaradoresvariable ',' declaradorvariable { printf("listadeclaradoresvariable\n"); }
+    declaradorvariable                                  { printf("listadeclaradoresvariable\n"); }
+    | listadeclaradoresvariable ',' declaradorvariable  { printf("listadeclaradoresvariable\n"); }
     ;
 declaradorvariable:
     IDENTIFICADOR inicializacionvariable { /*verificar declaracion en ts*/; /*agregarVariableDeclarada(lista,identificador,sufijo,tipodedato,linea)*/; printf("declarador_variable %s\n", $1); }
@@ -215,15 +215,15 @@ inicializacionvariable:
     ;
 
 listadeclaradoresfuncion:
-    declaradorfuncion { printf("lista_declaradores_funcion\n"); }
-    | listadeclaradoresfuncion ',' declaradorfuncion { printf("lista_declaradores_funcion\n"); }
+    declaradorfuncion                                   { printf("lista_declaradores_funcion\n"); }
+    | listadeclaradoresfuncion ',' declaradorfuncion    { printf("lista_declaradores_funcion\n"); }
     ;
 declaradorfuncion:
       IDENTIFICADOR '(' lista_argumentos_prototipo ')' { /*verificar declaracion en ts*/; /*agregarFuncion(lista,identificador,declaracion,listadodeparametros,tipodedato,linea)*/; printf("declarador_funcion %s\n", $1); }
     ;
 lista_argumentos_prototipo:
-    | argumento_prototipo { printf("argumento_prototipo\n"); }
-    | lista_argumentos_prototipo ',' argumento_prototipo { printf("argumento_prototipo\n"); }
+    | argumento_prototipo                                   { printf("argumento_prototipo\n"); }
+    | lista_argumentos_prototipo ',' argumento_prototipo    { printf("argumento_prototipo\n"); }
     ;
 argumento_prototipo:
      declaradorvariable
@@ -235,7 +235,7 @@ sufijo:
     | SUFIJO { printf("sufijo %s\n", $<cadena>1); }
     ;
 
-{-/*-----------------------------------------------------------------------------------------------------------*/-}
+/*-----------------------------------------------------------------------------------------------------------*/
 
 definicionesexternas:
     | declaracionesfunciones
@@ -250,8 +250,7 @@ definicion_funcion:
       TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' '{' cuerpo_funcion '}'{printf("Definición de función: %s, retorna: %s\n", $2, $1);}
     ;
 
-lista_parametros:
-    |/* vacío */                                   {printf("Funcion sin parametros\n"); }
+lista_parametros:                                   {printf("Funcion sin parametros\n"); }
     | TIPODEDATO IDENTIFICADOR                      {printf("Parámetro: %s %s\n", $1, $2);}
     | lista_parametros ',' TIPODEDATO IDENTIFICADOR {printf("Parámetro: %s %s\n", $3, $4);}
 

@@ -1,9 +1,5 @@
 #ifndef GENERAL_H
 #define GENERAL_H
-
-/* En los archivos de cabecera (header files) (*.h) poner DECLARACIONES (evitar DEFINICIONES) de C, así como directivas de preprocesador */
-/* Recordar solamente indicar archivos *.h en las directivas de preprocesador #include, nunca archivos *.c */
-
 #define YYLTYPE YYLTYPE
 
 typedef struct YYLTYPE
@@ -26,13 +22,12 @@ void reinicializarUbicacion(void);
 typedef struct NodoVariableDeclarada {
     char *variableDeclarada;
     char *tipoDato;
-    int linea;
     struct NodoVariableDeclarada *siguiente;
 } NodoVariableDeclarada;
 
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea);
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
@@ -95,31 +90,6 @@ void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
 
 extern NodoEstructuraNoReconocida* listaEstructurasNoReconocidas;
 
-// ESTRUCUTRA DEFINICIONES EXTERNAS 
-typedef struct NodoParametro {
-    char *tipoDeDato;
-    char *nombreParametro;
-    struct NodoParametro *siguiente;
-} NodoParametro;
-
-typedef struct NodoFuncionExterna {
-    char *nombreFuncion;
-    char *tipoRetorno;
-    NodoParametro *parametros;
-    struct NodoFuncionExterna *siguiente;
-} NodoFuncionExterna;
-
-NodoFuncionExterna* crearNodoFuncionExterna(const char *nombreFuncion, const char *tipoRetorno){};
-
-void agregarParametro(NodoFuncionExterna *funcion, const char *tipoDeDato, const char *nombreParametro){};
-
-void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno){};
-
-void imprimirFuncionesExterna(NodoFuncionExterna *lista){};
-
-void liberarFunciones(NodoFuncionExterna *lista){};
-
-extern NodoFuncionExterna* listaFuncionesExterna ;
 
 // CADENAS NO RECONOCIDAS
 typedef struct NodoCadenaNoReconocida {
