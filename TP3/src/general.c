@@ -241,17 +241,19 @@ NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 
 // DEFINICIONES EXTERNAS
 
-NodoFuncion* crearNodoFuncion(const char *nombre, const char *tipoRetorno){};
+NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipoRetorno){};
 
-void agregarParametro(NodoFuncion *funcion, const char *tipo, const char *nombre){};
+void agregarParametro(NodoFuncionExterna *funcion, const char *tipo, const char *nombre){};
 
 void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno){};
 
-void imprimirFuncionesExterna(NodoFuncionExterna *lista){};
+void imprimirListaDeFuncionesExterna(NodoFuncionExterna *lista){};
+
+void liberarListaDeFunciones(NodoFuncionExterna *lista){};
 
 //CREAR NODO DE FUNCION
 NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipoRetorno) {
-    NodoFuncion *nuevo = (NodoFuncionExterna *)malloc(sizeof(NodoFuncionExterna));
+    NodoFuncionExterna *nuevo = (NodoFuncionExterna *)malloc(sizeof(NodoFuncionExterna));
     nuevo->nombre = copiarCadena(nombre);
     nuevo->tipoRetorno = copiarCadena(tipoRetorno);
     nuevo->parametros = NULL;
@@ -260,7 +262,7 @@ NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipo
 }
 
 // AGREGAR PARAMETRO EN LA FUNCION
-void agregarParametro(NodoFuncion *funcion, const char *tipo, const char *nombre) {
+void agregarParametro(NodoFuncionExterna *funcion, const char *tipo, const char *nombre) {
     NodoParametro *nuevoParametro = (NodoParametro *)malloc(sizeof(NodoParametro));
     nuevoParametro->tipo = copiarCadena(tipo);
     nuevoParametro->nombre = copiarCadena(nombre);
@@ -280,8 +282,7 @@ void agregarParametro(NodoFuncion *funcion, const char *tipo, const char *nombre
 }
 
 // AGREGAR FUNCION EN UNA LISTA DE FUNCIONES 
-
-void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno) {
+void agregarFuncionExterna(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno) {
     NodoFuncionExterna *nuevaFuncionExterna = crearNodoFuncionExterna(nombre, tipoRetorno);
 
     // Si la lista está vacía, esta es la primera función
@@ -294,6 +295,62 @@ void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *
             actual = actual->siguiente;
         }
         actual->siguiente = nuevaFuncionExterna;
+    }
+}
+
+// IMPRIMIR FUNCIONES
+void imprimirListaDeFuncionesExterna(NodoFuncionExterna *lista) {
+    NodoFuncionExterna *actual = lista;
+    printf("* Listado de funciones declaradas/definidas:\n");
+    
+    if (actual == NULL) {
+        printf("-\n");
+        return;
+    }
+
+    while (actual != NULL) {
+        printf("Función: %s\n", actual->nombre);
+        printf("Tipo de retorno: %s\n", actual->tipoRetorno);
+        printf("Parámetros:\n");
+
+        NodoParametro *parametroActual = actual->parametros;
+        if (parametroActual == NULL) {
+            printf("Sin parámetros\n");
+        } else {
+            while (parametroActual != NULL) {
+                printf("  %s %s\n", parametroActual->tipo, parametroActual->nombre);
+                parametroActual = parametroActual->siguiente;
+            }
+        }
+        actual = actual->siguiente;
+        printf("\n");
+    }
+}
+
+// LIBERAR FUNCIONES 
+void liberarListaDeFunciones(NodoFuncionExterna *lista) {
+    NodoFuncionExterna *actual = lista;
+    NodoFuncionExterna *siguiente = NULL;
+
+    while (actual != NULL) {
+        siguiente = actual->siguiente;
+
+        // Liberar los parámetros
+        NodoParametro *parametroActual = actual->parametros;
+        NodoParametro *paramSiguiente = NULL;
+        while (parametroActual != NULL) {
+            paramSiguiente = parametro->siguiente;
+            free(parametroActual->tipo);
+            free(parametroActual->nombre);
+            free(parametroActual);
+            parametro = paramSiguiente;
+        }
+
+        // Liberar la función
+        free(actual->nombre);
+        free(actual->tipoRetorno);
+        free(actual);
+        actual = siguiente;
     }
 }
 
