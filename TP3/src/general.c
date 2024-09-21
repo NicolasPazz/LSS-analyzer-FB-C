@@ -239,14 +239,15 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
 
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 
+
 // DEFINICIONES EXTERNAS
 
-//ESTRUCTURA DE DEFINICIONES EXTERNAS
-NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipoRetorno){};
+//ESTRUCTURAS DE DEFINICIONES EXTERNAS
+NodoFuncionExterna* crearNodoFuncionExterna(const char *nombreFuncion, const char *tipoRetorno){};
 
-void agregarParametro(NodoFuncionExterna *funcion, const char *tipo, const char *nombre){};
+void agregarParametro(NodoFuncionExterna *funcion, const char *tipoDeDato, const char *nombreParametro){};
 
-void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno){};
+void agregarFuncion(NodoFuncionExterna **lista, const char *nombreFuncion, const char *tipoRetorno){};
 
 void imprimirFuncionesExterna(NodoFuncionExterna *lista){};
 
@@ -255,9 +256,9 @@ void liberarFuncionesExterna(NodoFuncionExterna *lista){};
 NodoFuncionExterna* listaFuncionesExterna = NULL;
 
 //CREAR NODO DE FUNCION
-NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipoRetorno) {
+NodoFuncionExterna* crearNodoFuncionExterna(const char *nombreFuncion, const char *tipoRetorno) {
     NodoFuncionExterna *nuevo = (NodoFuncionExterna *)malloc(sizeof(NodoFuncionExterna));
-    nuevo->nombre = copiarCadena(nombre);
+    nuevo->nombreFuncion = copiarCadena(nombreFuncion);
     nuevo->tipoRetorno = copiarCadena(tipoRetorno);
     nuevo->parametros = NULL;
     nuevo->siguiente = NULL;
@@ -265,10 +266,10 @@ NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipo
 }
 
 // AGREGAR PARAMETRO EN LA FUNCION
-void agregarParametro(NodoFuncionExterna *funcion, const char *tipo, const char *nombre) {
+void agregarParametro(NodoFuncionExterna *funcion, const char *tipoDeDato, const char *nombreParametro) {
     NodoParametro *nuevoParametro = (NodoParametro *)malloc(sizeof(NodoParametro));
-    nuevoParametro->tipo = copiarCadena(tipo);
-    nuevoParametro->nombre = copiarCadena(nombre);
+    nuevoParametro->tipoDeDato = copiarCadena(tipoDeDato);
+    nuevoParametro->nombreParametro = copiarCadena(nombreParametro);
     nuevoParametro->siguiente = NULL;
 
     // Si no hay parámetros, este es el primero
@@ -285,8 +286,8 @@ void agregarParametro(NodoFuncionExterna *funcion, const char *tipo, const char 
 }
 
 // AGREGAR FUNCION EN UNA LISTA DE FUNCIONES 
-void agregarFuncionExterna(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno) {
-    NodoFuncionExterna *nuevaFuncionExterna = crearNodoFuncionExterna(nombre, tipoRetorno);
+void agregarFuncionExterna(NodoFuncionExterna **lista, const char *nombreFuncion, const char *tipoRetorno) {
+    NodoFuncionExterna *nuevaFuncionExterna = crearNodoFuncionExterna(nombreFuncion, tipoRetorno);
 
     // Si la lista está vacía, esta es la primera función
     if (*lista == NULL) {
@@ -312,7 +313,7 @@ void imprimirFuncionesExterna(NodoFuncionExterna *lista) {
     }
 
     while (actual != NULL) {
-        printf("Función: %s\n", actual->nombre);
+        printf("Función: %s\n", actual->nombreFuncion);
         printf("Tipo de retorno: %s\n", actual->tipoRetorno);
         printf("Parámetros:\n");
 
@@ -321,7 +322,7 @@ void imprimirFuncionesExterna(NodoFuncionExterna *lista) {
             printf("Sin parámetros\n");
         } else {
             while (parametroActual != NULL) {
-                printf("  %s %s\n", parametroActual->tipo, parametroActual->nombre);
+                printf("  %s %s\n", parametroActual->tipoDeDato, parametroActual->nombreParametro);
                 parametroActual = parametroActual->siguiente;
             }
         }
@@ -343,14 +344,14 @@ void liberarFuncionesExterna(NodoFuncionExterna *lista) {
         NodoParametro *paramSiguiente = NULL;
         while (parametroActual != NULL) {
             paramSiguiente = parametro->siguiente;
-            free(parametroActual->tipo);
-            free(parametroActual->nombre);
+            free(parametroActual->tipoDeDato);
+            free(parametroActual->nombreParametro);
             free(parametroActual);
             parametro = paramSiguiente;
         }
 
         // Liberar la función
-        free(actual->nombre);
+        free(actual->nombreFuncion);
         free(actual->tipoRetorno);
         free(actual);
         actual = siguiente;

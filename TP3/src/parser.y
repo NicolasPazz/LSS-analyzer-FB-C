@@ -234,45 +234,34 @@ argumento_prototipo:
 sufijo:
     | SUFIJO { printf("sufijo %s\n", $<cadena>1); }
     ;
-/*-----------------------------------------------------------------------------------------------------------*/
+
+{-/*-----------------------------------------------------------------------------------------------------------*/-}
+
 definicionesexternas:
     | declaracionesfunciones
     | definicionesfunciones
 
 
-    
-/*declaracion_funcion:
-      TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' ';'
-      {
-          printf("Declaración de función: %s, retorna: %s\n", $2, $1);
-      }
+declaracion_funcion:
+      TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' ';'{printf("Declaración de función: %s, retorna: %s\n", $2, $1);}
     ;
 
 definicion_funcion:
-      TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' '{' cuerpo_funcion '}'
-      {
-          printf("Definición de función: %s, retorna: %s\n", $2, $1);
-      }
+      TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' '{' cuerpo_funcion '}'{printf("Definición de función: %s, retorna: %s\n", $2, $1);}
     ;
 
 lista_parametros:
-      // Ningún parámetro
-    | TIPODEDATO IDENTIFICADOR
-      {
-          printf("Parámetro: %s %s\n", $1, $2);
-      }
-    | lista_parametros ',' TIPODEDATO IDENTIFICADOR
-      {
-          printf("Parámetro: %s %s\n", $3, $4);
-      }
+    |/* vacío */                                   {printf("Funcion sin parametros\n"); }
+    | TIPODEDATO IDENTIFICADOR                      {printf("Parámetro: %s %s\n", $1, $2);}
+    | lista_parametros ',' TIPODEDATO IDENTIFICADOR {printf("Parámetro: %s %s\n", $3, $4);}
+
     ;
 
 cuerpo_funcion:
-      // Secuencia de sentencias en la función
-    | cuerpo_funcion sentencia
+      '{' sentencias '}'                            {printf("Cuerpo de la funcion\n"); }
     ;
 
-declaracion:
+declaracionGlobal:
     TIPODEDATO IDENTIFICADOR ';'
     {
         printf("Declaración de variable: %s, tipo: %s\n", $2, $1);
@@ -281,7 +270,12 @@ declaracion:
     {
         printf("Declaración e inicialización de variable: %s, tipo: %s\n", $2, $1);
     }
-    ;*/
+    ;
+sentenciaReturn:
+    RETURN expresion ';'
+    {
+        printf("Sentencia return: valor %s\n", $2);
+    }
 %%
 
 int main(int argc, char *argv[]) {
