@@ -11,8 +11,7 @@ extern FILE *yyin;
 
 extern int yylex(void);
 
-void yyerror(const char *s) {fprintf(stderr, "Error: %s\n", s);}
-
+void yyerror(const char *s);
 
 %}
 
@@ -31,8 +30,8 @@ void yyerror(const char *s) {fprintf(stderr, "Error: %s\n", s);}
 %token OP_AND OP_OR  BREAK CASE CONTINUE DEFAULT DO ELSE FOR GOTO IF RETURN SWITCH WHILE 
 
 //%type <cadena> expresion
-%type <cadena> sufijo
 
+%left OP_AND OP_OR
 %left '+' '-'
 %left '*' '/'
 %left '^'
@@ -47,10 +46,10 @@ input:
     ;
 line: 
       '\n'
-    | expresion '\n'  //
-    | sentencia '\n' 
-    | declaracion '\n' //
-    | //definicionesexternas '\n'
+    | expresion //'\n'  //
+    | sentencia //'\n' 
+    | declaracion //'\n' //
+    | //definicionesexternas //'\n'
     | error '\n' { /*agregarEstructuraNoReconocida(lista,estructura,linea)*/ yyclearin; yyerrok; printf("\n");}
     ;
 
@@ -67,7 +66,7 @@ expresion:
     | expresiondeasignacion                     { printf("expresion - EXPRESIONDEASIGNACION\n"); } //
     ;
 expresionprimaria:
-      IDENTIFICADOR                             { /*verificar declaracion en ts*/ printf("expresionprimaria - IDENTIFICADOR: %s\n", $1); } //
+      IDENTIFICADOR                             { printf("expresionprimaria - IDENTIFICADOR: %s\n", $1); } //
     | CONSTANTE_ENTERA                          { printf("expresionprimaria - CONSTANTE_ENTERA: %d\n", yylval.entero); } //
     | CONSTANTE_REAL                            { printf("expresionprimaria - CONSTANTE_REAL: %f\n", yylval.real); } //
     //| CONSTANTE_CARACTER                        { printf("expresionprimaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); } //
@@ -108,30 +107,29 @@ lista_argumentos_invocacion:
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 sentencia:
-    | sentenciadeexpresion //
-    | sentenciacompuesta
-    | sentenciaif
-    | sentenciaifelse
-    | sentenciaswitch
-    | sentenciawhile
-    | sentenciadowhile
+      sentenciadeexpresion //
+    | sentenciacompuesta //
+    | sentenciaif //
+    | sentenciaifelse //
+    | sentenciaswitch //
+    | sentenciawhile //
+    | sentenciadowhile //
     | sentenciafor
-    | sentenciaetiquetada
-    | sentenciadesalto
-    | //continue: solo puede aparecer dentro de una sentencia de iteracion
-    | //break: solo puede aparecer dentro de una sentenciaswitch
-    | //declaracion
+    //| sentenciaetiquetada: solo puede aparecer dentro de una sentenciaswitch
+    | sentenciadesalto //
+    //| continue: solo puede aparecer dentro de una sentencia de iteracion
+    //| break: solo puede aparecer dentro de una sentenciaswitch
+    //| declaracion
     ;
 sentenciadeexpresion:
-      expresion ';' {printf("sentenciadeexpresion\n");}
-    | ';'           {printf("sentenciadeexpresion\n");}
+    expresionop ';' {printf("sentenciadeexpresion\n");}
     ;
 sentenciacompuesta:
     '{' declaraciones sentencias '}' {printf("sentenciacompuesta\n");}
     ;
 sentencias:
-    | sentencia
-    | sentencias sentencia
+    | sentencia { printf("sentencias\n");}
+    | sentencias sentencia { printf("sentencias\n");}
     ;
 declaraciones:
     | declaracion
@@ -145,9 +143,23 @@ sentenciaifelse:
     sentenciaif ELSE sentenciacompuesta { /*agregarSentencia(listaSentencias,"if/else",linea,columna)*/ printf("sentenciaifelse\n");}
     ;
 sentenciaswitch:
-    SWITCH '(' expresion ')' '{' cases '}'              { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaswitch\n");}
-    | SWITCH '(' expresion ')' '{' cases default '}'    { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaifelse\n");}
-    //fijarme si el default puede ir en otra parte que no sea el final 
+    SWITCH '(' expresion ')' '{' sentenciaetiquetada '}'    { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaswitch\n");}
+sentenciaetiquetada:
+    cases default
+    ;
+case:
+      CASE expresion ':' sentencias  { printf("sentenciaetiquetada: case\n");}
+    | CASE expresion ':' sentencias 
+      BREAK                          { printf("sentenciaetiquetada: case\n");}
+    ;
+default:
+    | DEFAULT ':' sentencias    { printf("sentenciaetiquetada: default\n");}
+    | DEFAULT ':' sentencias 
+      BREAK                     { printf("sentenciaetiquetada: default\n");}
+    ;
+cases:
+    | case
+    | cases case
     ;
 sentenciawhile:
     WHILE '(' expresion ')' sentenciacompuesta { /*agregarSentencia(listaSentencias,"while",linea,columna)*/ printf("sentenciawhile\n");}
@@ -160,27 +172,14 @@ sentenciafor:
     FOR '(' primerapartefor ';' expresionop ';' expresionop ')' 
     sentenciacompuesta { /*agregarSentencia(listaSentencias,"for",linea,columna)*/ printf("sentenciafor\n");}
     //Definir primerapartefor - es una declaracion e inicializacion de variable
+    //for (inicializacion; condicion; actualizacion)
     ;
 expresionop:
-    | expresion
+    | expresion { printf("expresionop\n");}
     ;
 primerapartefor:
-    | declaracion
-    | expresion
-    ;
-sentenciaetiquetada:
-      case
-    | default
-    ;
-case:
-    CASE expresion ':' sentencias { printf("case\n");}
-    ;
-default:
-    DEFAULT  ':' sentencias { printf("default\n");}
-    ;
-cases:
-    | case
-    | cases case
+    | sufijo TIPODEDATO listadeclaradoresvariable { printf("primerapartefor\n");}
+    | IDENTIFICADOR                               { printf("primerapartefor\n");}
     ;
 sentenciadesalto:
       continue
@@ -188,14 +187,14 @@ sentenciadesalto:
     | return
     ;
 continue:
-    CONTINUE ';' { printf("continue\n");}
+    CONTINUE ';' { printf("sentenciadesalto: continue\n");}
     ;
 break:
-    BREAK ';' { printf("break\n");}
+    BREAK ';' { printf("sentenciadesalto: break\n");}
     ;
 return:
-      RETURN expresion ';'  { printf("return\n");}
-    | RETURN ';'            { printf("return\n");}
+      RETURN expresionop ';'  { printf("sentenciadesalto: return\n");}
+    | RETURN ';'            { printf("sentenciadesalto: return\n");}
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
@@ -236,7 +235,7 @@ sufijo:
     ;
 
 /*-----------------------------------------------------------------------------------------------------------*/
-
+/*
 definicionesexternas:
     | declaracionesfunciones
     | definicionesfunciones
@@ -274,7 +273,7 @@ sentenciaReturn:
     RETURN expresion ';'
     {
         printf("Sentencia return: valor %s\n", $2);
-    }
+    }*/
 %%
 
 int main(int argc, char *argv[]) {
@@ -327,4 +326,8 @@ int main(int argc, char *argv[]) {
     printf("\n");
 
     return 0;
+}
+
+void yyerror(const char *s) {
+    fprintf(stderr, "ERROR en linea %d columna %d: %s\n", yylloc.last_line, yylloc.last_column, s);
 }

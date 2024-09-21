@@ -71,7 +71,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
 [ \t]                                                                       {yylloc.last_column += yyleng;}
 
     /*Salto de linea*/
-\n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; return '\n'; printf("\n"); /*yylloc.last_line += 1;*/}
+\n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n'; printf("\n"); yylloc.last_line += 1;*/}
 
 [^ \t\n]                                                                    {unput(yytext[0]); BEGIN(tokenNoReconocido);}
 
