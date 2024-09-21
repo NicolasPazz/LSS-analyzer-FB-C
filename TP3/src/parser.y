@@ -41,15 +41,16 @@ void yyerror(const char *s) {fprintf(stderr, "Error: %s\n", s);}
 %start input
 
 %%
-
+// las gramaticas que tienen // al costado es porque ya fueron probadas y funcionan
 input:
     | input line
     ;
 line: 
       '\n'
-    | expresion '\n'
-    | sentencia '\n'
-    | declaracion '\n'
+    | expresion '\n'  //
+    | sentencia '\n' 
+    | declaracion '\n' //
+    | //definicionesexternas '\n'
     | error '\n' { /*agregarEstructuraNoReconocida(lista,estructura,linea)*/ yyclearin; yyerrok; printf("\n");}
     ;
 
@@ -107,7 +108,7 @@ lista_argumentos_invocacion:
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 sentencia:
-    | sentenciadeexpresion
+    | sentenciadeexpresion //
     | sentenciacompuesta
     | sentenciaif
     | sentenciaifelse
@@ -115,36 +116,38 @@ sentencia:
     | sentenciawhile
     | sentenciadowhile
     | sentenciafor
-    | continue
-    | break
-    | return
-    | declaracion
+    | sentenciaetiquetada
+    | sentenciadesalto
+    | //continue: solo puede aparecer dentro de una sentencia de iteracion
+    | //break: solo puede aparecer dentro de una sentenciaswitch
+    | //declaracion
     ;
 sentenciadeexpresion:
-    expresion ';' {printf("sentenciadeexpresion\n");}
+      expresion ';' {printf("sentenciadeexpresion\n");}
+    | ';' {printf("sentenciadeexpresion\n");}
     ;
 sentenciacompuesta:
-    '{' sentencias '}' {printf("sentenciacompuesta\n");}
+    '{' declaraciones sentencias '}' {printf("sentenciacompuesta\n");}
     ;
 sentencias:
-    sentencia
+    | sentencia
     | sentencias sentencia
+    ;
+declaraciones:
+    | declaracion
+    | declaraciones declaracion
     ;
 sentenciaif:
     IF '(' expresion ')' sentenciacompuesta { /*agregarSentencia(listaSentencias,"if",linea,columna)*/ printf("sentenciaif\n");}
     ;
 sentenciaifelse:
-//revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
-    IF '(' expresion ')' sentenciacompuesta
-    ELSE sentenciacompuesta { /*agregarSentencia(listaSentencias,"if/else",linea,columna)*/ printf("sentenciaifelse\n");}
+    //revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
+    sentenciaif ELSE sentenciacompuesta { /*agregarSentencia(listaSentencias,"if/else",linea,columna)*/ printf("sentenciaifelse\n");}
     ;
 sentenciaswitch:
     SWITCH '(' expresion ')' '{' cases '}' { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaswitch\n");}
     | SWITCH '(' expresion ')' '{' cases default '}' { /*agregarSentencia(listaSentencias,"switch",linea,columna)*/ printf("sentenciaifelse\n");}
     //fijarme si el default puede ir en otra parte que no sea el final 
-    ;
-default:
-    DEFAULT  ':' sentencias { /*agregarSentencia(listaSentencias,"default",linea,columna)*/ printf("default\n");}
     ;
 sentenciawhile:
     WHILE '(' expresion ')' sentenciacompuesta { /*agregarSentencia(listaSentencias,"while",linea,columna)*/ printf("sentenciawhile\n");}
@@ -154,26 +157,45 @@ sentenciadowhile:
     WHILE '(' expresion ')' ';' { /*agregarSentencia(listaSentencias,"do/while",linea,columna)*/ printf("sentenciadowhile\n");}
     ;
 sentenciafor:
-    //FOR '(' primerapartefor ';' expresion ';' expresion ')' 
+    FOR '(' primerapartefor ';' expresionop ';' expresionop ')' 
     sentenciacompuesta { /*agregarSentencia(listaSentencias,"for",linea,columna)*/ printf("sentenciafor\n");}
     //Definir primerapartefor - es una declaracion e inicializacion de variable
     ;
+expresionop:
+    | expresion
+    ;
+primerapartefor:
+    | declaracion
+    | expresion
+    ;
+sentenciaetiquetada:
+      case
+    | default
+    ;
 case:
-    CASE expresion ':' sentencias { /*agregarSentencia(listaSentencias,"case",linea,columna)*/ printf("case\n");}
+    CASE expresion ':' sentencias { printf("case\n");}
+    ;
+default:
+    DEFAULT  ':' sentencias { printf("default\n");}
     ;
 cases:
-    case
+    | case
     | cases case
     ;
+sentenciadesalto:
+      continue
+    | break
+    | return
+    ;
 continue:
-    CONTINUE ';' { /*agregarSentencia(listaSentencias,"continue",linea,columna)*/ printf("continue\n");}
+    CONTINUE ';' { printf("continue\n");}
     ;
 break:
-    BREAK ';' { /*agregarSentencia(listaSentencias,"break",linea,columna)*/ printf("break\n");}
+    BREAK ';' { printf("break\n");}
     ;
 return:
-    //podria ir tambien '(' expresion ')'
-    RETURN expresion ';' { /*agregarSentencia(listaSentencias,"return",linea,columna)*/ printf("return\n");}
+      RETURN expresion ';' { printf("return\n");}
+    | RETURN ';' { printf("return\n");}
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
@@ -212,12 +234,8 @@ argumento_prototipo:
 sufijo:
     | SUFIJO { printf("sufijo %s\n", $<cadena>1); }
     ;
-%%
-
-
-
-{-
-declaracion_funcion:
+/*-----------------------------------------------------------------------------------------------------------*/
+/*declaracion_funcion:
       TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' ';'
       {
           printf("Declaración de función: %s, retorna: %s\n", $2, $1);
@@ -232,7 +250,7 @@ definicion_funcion:
     ;
 
 lista_parametros:
-      /* Ningún parámetro */
+      // Ningún parámetro
     | TIPODEDATO IDENTIFICADOR
       {
           printf("Parámetro: %s %s\n", $1, $2);
@@ -244,7 +262,7 @@ lista_parametros:
     ;
 
 cuerpo_funcion:
-      /* Secuencia de sentencias en la función */
+      // Secuencia de sentencias en la función
     | cuerpo_funcion sentencia
     ;
 
@@ -257,76 +275,8 @@ declaracion:
     {
         printf("Declaración e inicialización de variable: %s, tipo: %s\n", $2, $1);
     }
-    ;
-
--}
-
-
-
-
-
-// Define variable puntero que apunta a la tabla de símbolos 
-
-
-
-
-
-struct init
-
-{
-
-  char const *fname;
-
- 
-
-};
-
-
-
-// Declaramos una vector de tipo init llamado no_nec_declaracion para almacenar todas las funciones de las bibliotecas de c en la Tabla de Simbolos.
-
-struct init const no_nec_declaracion[]=
-
-{
-
-  {"printf",printf},
-
-  {"scanf",scanf},
-
-  {"getchar",getchar},
-
-  {"putchar",putchar},
-
-  {"malloc",malloc},
-
-  {"fopen",fopen},
-
-  {"fclose",fclose},
-
-  {"fprintf",fprintf},
-
-  {"fscanf",fscanf},
-
-  {"fgets",fgets},
-
-  {"fputs",fputs},
-
-  {"fgetc",fgetc},
-
-  {"fputc",fputc},
-
-  {"feof",feof},
-
-  {"perror",perror},  
-
-  {"exit",exit},
-
-  {"atoi",atoi},
-
-
-
-};
-
+    ;*/
+%%
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
