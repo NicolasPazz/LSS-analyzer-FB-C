@@ -241,15 +241,18 @@ NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 
 // DEFINICIONES EXTERNAS
 
+//ESTRUCTURA DE DEFINICIONES EXTERNAS
 NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipoRetorno){};
 
 void agregarParametro(NodoFuncionExterna *funcion, const char *tipo, const char *nombre){};
 
 void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno){};
 
-void imprimirListaDeFuncionesExterna(NodoFuncionExterna *lista){};
+void imprimirFuncionesExterna(NodoFuncionExterna *lista){};
 
-void liberarListaDeFunciones(NodoFuncionExterna *lista){};
+void liberarFuncionesExterna(NodoFuncionExterna *lista){};
+
+NodoFuncionExterna* listaFuncionesExterna = NULL;
 
 //CREAR NODO DE FUNCION
 NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipoRetorno) {
@@ -299,7 +302,7 @@ void agregarFuncionExterna(NodoFuncionExterna **lista, const char *nombre, const
 }
 
 // IMPRIMIR FUNCIONES
-void imprimirListaDeFuncionesExterna(NodoFuncionExterna *lista) {
+void imprimirFuncionesExterna(NodoFuncionExterna *lista) {
     NodoFuncionExterna *actual = lista;
     printf("* Listado de funciones declaradas/definidas:\n");
     
@@ -328,7 +331,7 @@ void imprimirListaDeFuncionesExterna(NodoFuncionExterna *lista) {
 }
 
 // LIBERAR FUNCIONES 
-void liberarListaDeFunciones(NodoFuncionExterna *lista) {
+void liberarFuncionesExterna(NodoFuncionExterna *lista) {
     NodoFuncionExterna *actual = lista;
     NodoFuncionExterna *siguiente = NULL;
 

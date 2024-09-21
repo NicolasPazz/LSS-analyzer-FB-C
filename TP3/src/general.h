@@ -95,8 +95,7 @@ void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
 
 extern NodoEstructuraNoReconocida* listaEstructurasNoReconocidas;
 
-// DEFINICIONES EXTERNAS 
-
+// ESTRUCUTRA DEFINICIONES EXTERNAS 
 typedef struct NodoParametro {
     char *tipoDeDato;
     char *nombre;
@@ -110,9 +109,17 @@ typedef struct NodoFuncionExterna {
     struct NodoFuncionExterna *siguiente;
 } NodoFuncionExterna;
 
+NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipoRetorno){};
 
+void agregarParametro(NodoFuncionExterna *funcion, const char *tipo, const char *nombre){};
 
+void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno){};
 
+void imprimirFuncionesExterna(NodoFuncionExterna *lista){};
+
+void liberarFunciones(NodoFuncionExterna *lista){};
+
+NodoFuncionExterna* listaFuncionesExterna = NULL;
 
 // CADENAS NO RECONOCIDAS
 typedef struct NodoCadenaNoReconocida {
