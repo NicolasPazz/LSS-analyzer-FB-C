@@ -239,6 +239,65 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
 
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 
+// DEFINICIONES EXTERNAS
+
+NodoFuncion* crearNodoFuncion(const char *nombre, const char *tipoRetorno){};
+
+void agregarParametro(NodoFuncion *funcion, const char *tipo, const char *nombre){};
+
+void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno){};
+
+void imprimirFuncionesExterna(NodoFuncionExterna *lista){};
+
+//CREAR NODO DE FUNCION
+NodoFuncionExterna* crearNodoFuncionExterna(const char *nombre, const char *tipoRetorno) {
+    NodoFuncion *nuevo = (NodoFuncionExterna *)malloc(sizeof(NodoFuncionExterna));
+    nuevo->nombre = copiarCadena(nombre);
+    nuevo->tipoRetorno = copiarCadena(tipoRetorno);
+    nuevo->parametros = NULL;
+    nuevo->siguiente = NULL;
+    return nuevo;
+}
+
+// AGREGAR PARAMETRO EN LA FUNCION
+void agregarParametro(NodoFuncion *funcion, const char *tipo, const char *nombre) {
+    NodoParametro *nuevoParametro = (NodoParametro *)malloc(sizeof(NodoParametro));
+    nuevoParametro->tipo = copiarCadena(tipo);
+    nuevoParametro->nombre = copiarCadena(nombre);
+    nuevoParametro->siguiente = NULL;
+
+    // Si no hay parámetros, este es el primero
+    if (funcion->parametros == NULL) {
+        funcion->parametros = nuevoParametro;
+    } else {
+        // Si ya hay parámetros, lo agregamos al final
+        NodoParametro *actual = funcion->parametros;
+        while (actual->siguiente != NULL) {
+            actual = actual->siguiente;
+        }
+        actual->siguiente = nuevoParametro;
+    }
+}
+
+// AGREGAR FUNCION EN UNA LISTA DE FUNCIONES 
+
+void agregarFuncion(NodoFuncionExterna **lista, const char *nombre, const char *tipoRetorno) {
+    NodoFuncionExterna *nuevaFuncionExterna = crearNodoFuncionExterna(nombre, tipoRetorno);
+
+    // Si la lista está vacía, esta es la primera función
+    if (*lista == NULL) {
+        *lista = nuevaFuncionExterna;
+    } else {
+        // Si ya hay funciones, la agregamos al final
+        NodoFuncionExterna *actual = *lista;
+        while (actual->siguiente != NULL) {
+            actual = actual->siguiente;
+        }
+        actual->siguiente = nuevaFuncionExterna;
+    }
+}
+
+
 
 // FUNCIONES
 

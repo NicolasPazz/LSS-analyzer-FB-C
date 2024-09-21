@@ -95,6 +95,24 @@ void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
 
 extern NodoEstructuraNoReconocida* listaEstructurasNoReconocidas;
 
+// DEFINICIONES EXTERNAS 
+
+typedef struct NodoParametro {
+    char *tipoDeDato;
+    char *nombre;
+    struct NodoParametro *siguiente;
+} NodoParametro;
+
+typedef struct NodoFuncionExterna {
+    char *nombre;
+    char *tipoRetorno;
+    NodoParametro *parametros;
+    struct NodoFuncionExterna *siguiente;
+} NodoFuncionExterna;
+
+
+
+
 
 // CADENAS NO RECONOCIDAS
 typedef struct NodoCadenaNoReconocida {

@@ -235,6 +235,12 @@ sufijo:
     | SUFIJO { printf("sufijo %s\n", $<cadena>1); }
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
+definicionesexternas:
+    | declaracionesfunciones
+    | definicionesfunciones
+
+
+    
 /*declaracion_funcion:
       TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' ';'
       {
