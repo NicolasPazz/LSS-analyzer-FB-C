@@ -43,9 +43,9 @@ typedef struct NodoFuncion {
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
-NodoFuncion* crearNodoFuncion(const char *funcion);
+NodoFuncion* crearNodoFuncion(const char *funcion, const int linea);
 
-void agregarFuncion(NodoFuncion **lista, const char *funcion);
+void agregarFuncion(NodoFuncion **lista, const char *funcion, const int linea);
 
 void imprimirFunciones(NodoFuncion *lista);
 
@@ -81,9 +81,9 @@ typedef struct NodoEstructuraNoReconocida {
     struct NodoEstructuraNoReconocida *siguiente;
 } NodoEstructuraNoReconocida;
 
-NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida);
+NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida, int linea);
 
-void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida);
+void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida, int linea);
 
 void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
 

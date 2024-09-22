@@ -25,13 +25,59 @@ void reinicializarUbicacion(void)
 
 
 // VARIABLES DECLARADAS
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada){}
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada){
+    NodoVariableDeclarada *nuevo = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
+    nuevo->variableDeclarada = copiarCadena(variableDeclarada);
+    return nuevo;
+}
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato){}
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato){
+    // Crear el nuevo nodo
+    NodoVariableDeclarada *nuevoNodo = crearNodoFuncion(variableDeclarada, tipoDato);
 
-void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){}
+    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+        return;
+    }
 
-void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){}
+    // Si la lista no está vacía, recorrer hasta el final
+    NodoVariableDeclarada *actual = *lista;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodo;
+}
+
+void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
+    NodoVariableDeclarada *actual = lista;
+    printf("* Listado de variables declaradas:\n");
+    
+    if (actual == NULL) {
+        printf("-\n");
+        return;
+    }
+
+    while (actual != NULL) {
+        printf("%s: linea %d\n", actual->variableDeclarada, actual->tipoDato);
+        actual = actual->siguiente;
+    }
+
+}
+
+void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
+    NodoVariableDeclarada *actual = lista;
+    NodoVariableDeclarada *siguiente = NULL;
+
+    while (actual != NULL) {
+        siguiente = actual->siguiente;
+        free(actual->variableDeclarada);
+        free(actual);
+        actual = siguiente;
+    }
+}
 
 NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
 

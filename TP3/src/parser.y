@@ -198,8 +198,8 @@ return:
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
-      sufijo TIPODEDATO listadeclaradoresvariable ';'   { printf("declaracion de variable %s\n", $<cadena>2); }
-    | sufijo TIPODEDATO listadeclaradoresfuncion ';'    { printf("declaracion de funcion %s\n", $<cadena>2); }
+      sufijo TIPODEDATO listadeclaradoresvariable ';'   { printf("declaracion de variable %s\n", $2); }
+    | sufijo TIPODEDATO listadeclaradoresfuncion ';'    { printf("declaracion de funcion %s\n", $2); }
     ;
 
 listadeclaradoresvariable:
@@ -231,7 +231,7 @@ argumento_prototipo:
     ;
 
 sufijo:
-    | SUFIJO { printf("sufijo %s\n", $<cadena>1); }
+    | SUFIJO { printf("sufijo %s\n", $1); }
     ;
 
 /*-----------------------------------------------------------------------------------------------------------*/
@@ -273,7 +273,7 @@ int main(int argc, char *argv[]) {
 
 //Reporte
     //1
-    /*imprimirVariablesDeclaradas(listaVariablesDeclaradas);
+    imprimirVariablesDeclaradas(listaVariablesDeclaradas);
     liberarVariablesDeclaradas(listaVariablesDeclaradas);
     printf("\n");
 
@@ -291,7 +291,7 @@ int main(int argc, char *argv[]) {
     imprimirEstructurasNoReconocidas(listaEstructurasNoReconocidas);
     liberarEstructurasNoReconocidas(listaEstructurasNoReconocidas);
     printf("\n");
-*/
+
     //5
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
