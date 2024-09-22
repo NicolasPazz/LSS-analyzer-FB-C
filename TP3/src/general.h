@@ -66,7 +66,6 @@ NodoSentencia* crearNodoSentencia(const char *sentencia, const int linea, const 
 void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int linea, const int columna);
 //void agregarSentencia(listaSentencias, sentencia, tipoSentencia, linea, columna);
 
-
 void imprimirSentencias(NodoSentencia *lista);
 
 void liberarSentencias(NodoSentencia *lista);
@@ -77,6 +76,7 @@ extern NodoSentencia* listaSentencias;
 // ESTRUCTURAS NO RECONOCIDAS
 typedef struct NodoEstructuraNoReconocida {
     char *estructuraNoReconocida;
+  //  int linea;
     struct NodoEstructuraNoReconocida *siguiente;
 } NodoEstructuraNoReconocida;
 

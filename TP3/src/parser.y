@@ -235,45 +235,17 @@ sufijo:
     ;
 
 /*-----------------------------------------------------------------------------------------------------------*/
-/*
+
 definicionesexternas:
-    | declaracionesfunciones
-    | definicionesfunciones
+    declaracion
+    |definicion_de_funciones
+;
 
+definicion_de_funciones: 
+sufijo TIPODEDATO listadeclaradoresfuncion sentenciacompuesta { printf("declaracion de funcion %s\n", $<cadena>3); }
+;
+    
 
-declaracion_funcion:
-      TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' ';'{printf("Declaración de función: %s, retorna: %s\n", $2, $1);}
-    ;
-
-definicion_funcion:
-      TIPODEDATO IDENTIFICADOR '(' lista_parametros ')' '{' cuerpo_funcion '}'{printf("Definición de función: %s, retorna: %s\n", $2, $1);}
-    ;
-
-lista_parametros:                                   {printf("Funcion sin parametros\n"); }
-    | TIPODEDATO IDENTIFICADOR                      {printf("Parámetro: %s %s\n", $1, $2);}
-    | lista_parametros ',' TIPODEDATO IDENTIFICADOR {printf("Parámetro: %s %s\n", $3, $4);}
-
-    ;
-
-cuerpo_funcion:
-      '{' sentencias '}'                            {printf("Cuerpo de la funcion\n"); }
-    ;
-
-declaracionGlobal:
-    TIPODEDATO IDENTIFICADOR ';'
-    {
-        printf("Declaración de variable: %s, tipo: %s\n", $2, $1);
-    }
-    | TIPODEDATO IDENTIFICADOR '=' expresion ';'
-    {
-        printf("Declaración e inicialización de variable: %s, tipo: %s\n", $2, $1);
-    }
-    ;
-sentenciaReturn:
-    RETURN expresion ';'
-    {
-        printf("Sentencia return: valor %s\n", $2);
-    }*/
 %%
 
 int main(int argc, char *argv[]) {

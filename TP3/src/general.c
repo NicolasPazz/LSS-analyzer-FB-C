@@ -112,14 +112,67 @@ NodoSentencia* listaSentencias = NULL;
 
 
 // ESTRUCTURAS NO RECONOCIDAS
+NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida){
 
-NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida){}
+    NodoEstructuraNoReconocida *nuevo = (NodoEstructuraNoReconocida *)malloc(sizeof(NodoEstructuraNoReconocida));
+    nuevo->estructuraNoReconocida = copiarCadena(estructuraNoReconocida);
+    //nuevo->linea = linea;
+    nuevo->siguiente = NULL;
 
-void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida){}
+    return nuevo;
 
-void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){}
+}
 
-void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){}
+void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida){
+
+    // Crear el nuevo nodo
+    NodoEstructuraNoReconocida *nuevoNodo = crearNodoEstructuraNoReconocida(estructuraNoReconocida);
+
+    
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+        return;
+    }
+
+    // Si la lista no está vacía, recorrer hasta el final
+    NodoEstructuraNoReconocida *actual = *lista;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodo;
+
+}
+
+void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
+
+    /*NodoEstructuraNoReconocida *actual = lista;
+    printf("* Listado de estructuras no reconocidas:\n");
+    
+    if (actual == NULL) {
+        printf("-\n");
+        return;
+    }
+
+    while (actual != NULL) {
+        printf("%s: linea %d\n", actual->estructuraNoReconocida, actual->linea);
+        actual = actual->siguiente;
+    }*/
+
+}
+void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
+
+    NodoEstructuraNoReconocida *actual = lista;
+    NodoEstructuraNoReconocida *siguiente = NULL;
+
+    while (actual != NULL) {
+        siguiente = actual->siguiente;
+        free(actual->estructuraNoReconocida);
+        free(actual);
+        actual = siguiente;
+    }
+}
 
 NodoEstructuraNoReconocida* listaEstructurasNoReconocidas = NULL;
 

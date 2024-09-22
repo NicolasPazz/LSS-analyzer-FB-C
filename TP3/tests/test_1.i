@@ -22,7 +22,7 @@ int main(void) {
 
     switch(potencia(j, 2)) {
         case 2:
-            j = a
+            j = a;
             break;
         case 4:
             @double = 0;

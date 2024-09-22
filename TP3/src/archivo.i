@@ -37,3 +37,4 @@ for (int n = 0; n < 10; n++) {
     }
     printf("Ejemplo 6: %d es par\n", n);
 }
+
