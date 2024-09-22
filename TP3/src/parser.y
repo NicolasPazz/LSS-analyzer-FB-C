@@ -59,7 +59,6 @@ NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 %start input
 
 %%
-// las gramaticas que tienen // al costado es porque ya fueron probadas y funcionan
 input:
     | input line
     ;
@@ -69,8 +68,7 @@ line:
     | sentencia //'\n' //
     | declaracion //'\n' //
     | definiciones_externas //'\n' 
-    | NO_RECONOCIDO { DBG_PRINT("NO_RECONOCIDO\n"); } //
-    //| error '\n' { agregarEstructuraNoReconocida(lista, estructura, yylloc.first_line); yyclearin; yyerrok; printf("\n");}
+    | error '\n' { agregarEstructuraNoReconocida(lista, estructura, yylloc.first_line);/* yyclearin; yyerrok; printf("\n");*/}
     ;
 
 expresion:
@@ -86,11 +84,11 @@ expresion:
     | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); } //
     ;
 expresion_primaria:
-      IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR\n"); } //
-    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA\n"); } //
-    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL\n"); } //
-//  | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", yylval.mystruct.cadena); } //
-    | LITERAL_CADENA                            //{ DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", yylval.mystruct.cadena); } //
+      IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); } //
+    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", yylval.entero); } //
+    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", yylval.real); } //
+//  | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); } //
+    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", yylval.cadena); } //
     | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");} //
     ;
 expresion_postfija:
@@ -258,7 +256,7 @@ inicializacion_variable:
     ;
 
 lista_declaradores_funcion:
-    declarador_funcion                                     { DBG_PRINT("lista_declaradores_funcion\n"); }
+      declarador_funcion                                   { DBG_PRINT("lista_declaradores_funcion\n"); }
     | lista_declaradores_funcion ',' declarador_funcion    { DBG_PRINT("lista_declaradores_funcion\n"); }
     ;
 declarador_funcion:
