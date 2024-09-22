@@ -22,12 +22,14 @@ void reinicializarUbicacion(void);
 typedef struct NodoVariableDeclarada {
     char *variableDeclarada;
     char *tipoDato;
+    int linea;
+    char *sufijo;
     struct NodoVariableDeclarada *siguiente;
 } NodoVariableDeclarada;
 
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada);
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 

@@ -1,6 +1,6 @@
 float potencia(float base, long exp) {
     float acumulador = 1.0;
-    for (long i = 0; i < exp; i++) {
+    for (; exp > 0; exp--) {
         acumulador *= base;
     }
     return acumulador;
@@ -22,10 +22,10 @@ int main(void) {
 
     switch(potencia(j, 2)) {
         case 2:
-            j = a
+            j = a;
             break;
         case 4:
-            int @double = 0;
+            @double = 0;
             return b-j;
         default:
             return 1+j+b;

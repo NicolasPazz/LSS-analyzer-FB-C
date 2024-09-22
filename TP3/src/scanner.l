@@ -20,18 +20,18 @@
 ";"                                                                         {yylloc.last_column += yyleng; return ';';}
 ","                                                                         {yylloc.last_column += yyleng; return ',';}
 ":"                                                                         {yylloc.last_column += yyleng; return ':';}
-"="|"*="|"/="|"+="|"-="                                                     {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_ASIGNACION;}
-"<"|">"|"<="|">="                                                           {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_RELACIONAL;}
+"="|"*="|"/="|"+="|"-="                                                     {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_ASIGNACION;}
+"<"|">"|"<="|">="                                                           {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_RELACIONAL;}
 "&&"                                                                        {yylloc.last_column += yyleng; return OP_AND;}
 "||"                                                                        {yylloc.last_column += yyleng; return OP_OR;}
-"++"|"--"                                                                   {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_INCREMENTO_DECREMENTO;}
-[*/]                                                                        {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_MULTIPLICATIVO;}
+"++"|"--"                                                                   {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_INCREMENTO_DECREMENTO;}
+[*/]                                                                        {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_MULTIPLICATIVO;}
 [+-]                                                                        {yylloc.last_column += yyleng; return OP_ADITIVO;}
-"=="|"!="                                                                   {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
+"=="|"!="                                                                   {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
     /*Tipos de datos*/
-char|double|enum|float|int|long|short|struct|union                          {yylloc.last_column += yyleng; return TIPODEDATO;}
-void                                                                        {yylloc.last_column += yyleng; return VOID;}
+char|double|enum|float|int|long|short|struct|union                          {yylval.mystruct.tipo = strdup(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
+void                                                                        {yylval.mystruct.tipo = strdup(yytext); yylloc.last_column += yyleng; return VOID;}
 
     /*Estructuras de control*/
 break                                                                       {yylloc.last_column += yyleng; return BREAK;}
@@ -48,25 +48,25 @@ switch                                                                      {yyl
 while                                                                       {yylloc.last_column += yyleng; return WHILE;}
 
     /*Otros*/
-auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yylloc.last_column += yyleng; return SUFIJO;}
+auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yylval.mystruct.sufijo = strdup(yytext); yylloc.last_column += yyleng; return SUFIJO;}
 
     /*Constantes enteras*/
-0[0-7]*[uU]?[lL]{0,2}                                                       {yylval.entero = strtol(yytext, NULL, 8); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
-0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                             {yylval.entero = strtol(yytext, NULL, 16); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
-[1-9][0-9]*[uU]?[lL]{0,2}                                                   {yylval.entero = strtol(yytext, NULL, 10); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
+0[0-7]*[uU]?[lL]{0,2}                                                       {yylval.mystruct.entero = strtol(yytext, NULL, 8); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
+0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                             {yylval.mystruct.entero = strtol(yytext, NULL, 16); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
+[1-9][0-9]*[uU]?[lL]{0,2}                                                   {yylval.mystruct.entero = strtol(yytext, NULL, 10); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
 
     /*Constantes reales*/
-[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                     {yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
-[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                              {yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
+[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                     {yylval.mystruct.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
+[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                              {yylval.mystruct.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
 
     /*Constantes de caracter
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}*/
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}*/
 
     /*Literal cadena*/
-\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
+\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
 
     /*Identificadores*/
-[a-zA-Z_][a-zA-Z0-9_]*                                                      {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
+[a-zA-Z_][a-zA-Z0-9_]*                                                      {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
 
     /*Espacio y tabulacion*/
 [ \t]                                                                       {yylloc.last_column += yyleng;}
@@ -85,7 +85,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
                     BEGIN(INITIAL);
                 }   
     [^ \t\n]+   {
-                    yylval.cadena = strdup(yytext);
+                    yylval.mystruct.cadena = strdup(yytext);
                     agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.last_column); 
                     yylloc.last_column += yyleng;
                     BEGIN(INITIAL); 
@@ -95,5 +95,4 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
 
     /*Fin de archivo*/
 <<EOF>> {return EOF;}
-
 %%

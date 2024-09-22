@@ -4,7 +4,7 @@
 #include "general.h"
 
 YYLTYPE yylloc;
-
+extern yyval;
 void pausa(void)
 {
     printf("Presione ENTER para continuar...\n");
@@ -25,15 +25,19 @@ void reinicializarUbicacion(void)
 
 
 // VARIABLES DECLARADAS
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada){
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo){
     NodoVariableDeclarada *nuevo = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
     nuevo->variableDeclarada = copiarCadena(variableDeclarada);
+    nuevo->tipoDato = copiarCadena(tipoDato);
+    nuevo->linea = linea;
+    nuevo->sufijo = sufijo;
+    nuevo->siguiente = NULL;
     return nuevo;
 }
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato){
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo){
     // Crear el nuevo nodo
-    NodoVariableDeclarada *nuevoNodo = crearNodoFuncion(variableDeclarada, tipoDato);
+    NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(variableDeclarada, tipoDato, linea, sufijo);
 
     // Si la lista está vacía, el nuevo nodo es el primer nodo
     if (*lista == NULL) {
@@ -49,11 +53,12 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variabl
 
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
+
 }
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
     NodoVariableDeclarada *actual = lista;
-    printf("* Listado de variables declaradas:\n");
+    printf("* Listado de variables declaradas (tipo de dato y numero de linea):\n");
     
     if (actual == NULL) {
         printf("-\n");
@@ -61,10 +66,13 @@ void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
     }
 
     while (actual != NULL) {
-        printf("%s: linea %d\n", actual->variableDeclarada, actual->tipoDato);
+        if(actual->sufijo!=NULL){
+            printf("%s: %s %s, linea %d\n", actual->variableDeclarada, actual->sufijo, actual->tipoDato, actual->linea);
+        }else{
+            printf("%s: %s, linea %d\n", actual->variableDeclarada, actual->tipoDato, actual->linea);
+        }
         actual = actual->siguiente;
     }
-
 }
 
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
@@ -79,7 +87,6 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
     }
 }
 
-NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
 
 
 // FUNCIONES
@@ -113,7 +120,7 @@ void agregarFuncion(NodoFuncion **lista, const char *funcion, const int linea){
 
 void imprimirFunciones(NodoFuncion *lista){
     NodoFuncion *actual = lista;
-    printf("* Listado de funciones:\n");
+    printf("* Listado de funciones declaradas o definidas:\n");
     
     if (actual == NULL) {
         printf("-\n");
@@ -121,9 +128,14 @@ void imprimirFunciones(NodoFuncion *lista){
     }
 
     while (actual != NULL) {
-        printf("%s: linea %d\n", actual->funcion, actual->linea);
+        printf("%s: %s, input: %s %s, retorna: %s, linea %d\n", actual->funcion, actual->linea);
         actual = actual->siguiente;
     }
+
+
+//potencia: definicion, input: float base, long exp, retorna: float, linea 1
+
+
 }
 
 void liberarFunciones(NodoFuncion *lista){
@@ -138,7 +150,6 @@ void liberarFunciones(NodoFuncion *lista){
     }
 }
 
-NodoFuncion* listaFunciones = NULL;
 
 
 // SENTENCIAS
@@ -173,7 +184,7 @@ void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int li
 
 void imprimirSentencias(NodoSentencia *lista){
     NodoSentencia *actual = lista;
-    printf("* Listado de sentencias:\n");
+    printf("* Listado de sentencias indicando tipo, numero de linea y de columna:\n");
     
     if (actual == NULL) {
         printf("-\n");
@@ -230,7 +241,7 @@ void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const cha
 
 void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
     NodoEstructuraNoReconocida *actual = lista;
-    printf("* Listado de estructuras no reconocidas:\n");
+    printf("* Listado de estructuras sintácticas no reconocidas\n");
     
     if (actual == NULL) {
         printf("-\n");
@@ -255,7 +266,6 @@ void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
     }
 }
 
-NodoEstructuraNoReconocida* listaEstructurasNoReconocidas = NULL;
 
 
 // CADENAS NO RECONOCIDAS
@@ -314,8 +324,6 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
         actual = siguiente;
     }
 }
-
-NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 
 
 // Funciones de Utilidad
