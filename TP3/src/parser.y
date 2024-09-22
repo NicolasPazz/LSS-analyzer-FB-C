@@ -69,7 +69,7 @@ expresionprimaria:
       IDENTIFICADOR                             { printf("expresionprimaria - IDENTIFICADOR: %s\n", $1); } //
     | CONSTANTE_ENTERA                          { printf("expresionprimaria - CONSTANTE_ENTERA: %d\n", yylval.entero); } //
     | CONSTANTE_REAL                            { printf("expresionprimaria - CONSTANTE_REAL: %f\n", yylval.real); } //
-    //| CONSTANTE_CARACTER                        { printf("expresionprimaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); } //
+  //  | CONSTANTE_CARACTER                        { printf("expresionprimaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); } //
     | LITERAL_CADENA                            { printf("expresionprimaria - LITERAL_CADENA: %s\n", yylval.cadena); } //
     | '(' expresion ')'                         { printf("expresionprimaria - (EXP)\n");} //
     ;
@@ -84,7 +84,7 @@ expresionmultiplicativa:
       expresion OP_MULTIPLICATIVO expresion     { printf("expresionmultiplicativa: EXP1 %s EXP2\n", $2); } //
     ;
 expresionaditiva:
-      expresion OP_ADITIVO expresion            { printf("expresionaditiva: EXP1 +/- EXP2\n"); } //
+      expresion OP_ADITIVO expresion           // { printf("expresionaditiva: EXP1 +/- EXP2\n"); } //
     ;
 expresionrelacional:
       expresion OP_RELACIONAL expresion         { printf("expresionrelacional: EXP1 %s EXP2\n", $2); } //
@@ -244,7 +244,7 @@ definicionesexternas:
 definicion_de_funciones: 
 sufijo TIPODEDATO listadeclaradoresfuncion sentenciacompuesta { printf("declaracion de funcion %s\n", $<cadena>3); }
 ;
-    
+
 
 %%
 

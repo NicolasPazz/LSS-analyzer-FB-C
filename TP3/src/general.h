@@ -39,6 +39,7 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 // FUNCIONES
 typedef struct NodoFuncion {
     char *funcion;
+    int linea;
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
@@ -76,7 +77,7 @@ extern NodoSentencia* listaSentencias;
 // ESTRUCTURAS NO RECONOCIDAS
 typedef struct NodoEstructuraNoReconocida {
     char *estructuraNoReconocida;
-  //  int linea;
+    int linea;
     struct NodoEstructuraNoReconocida *siguiente;
 } NodoEstructuraNoReconocida;
 
