@@ -12,6 +12,9 @@ extern int yylex(void);
 
 void yyerror(const char *s);
 
+NodoSentencia* listaSentencias = NULL;
+
+
 #define DEBUG 0
 
 #if DEBUG
@@ -37,7 +40,6 @@ void yyerror(const char *s);
 
 //%type <cadena> expresion
 %left OP_AND OP_OR
-//%left IDENTIFICADOR
 %left '+' '-'
 %left '*' '/'
 %left '^'
@@ -141,14 +143,14 @@ declaraciones:
     | declaraciones declaracion
     ;
 sentencia_if:
-    IF '(' expresion ')' sentencia_compuesta { /*agregarSentencia(listaSentencias, "if", yylloc.first_line, yylloc.first_column) ;*/ DBG_PRINT("sentencia_if\n");}
+    IF '(' expresion ')' sentencia_compuesta { agregarSentencia(&listaSentencias, "if", yylloc.first_line, yylloc.first_column) ; DBG_PRINT("sentencia_if\n");}
     ;
 sentencia_if_else:
     //revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
-    sentencia_if ELSE sentencia_compuesta { /*agregarSentencia(listaSentencias, "if/else", yylloc.first_line, yylloc.first_column) ;*/ DBG_PRINT("sentencia_if_else\n");}
+    sentencia_if ELSE sentencia_compuesta { agregarSentencia(&listaSentencias, "if/else", yylloc.last_line, yylloc.last_column) ; DBG_PRINT("sentencia_if_else\n");}
     ;
 sentencia_switch:
-    SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { /*agregarSentencia(listaSentencias, "switch", yylloc.first_line, yylloc.first_column) ;*/ DBG_PRINT("sentencia_switch\n");}
+    SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { agregarSentencia(&listaSentencias, "switch", yylloc.last_line, yylloc.last_column) ; DBG_PRINT("sentencia_switch\n");}
 sentencia_etiquetada:
     cases default
     ;
@@ -167,15 +169,15 @@ cases:
     | cases case
     ;
 sentencia_while:
-    WHILE '(' expresion ')' sentencia_compuesta { /*agregarSentencia(listaSentencias, "while", yylloc.first_line, yylloc.first_column) ;*/ DBG_PRINT("sentencia_while\n");}
+    WHILE '(' expresion ')' sentencia_compuesta { agregarSentencia(&listaSentencias, "while", yylloc.last_line, yylloc.last_column) ; DBG_PRINT("sentencia_while\n");}
     ;
 sentencia_do_while:
     DO sentencia_compuesta
-    WHILE '(' expresion ')' ';' { /*agregarSentencia(listaSentencias, "do/while", yylloc.first_line, yylloc.first_column) ;*/ DBG_PRINT("sentencia_do_while\n");}
+    WHILE '(' expresion ')' ';' { agregarSentencia(&listaSentencias, "do/while", yylloc.last_line, yylloc.last_column) ; DBG_PRINT("sentencia_do_while\n");}
     ;
 sentencia_for:
     FOR '(' primera_parte_for ';' expresion_op ';' expresion_op ')' 
-    sentencia_compuesta { /*agregarSentencia(listaSentencias, "for", yylloc.first_line, yylloc.first_column) ;*/ DBG_PRINT("sentencia_for\n");}
+    sentencia_compuesta { agregarSentencia(&listaSentencias, "for", yylloc.last_line, yylloc.last_column) ; DBG_PRINT("sentencia_for\n");}
     //Definir primera_parte_for - es una declaracion e inicializacion de variable
     //for (inicializacion; condicion; actualizacion)
     ;
