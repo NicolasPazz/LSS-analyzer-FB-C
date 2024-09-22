@@ -30,7 +30,8 @@
 "=="|"!="                                                                   {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
     /*Tipos de datos*/
-char|double|enum|float|int|long|short|struct|union|void                     {yylloc.last_column += yyleng; return TIPODEDATO;}
+char|double|enum|float|int|long|short|struct|union                          {yylloc.last_column += yyleng; return TIPODEDATO;}
+void                                                                        {yylloc.last_column += yyleng; return VOID;}
 
     /*Estructuras de control*/
 break                                                                       {yylloc.last_column += yyleng; return BREAK;}
@@ -71,7 +72,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
 [ \t]                                                                       {yylloc.last_column += yyleng;}
 
     /*Salto de linea*/
-\n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n'; printf("\n"); yylloc.last_line += 1;*/}
+\n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n';*/ printf("\n\n"); /*yylloc.last_line += 1;*/}
 
 [^ \t\n]                                                                    {unput(yytext[0]); BEGIN(tokenNoReconocido);}
 

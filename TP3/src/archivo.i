@@ -1,39 +1,49 @@
-for (a;a<10;) {
-    a++;
-}
-
-for (int i = 0; i < 10; i++) {
-        printf("Valor de i: %d\n", i);
-}
-
-for (int i = 0, j = 10; i < j; i++) {
-        printf("i = %d, j = %d\n", i, j);
-}
-
-for (;;) {
-    printf("Ejemplo 1: bucle infinito\n");
-    break;
-}
-
-for (int i = 0; i < 5; i++) {
-    printf("Ejemplo 2: %d\n", i);
-}
-
-for (int j = 0; j < 5; j += 2) {
-    printf("Ejemplo 3: %d\n", j);
-}
-
-for (int k = 1, l = 5; k < 5 && l > 0; k++) {
-    printf("Ejemplo 4: %d - %d\n", k, l);
-}
-
-for (int m = 10; m > 0; m--) {
-    printf("Ejemplo 5: %d\n", m);
-}
-
-for (int n = 0; n < 10; n++) {
-    if (n2 != 0) {
-        continue;
+float potencia(float base, long exp) {
+    float acumulador = 1.0;
+    for (long i = 0; i < exp; i++) {
+        acumulador *= base;
     }
-    printf("Ejemplo 6: %d es par\n", n);
+    return acumulador;
+}
+
+void rutina(int x);
+
+int main(void) {
+    unsigned int i, j = 0xA, a = 06;
+    if (a > 5 && j == 10) {
+        int b = a;
+        while (b != 0) {
+            printf("El valor de b es %d\n", b);
+            b--;
+            ++j;
+            continue;
+        }
+    }
+
+    switch(potencia(j, 2)) {
+        case 2:
+            j = a
+            break;
+        case 4:
+            int @double = 0;
+            return b-j;
+        default:
+            return 1+j+b;
+    }
+
+    rutina(5);
+    return 0;
+}
+
+void rutina(int x) {
+    do {
+        printf("El valor de x es %d \n", x);
+        x+=1;
+    } while (x < 5);
+
+    if (x == 5 || x > 10) {
+        printf("x es 5 o mayor que 10 \n");
+    } else {
+        printf("x tiene un valor entre 6 y 9 inclusive \n");
+    }
 }
