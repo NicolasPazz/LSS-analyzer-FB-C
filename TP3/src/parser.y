@@ -37,7 +37,7 @@ void yyerror(const char *s);
 
 //%type <cadena> expresion
 %left OP_AND OP_OR
-%left IDENTIFICADOR
+//%left IDENTIFICADOR
 %left '+' '-'
 %left '*' '/'
 %left '^'
@@ -46,7 +46,6 @@ void yyerror(const char *s);
 %start input
 
 %%
-// las gramaticas que tienen // al costado es porque ya fueron probadas y funcionan
 input:
     | input line
     ;
@@ -56,8 +55,7 @@ line:
     | sentencia //'\n' //
     | declaracion //'\n' //
     | definiciones_externas //'\n' 
-    | NO_RECONOCIDO { DBG_PRINT("NO_RECONOCIDO\n"); } //
-    //| error '\n' { agregarEstructuraNoReconocida(lista, estructura, yylloc.first_line); yyclearin; yyerrok; printf("\n");}
+    | error '\n' { agregarEstructuraNoReconocida(lista, estructura, yylloc.first_line);/* yyclearin; yyerrok; printf("\n");*/}
     ;
 
 expresion:
@@ -77,7 +75,7 @@ expresion_primaria:
     | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", yylval.entero); } //
     | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", yylval.real); } //
 //  | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); } //
-    | LITERAL_CADENA                            //{ DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", yylval.cadena); } //
+    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", yylval.cadena); } //
     | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");} //
     ;
 expresion_postfija:
@@ -186,7 +184,7 @@ expresion_op:
     ;
 primera_parte_for:
     | sufijo TIPODEDATO lista_declaradores_variable { DBG_PRINT("primera_parte_for\n");}
-    | IDENTIFICADOR                               { DBG_PRINT("primera_parte_for\n");}
+    | IDENTIFICADOR                                 { DBG_PRINT("primera_parte_for\n");}
     ;
 sentencia_de_salto:
       continue
@@ -200,8 +198,8 @@ break:
     BREAK ';' { DBG_PRINT("sentencia_de_salto: break\n");}
     ;
 return:
-      RETURN expresion_op ';'  { DBG_PRINT("sentencia_de_salto: return\n");}
-    | RETURN ';'            { DBG_PRINT("sentencia_de_salto: return\n");}
+      RETURN expresion_op ';'   { DBG_PRINT("sentencia_de_salto: return\n");}
+    | RETURN ';'                { DBG_PRINT("sentencia_de_salto: return\n");}
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
@@ -212,8 +210,8 @@ declaracion:
     ;
 
 lista_declaradores_variable:
-    declarador_variable                                  { DBG_PRINT("lista_declaradores_variable\n"); }
-    | lista_declaradores_variable ',' declarador_variable  { DBG_PRINT("lista_declaradores_variable\n"); }
+      declarador_variable                                   { DBG_PRINT("lista_declaradores_variable\n"); }
+    | lista_declaradores_variable ',' declarador_variable   { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
     IDENTIFICADOR inicializacion_variable { /*agregarVariableDeclarada(lista, strdup($1), sufijo, tipodedato);*/ DBG_PRINT("declarador_variable \n"); }
@@ -223,7 +221,7 @@ inicializacion_variable:
     ;
 
 lista_declaradores_funcion:
-    declarador_funcion                                     { DBG_PRINT("lista_declaradores_funcion\n"); }
+      declarador_funcion                                   { DBG_PRINT("lista_declaradores_funcion\n"); }
     | lista_declaradores_funcion ',' declarador_funcion    { DBG_PRINT("lista_declaradores_funcion\n"); }
     ;
 declarador_funcion:
@@ -234,7 +232,7 @@ lista_argumentos_prototipo:
     | lista_argumentos_prototipo ',' argumento_prototipo    { DBG_PRINT("argumento_prototipo\n"); }
     ;
 argumento_prototipo:
-     declarador_variable
+      declarador_variable
     | TIPODEDATO declarador_variable
     | TIPODEDATO
     ;
