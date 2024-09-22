@@ -198,7 +198,6 @@ void liberarSentencias(NodoSentencia *lista){
     }
 }
 
-NodoSentencia* listaSentencias = NULL;
 
 
 // ESTRUCTURAS NO RECONOCIDAS
