@@ -82,8 +82,6 @@ expresion:
     | expresion_and                              { DBG_PRINT("expresion - EXPRESION_AND\n"); }
     | expresion_or                               { DBG_PRINT("expresion - EXPRESION_OR\n"); }
     | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); }
-    | error                                                     {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $<mystruct>1.cadena , @1.first_line); } 
-    ;
     ;
 expresion_primaria:
       IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
@@ -125,7 +123,7 @@ lista_argumentos_invocacion:
     | expresion                                   { DBG_PRINT("ARGUMENTO\n"); } 
     | lista_argumentos_invocacion ',' expresion   { DBG_PRINT("ARGUMENTO\n"); } 
     ;
-/*-----------------------------------------------------------------------------------------------------------*/
+
 sentencia:
       sentencia_de_expresion 
     | sentencia_compuesta 
@@ -140,8 +138,6 @@ sentencia:
     //| continue: solo puede aparecer dentro de una sentencia de iteracion
     //| break: solo puede aparecer dentro de una sentencia_switch
     //| declaracion
-    | error                                                     {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $<mystruct>1.cadena , @1.first_line); } 
-    ;
     ;
 sentencia_de_expresion:
     expresion_op ';' {DBG_PRINT("sentencia_de_expresion\n");}
@@ -173,7 +169,6 @@ sentencia_if_else:
     ;
 sentencia_switch:
     SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { agregarSentencia(&listaSentencias, "switch", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_switch\n");}
-    ;
 sentencia_etiquetada:
     cases default
     ;
@@ -207,11 +202,11 @@ expresion_op:
     ;
 primera_parte_for:
     | sufijo TIPODEDATO lista_declaradores_variable_for { DBG_PRINT("primera_parte_for\n");}
-    | IDENTIFICADOR                                 { DBG_PRINT("primera_parte_for\n");}
+    | IDENTIFICADOR                                     { DBG_PRINT("primera_parte_for\n");}
     ;
 lista_declaradores_variable_for:
-    declarador_variable_for                                    { DBG_PRINT("lista_declaradores_variable\n"); }
-    | lista_declaradores_variable_for ',' declarador_variable_for  { DBG_PRINT("lista_declaradores_variable\n"); }
+    declarador_variable_for                                         { DBG_PRINT("lista_declaradores_variable\n"); }
+    | lista_declaradores_variable_for ',' declarador_variable_for   { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable_for:
     IDENTIFICADOR inicializacion_variable { }
@@ -243,7 +238,7 @@ declaracion:
     | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 2 %s %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena);}
     | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 3 %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena); }
     | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 4 %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena);}
-    | error                                               {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $<mystruct>1.cadena , @1.first_line); } 
+    | error                                              // {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $<mystruct>1.cadena , @1.first_line); } 
 
     ;
 
@@ -336,7 +331,7 @@ int main(int argc, char *argv[]) {
 //Reporte
     //1
     imprimirVariablesDeclaradas(listaVariablesDeclaradas);
-    //liberarVariablesDeclaradas(&listaVariablesDeclaradas);
+    //liberarVariablesDeclaradas(&listaVariablesDeclaradas); 
     printf("\n");
 
     //2

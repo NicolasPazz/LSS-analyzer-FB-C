@@ -3,7 +3,7 @@
 #include <string.h>
 #include "general.h"
 
-YYLTYPE yylloc;
+extern YYLTYPE yylloc;
 extern yyval;
 void pausa(void)
 {
@@ -90,11 +90,6 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
         actual = siguiente;
     }
 }
-
-
-
-
-
 
 // FUNCIONES
 NodoFuncion* crearNodoFuncion(const char *funcion, const char *sufijo, const char *retorno, const int linea, const char* tipogramatica){

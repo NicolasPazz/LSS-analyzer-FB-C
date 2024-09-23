@@ -1,4 +1,4 @@
-float potencia(float base, long exp) {
+float potencia(float base, long exp){
     float acumulador = 1.0;
     for (; exp > 0; exp--) {
         acumulador *= base;

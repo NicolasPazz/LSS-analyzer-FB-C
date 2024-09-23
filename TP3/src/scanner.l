@@ -1,10 +1,9 @@
 %{
-
 #include <string.h>
 #include <stdlib.h>
 #include "general.h"
 #include "parser.tab.h"
-
+extern char* copiarCadena(const char *str);
 %}
 
 %pointer
@@ -20,18 +19,18 @@
 ";"                                                                         {yylloc.last_column += yyleng; return ';';}
 ","                                                                         {yylloc.last_column += yyleng; return ',';}
 ":"                                                                         {yylloc.last_column += yyleng; return ':';}
-"="|"*="|"/="|"+="|"-="                                                     {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_ASIGNACION;}
-"<"|">"|"<="|">="                                                           {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_RELACIONAL;}
+"="|"*="|"/="|"+="|"-="                                                     {yylval.mystruct.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_ASIGNACION;}
+"<"|">"|"<="|">="                                                           {yylval.mystruct.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_RELACIONAL;}
 "&&"                                                                        {yylloc.last_column += yyleng; return OP_AND;}
 "||"                                                                        {yylloc.last_column += yyleng; return OP_OR;}
-"++"|"--"                                                                   {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_INCREMENTO_DECREMENTO;}
-[*/]                                                                        {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_MULTIPLICATIVO;}
+"++"|"--"                                                                   {yylval.mystruct.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_INCREMENTO_DECREMENTO;}
+[*/]                                                                        {yylval.mystruct.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_MULTIPLICATIVO;}
 [+-]                                                                        {yylloc.last_column += yyleng; return OP_ADITIVO;}
-"=="|"!="                                                                   {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
+"=="|"!="                                                                   {yylval.mystruct.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
     /*Tipos de datos*/
-char|double|enum|float|int|long|short|struct|union                          {yylval.mystruct.tipo = strdup(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
-void                                                                        {yylval.mystruct.tipo = strdup(yytext); yylloc.last_column += yyleng; return VOID;}
+char|double|enum|float|int|long|short|struct|union                          {yylval.mystruct.tipo = copiarCadena(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
+void                                                                        {yylval.mystruct.tipo = copiarCadena(yytext); yylloc.last_column += yyleng; return VOID;}
 
     /*Estructuras de control*/
 break                                                                       {yylloc.last_column += yyleng; return BREAK;}
@@ -48,7 +47,7 @@ switch                                                                      {yyl
 while                                                                       {yylloc.last_column += yyleng; return WHILE;}
 
     /*Otros*/
-auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yylval.mystruct.sufijo = strdup(yytext); yylloc.last_column += yyleng; return SUFIJO;}
+auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yylval.mystruct.sufijo = copiarCadena(yytext); yylloc.last_column += yyleng; return SUFIJO;}
 
     /*Constantes enteras*/
 0[0-7]*[uU]?[lL]{0,2}                                                       {yylval.mystruct.entero = strtol(yytext, NULL, 8); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
@@ -60,19 +59,19 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
 [0-9]+([eE][+-]?[0-9]+)[fFlL]?                                              {yylval.mystruct.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
 
     /*Constantes de caracter
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}*/
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {yylval.mystruct.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}*/
 
     /*Literal cadena*/
-\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
+\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {yylval.mystruct.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
 
     /*Identificadores*/
-[a-zA-Z_][a-zA-Z0-9_]*                                                      {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
+[a-zA-Z_][a-zA-Z0-9_]*                                                      {yylval.mystruct.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
 
     /*Espacio y tabulacion*/
 [ \t]                                                                       {yylloc.first_column += yyleng;}
 
     /*Salto de linea*/
-\n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n';*/ printf("\n\n"); /*yylloc.last_line += 1;*/}
+\n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n'; printf("\n\n"); yylloc.last_line += 1;*/}
 
 [^ \t\n]                                                                    {unput(yytext[0]); BEGIN(tokenNoReconocido);}
 
@@ -85,7 +84,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
                     BEGIN(INITIAL);
                 }   
     [^ \t\n]+   {
-                    yylval.mystruct.cadena = strdup(yytext);
+                    yylval.mystruct.cadena = copiarCadena(yytext);
                     agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.first_column); 
                     yylloc.last_column += yyleng;
                     BEGIN(INITIAL); 
