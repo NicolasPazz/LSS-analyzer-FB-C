@@ -64,74 +64,74 @@ input:
     ;
 line: 
       '\n'
-    | expresion //'\n'  //
-    | sentencia //'\n' //
-    | declaracion //'\n' //
-    | definiciones_externas //'\n' 
+    | expresion
+    | sentencia
+    | declaracion
+    | definiciones_externas
     | error '\n' //{ agregarEstructuraNoReconocida(listaEstructurasNoReconocidas, estructura, yylloc.first_line);/* yyclearin; yyerrok; printf("\n");*/}
     ;
 
 expresion:
-      expresion_primaria                         { DBG_PRINT("expresion - EXPRESION_PRIMARIA\n"); } //
-    | expresion_postfija                         { DBG_PRINT("expresion - EXPRESION_POSTFIJA\n"); } //
-    | expresion_unaria                           { DBG_PRINT("expresion - EXPRESION_UNARIA\n"); } //
-    | expresion_multiplicativa                   { DBG_PRINT("expresion - EXPRESION_MULTIPLICATIVA\n"); } //
-    | expresion_aditiva                          { DBG_PRINT("expresion - EXPRESION_ADITIVA\n"); } //
-    | expresion_relacional                       { DBG_PRINT("expresion - EXPRESION_RELACIONAL\n"); } //
-    | expresion_de_igualdad                      { DBG_PRINT("expresion - EXPRESION_DE_IGUALDAD\n"); } //
-    | expresion_and                              { DBG_PRINT("expresion - EXPRESION_AND\n"); } //
-    | expresion_or                               { DBG_PRINT("expresion - EXPRESION_OR\n"); } //
-    | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); } //
+      expresion_primaria                         { DBG_PRINT("expresion - EXPRESION_PRIMARIA\n"); }
+    | expresion_postfija                         { DBG_PRINT("expresion - EXPRESION_POSTFIJA\n"); }
+    | expresion_unaria                           { DBG_PRINT("expresion - EXPRESION_UNARIA\n"); }
+    | expresion_multiplicativa                   { DBG_PRINT("expresion - EXPRESION_MULTIPLICATIVA\n"); }
+    | expresion_aditiva                          { DBG_PRINT("expresion - EXPRESION_ADITIVA\n"); }
+    | expresion_relacional                       { DBG_PRINT("expresion - EXPRESION_RELACIONAL\n"); }
+    | expresion_de_igualdad                      { DBG_PRINT("expresion - EXPRESION_DE_IGUALDAD\n"); }
+    | expresion_and                              { DBG_PRINT("expresion - EXPRESION_AND\n"); }
+    | expresion_or                               { DBG_PRINT("expresion - EXPRESION_OR\n"); }
+    | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); }
     ;
 expresion_primaria:
-      IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); } //
-    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", yylval.entero); } //
-    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", yylval.real); } //
-//  | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); } //
-    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", yylval.cadena); } //
-    | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");} //
+      IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
+    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", yylval.entero); }
+    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", yylval.real); }
+//  | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); }
+    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", yylval.cadena); }
+    | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");}
     ;
 expresion_postfija:
-      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); } //
-    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); } //
+      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); }
+    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); }
     ;
 expresion_unaria:
-      OP_INCREMENTO_DECREMENTO IDENTIFICADOR      { DBG_PRINT("expresion_unaria - INCREMENTO/DECREMENTO:\n"); } //
+      OP_INCREMENTO_DECREMENTO IDENTIFICADOR      { DBG_PRINT("expresion_unaria - INCREMENTO/DECREMENTO:\n"); }
     ;
 expresion_multiplicativa:
-      expresion OP_MULTIPLICATIVO expresion       { DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n"); } //
+      expresion OP_MULTIPLICATIVO expresion       { DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n"); }
     ;
 expresion_aditiva:
-      expresion OP_ADITIVO expresion              { DBG_PRINT("expresion_aditiva: EXP1 +/- EXP2\n"); } //
+      expresion OP_ADITIVO expresion              { DBG_PRINT("expresion_aditiva: EXP1 +/- EXP2\n"); } 
     ;
 expresion_relacional:
-      expresion OP_RELACIONAL expresion           {  } //
+      expresion OP_RELACIONAL expresion           {  } 
     ;
 expresion_de_igualdad:
-      expresion OP_IGUALDAD expresion             { DBG_PRINT("expresion_de_igualdad: EXP1 ==/!= EXP2\n"); } //
+      expresion OP_IGUALDAD expresion             { DBG_PRINT("expresion_de_igualdad: EXP1 ==/!= EXP2\n"); }
     ;
 expresion_and:
-      expresion OP_AND expresion                  { DBG_PRINT("expresion_and\n"); } //
+      expresion OP_AND expresion                  { DBG_PRINT("expresion_and\n"); }
     ;
 expresion_or:
-      expresion OP_OR expresion                   { DBG_PRINT("expresion_or\n"); } //
+      expresion OP_OR expresion                   { DBG_PRINT("expresion_or\n"); } 
     ;
 expresion_de_asignacion:
-      IDENTIFICADOR OP_ASIGNACION expresion       { } //
+      IDENTIFICADOR OP_ASIGNACION expresion       { } 
     ;
 lista_argumentos_invocacion:
-    | expresion                                   { DBG_PRINT("ARGUMENTO\n"); } //
-    | lista_argumentos_invocacion ',' expresion   { DBG_PRINT("ARGUMENTO\n"); } //
+    | expresion                                   { DBG_PRINT("ARGUMENTO\n"); } 
+    | lista_argumentos_invocacion ',' expresion   { DBG_PRINT("ARGUMENTO\n"); } 
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 sentencia:
-      sentencia_de_expresion //{yylloc.last_line = yylloc.first_line ; yylloc.first_column = yylloc.last_column};
-    | sentencia_compuesta //
-    | sentencia_if //
-    | sentencia_if_else //
-    | sentencia_switch //
-    | sentencia_while //
-    | sentencia_do_while //
+      sentencia_de_expresion 
+    | sentencia_compuesta 
+    | sentencia_if 
+    | sentencia_if_else 
+    | sentencia_switch 
+    | sentencia_while 
+    | sentencia_do_while 
     | sentencia_for 
     //| sentencia_etiquetada: solo puede aparecer dentro de una sentencia_switch
     | sentencia_de_salto //
@@ -165,7 +165,6 @@ sentencia_if:
     IF '(' expresion ')' sentencia_compuesta { agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");}
     ;
 sentencia_if_else:
-    //revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
     IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta { agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");}
     ;
 sentencia_switch:
@@ -197,8 +196,6 @@ sentencia_do_while:
 sentencia_for:
     FOR '(' primera_parte_for ';' expresion_op ';' expresion_op ')' 
     sentencia_compuesta { agregarSentencia(&listaSentencias, "for", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_for\n");}
-    //Definir primera_parte_for - es una declaracion e inicializacion de variable
-    //for (inicializacion; condicion; actualizacion)
     ;
 expresion_op:
     | expresion { DBG_PRINT("expresion_op\n");}
@@ -237,10 +234,10 @@ declaracion:
       sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $<mystruct>3.cadena, $<mystruct>2.tipo, yylloc.last_line, $<mystruct>1.sufijo);*/ DBG_PRINT("declaracion de variable/s %s\n", $<mystruct>3.cadena); $<mystruct>1.sufijo = NULL;}
     | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $<mystruct>2.cadena, $<mystruct>1.tipo, yylloc.last_line, NULL);*/ DBG_PRINT("declaracion de variable/s \n"); }
     
-    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); }
-    | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); }
-    | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); }
-    | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); }
+    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 1 %s %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena);}
+    | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 2 %s %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena);}
+    | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 3 %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena); }
+    | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 4 %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena);}
     | error                                               //{ yyclearin; yyerrok; printf("\n"); }
     ;
 
@@ -286,7 +283,7 @@ sufijo:
     | SUFIJO { DBG_PRINT("sufijo\n"); }
     | /*vacio*/
     ;
-/*-----------------------------------------------------------------------------------------------------------*/
+
 definiciones_externas:
       declaracion               { DBG_PRINT("definiciones_externas: declaracion \n"); }
     | definicion_funcion   
@@ -295,7 +292,7 @@ definiciones_externas:
 definicion_funcion: 
       TIPODEDATO definidor_funcion sentencia_compuesta   { DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
     | VOID definidor_funcion sentencia_compuesta         { DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
-    ;
+    ; 
 definidor_funcion:
     IDENTIFICADOR '(' lista_argumentos_definicion ')' //{ agregarFuncion(&listaFunciones,identificador,declaracion,listadodeparametros,tipodedato,linea); DBG_PRINT("definidor_funcion\n"); }
     ;
@@ -307,6 +304,10 @@ argumento_definicion:
     | sufijo TIPODEDATO IDENTIFICADOR
     | TIPODEDATO IDENTIFICADOR
     | VOID
+    ;
+
+cadenas_no_reconocidas: 
+    error                                                  //    {agregarEstructuraNoReconocida(&listaCadenasNoReconocidas, yytext, @1.first_line, @1.first_column); } 
     ;
 %%
 
@@ -321,9 +322,7 @@ int main(int argc, char *argv[]) {
     if (!file) {
         perror("No se puede abrir el archivo");
         return 1;
-    }
-
-    //init_table();     
+    }  
 
     yyin = file;
 
@@ -335,21 +334,21 @@ int main(int argc, char *argv[]) {
 //Reporte
     //1
     imprimirVariablesDeclaradas(listaVariablesDeclaradas);
-    //liberarVariablesDeclaradas(&listaVariablesDeclaradas); //PENDIENTE
+    //liberarVariablesDeclaradas(&listaVariablesDeclaradas);
     printf("\n");
 
     //2
-    //imprimirFunciones(listaFunciones);
-    //liberarFunciones(listaFunciones);
-    //printf("\n");
+    imprimirFunciones(listaFunciones);
+    liberarFunciones(listaFunciones);
+    printf("\n");
 
     //3
     imprimirSentencias(listaSentencias);
-    //liberarSentencias(&listaSentencias);
+    liberarSentencias(&listaSentencias);
     printf("\n");
 
     //4
-    //imprimirEstructurasNoReconocidas(listaEstructurasNoReconocidas);
+    imprimirEstructurasNoReconocidas(listaEstructurasNoReconocidas);
     //liberarEstructurasNoReconocidas(listaEstructurasNoReconocidas);
     printf("\n");
 

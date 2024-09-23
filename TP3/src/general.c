@@ -33,6 +33,7 @@ NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada,
     nuevo->sufijo = sufijo;
     nuevo->siguiente = NULL;
     return nuevo;
+    
 }
 
 void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo){
@@ -73,8 +74,8 @@ void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
         }
         actual = actual->siguiente;
     }
-    //liberarVariablesDeclaradas(&listaVariablesDeclaradas);
 }
+
 
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
     NodoVariableDeclarada *actual = lista;
@@ -83,12 +84,15 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
     while (actual != NULL) {
         siguiente = actual->siguiente;
         free(actual->variableDeclarada);
-        /*free(actual->tipoDato);
-        free(actual->sufijo);*/
+        free(actual->tipoDato);
+        free(actual->sufijo);
         free(actual);
         actual = siguiente;
     }
 }
+
+
+
 
 
 
@@ -135,14 +139,9 @@ void imprimirFunciones(NodoFuncion *lista){
     }
 
     while (actual != NULL) {
-        //printf("%s: %s, input: %s, retorna: %s, linea %d\n", actual->funcion, actual->tipogramatica, actual->argumentos, actual->tipogramatica, actual->retorno, actual->linea);
+        //printf("%s: %s, input: %s, retorna: %s, linea %d\n", actual->funcion, actual->tipogramatica, actual->argumentos, actual->retorno, actual->linea);
         actual = actual->siguiente;
     }
-
-
-//potencia: definicion, input: float base, long exp, retorna: float, linea 1
-
-
 }
 
 void liberarFunciones(NodoFuncion *lista){
@@ -156,7 +155,6 @@ void liberarFunciones(NodoFuncion *lista){
         actual = siguiente;
     }
 }
-
 
 
 // SENTENCIAS
@@ -213,7 +211,6 @@ void imprimirSentencias(NodoSentencia *lista){
         printf("%s: linea %d, columna %d\n", actual->sentencia, actual->linea, actual->columna);
         actual = actual->siguiente;
     }
-    liberarSentencias(&listaSentencias);
 }
 
 void liberarSentencias(NodoSentencia *lista){
@@ -263,7 +260,7 @@ void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
     printf("* Listado de estructuras sintácticas no reconocidas\n");
     
     if (actual == NULL) {
-        printf("-\n");
+       // printf("-\n");
         return;
     }
 
