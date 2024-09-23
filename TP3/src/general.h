@@ -41,13 +41,16 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 // FUNCIONES
 typedef struct NodoFuncion {
     char *funcion;
+    char *retorno;
+    char *sufijo;
+    char *tipogramatica;
     int linea;
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
-NodoFuncion* crearNodoFuncion(const char *funcion, const int linea);
+NodoFuncion* crearNodoFuncion(const char *sufijo, const char *retorno, const char *funcion, const int linea, const char *tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, const char *funcion, const int linea);
+void agregarFuncion(NodoFuncion **lista, const char *sufijo, const char *retorno, const char *funcion, const int linea, const char *tipogramatica);
 
 void imprimirFunciones(NodoFuncion *lista);
 

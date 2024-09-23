@@ -69,7 +69,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
 [a-zA-Z_][a-zA-Z0-9_]*                                                      {yylval.mystruct.cadena = strdup(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
 
     /*Espacio y tabulacion*/
-[ \t]                                                                       {yylloc.last_column += yyleng;}
+[ \t]                                                                       {yylloc.first_column += yyleng;}
 
     /*Salto de linea*/
 \n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n';*/ printf("\n\n"); /*yylloc.last_line += 1;*/}

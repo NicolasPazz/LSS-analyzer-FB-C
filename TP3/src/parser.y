@@ -68,7 +68,7 @@ line:
     | sentencia //'\n' //
     | declaracion //'\n' //
     | definiciones_externas //'\n' 
-    | error '\n' { agregarEstructuraNoReconocida(lista, estructura, yylloc.first_line);/* yyclearin; yyerrok; printf("\n");*/}
+    | error '\n' //{ agregarEstructuraNoReconocida(listaEstructurasNoReconocidas, estructura, yylloc.first_line);/* yyclearin; yyerrok; printf("\n");*/}
     ;
 
 expresion:
@@ -162,41 +162,41 @@ declaraciones:
     | declaraciones declaracion
     ;
 sentencia_if:
-    IF '(' expresion ')' sentencia_compuesta { agregarSentencia(&listaSentencias, "if", yylloc.first_line, yylloc.last_column) ; DBG_PRINT("sentencia_if\n");}
+    IF '(' expresion ')' sentencia_compuesta { agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");}
     ;
 sentencia_if_else:
     //revisar si cuando tengo un ifelse me lo toma como sentencia if y sentencia ifelse
-    IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta { agregarSentencia(&listaSentencias, "if/else", yylloc.first_line, yylloc.last_column) ; DBG_PRINT("sentencia_if_else\n");}
+    IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta { agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");}
     ;
 sentencia_switch:
-    SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { agregarSentencia(&listaSentencias, "switch", yylloc.first_line, yylloc.last_column) ; DBG_PRINT("sentencia_switch\n");}
+    SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { agregarSentencia(&listaSentencias, "switch", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_switch\n");}
 sentencia_etiquetada:
     cases default
     ;
 case:
-      CASE expresion ':' sentencias_compuestas_sin_llaves   { agregarSentencia(&listaSentencias, "case", yylloc.first_line, yylloc.last_column);}
+      CASE expresion ':' sentencias_compuestas_sin_llaves   { agregarSentencia(&listaSentencias, "case", @1.first_line, @1.first_column);}
     | CASE expresion ':' sentencias_compuestas_sin_llaves 
-      BREAK                                                 { agregarSentencia(&listaSentencias, "case/break", yylloc.first_line, yylloc.last_column);}
+      BREAK                                                 { agregarSentencia(&listaSentencias, "case/break", @1.first_line, @1.first_column);}
     ;
 default:
-    | DEFAULT ':' sentencias    { agregarSentencia(&listaSentencias, "default", yylloc.first_line, yylloc.last_column); }
+    | DEFAULT ':' sentencias    { agregarSentencia(&listaSentencias, "default", @1.first_line, @1.first_column); }
     | DEFAULT ':' sentencias 
-      BREAK                     { agregarSentencia(&listaSentencias, "default/break", yylloc.first_line, yylloc.last_column);}
+      BREAK                     { agregarSentencia(&listaSentencias, "default/break", @1.first_line, @1.first_column);}
     ;
 cases:
     | case
     | cases case
     ;
 sentencia_while:
-    WHILE '(' expresion ')' sentencia_compuesta { agregarSentencia(&listaSentencias, "while", yylloc.last_line, yylloc.last_column) ; DBG_PRINT("sentencia_while\n");}
+    WHILE '(' expresion ')' sentencia_compuesta { agregarSentencia(&listaSentencias, "while", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_while\n");}
     ;
 sentencia_do_while:
     DO sentencia_compuesta
-    WHILE '(' expresion ')' ';' { agregarSentencia(&listaSentencias, "do/while",yylloc.first_line, yylloc.last_column) ; DBG_PRINT("sentencia_do_while\n");}
+    WHILE '(' expresion ')' ';' { agregarSentencia(&listaSentencias, "do/while", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_do_while\n");}
     ;
 sentencia_for:
     FOR '(' primera_parte_for ';' expresion_op ';' expresion_op ')' 
-    sentencia_compuesta { agregarSentencia(&listaSentencias, "for",yylloc.first_line, yylloc.last_column) ; DBG_PRINT("sentencia_for\n");}
+    sentencia_compuesta { agregarSentencia(&listaSentencias, "for", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_for\n");}
     //Definir primera_parte_for - es una declaracion e inicializacion de variable
     //for (inicializacion; condicion; actualizacion)
     ;
@@ -223,24 +223,24 @@ sentencia_de_salto:
     | return
     ;
 continue:
-    CONTINUE ';' { agregarSentencia(&listaSentencias, "continue", yylloc.last_line, yylloc.last_column); }
+    CONTINUE ';' { agregarSentencia(&listaSentencias, "continue", @1.first_line, @1.first_column); }
     ;
 break:
-    BREAK ';' { agregarSentencia(&listaSentencias, "break", yylloc.last_line, yylloc.last_column); }
+    BREAK ';' { agregarSentencia(&listaSentencias, "break", @1.first_line, @1.first_column); }
     ;
 return:
-      RETURN expresion_op ';'  { agregarSentencia(&listaSentencias, "return", yylloc.last_line, yylloc.last_column); }
-    | RETURN ';'               { agregarSentencia(&listaSentencias, "return", yylloc.last_line, yylloc.last_column); }
+      RETURN expresion_op ';'  { agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column); }
+    | RETURN ';'               { agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column); }
     ;
 /*-----------------------------------------------------------------------------------------------------------*/
 declaracion:
       sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $<mystruct>3.cadena, $<mystruct>2.tipo, yylloc.last_line, $<mystruct>1.sufijo);*/ DBG_PRINT("declaracion de variable/s %s\n", $<mystruct>3.cadena); $<mystruct>1.sufijo = NULL;}
-    | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $<mystruct>2.cadena, $<mystruct>1.tipo, yylloc.last_line, $<mystruct>1.sufijo);*/ DBG_PRINT("declaracion de variable/s \n"); }
+    | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $<mystruct>2.cadena, $<mystruct>1.tipo, yylloc.last_line, NULL);*/ DBG_PRINT("declaracion de variable/s \n"); }
     
-    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { DBG_PRINT("declaracion de funcion/es \n")}
-    | sufijo VOID lista_declaradores_funcion ';'          { DBG_PRINT("declaracion de funcion/es VOID\n"); }
-    | TIPODEDATO lista_declaradores_funcion ';'           { DBG_PRINT("declaracion de funcion/es \n") }
-    | VOID lista_declaradores_funcion ';'                 { DBG_PRINT("declaracion de funcion/es VOID\n"); }
+    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); }
+    | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); }
+    | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); }
+    | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); }
     | error                                               //{ yyclearin; yyerrok; printf("\n"); }
     ;
 
@@ -262,8 +262,7 @@ lista_declaradores_funcion:
 declarador_funcion:
     IDENTIFICADOR '(' lista_argumentos_prototipo ')'       { /*agregarFuncion(&listaFunciones, $<mystruct>1.cadena, yylloc.last_line, "declaracion", $<mystruct>2.cadena, retorna)*/ }
     ;
-lista_argumentos_prototipo:
-                                                            { /* agregarRetornoFuncion(&listaFunciones, $<mystruct>1.cadena, retorna); */ }
+lista_argumentos_prototipo:                                                            
     | argumento_prototipo                                   { DBG_PRINT("argumento_prototipo\n"); }
     | lista_argumentos_prototipo ',' argumento_prototipo    { DBG_PRINT("argumento_prototipo\n"); }
     ;
@@ -346,7 +345,7 @@ int main(int argc, char *argv[]) {
 
     //3
     imprimirSentencias(listaSentencias);
-    liberarSentencias(&listaSentencias);
+    //liberarSentencias(&listaSentencias);
     printf("\n");
 
     //4

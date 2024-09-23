@@ -73,6 +73,7 @@ void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
         }
         actual = actual->siguiente;
     }
+    //liberarVariablesDeclaradas(&listaVariablesDeclaradas);
 }
 
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
@@ -82,6 +83,8 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
     while (actual != NULL) {
         siguiente = actual->siguiente;
         free(actual->variableDeclarada);
+        /*free(actual->tipoDato);
+        free(actual->sufijo);*/
         free(actual);
         actual = siguiente;
     }
@@ -90,17 +93,21 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
 
 
 // FUNCIONES
-NodoFuncion* crearNodoFuncion(const char *funcion, const int linea){
+NodoFuncion* crearNodoFuncion(const char *funcion, const char *sufijo, const char *retorno, const int linea, const char* tipogramatica){
     NodoFuncion *nuevo = (NodoFuncion *)malloc(sizeof(NodoFuncion));
     nuevo->funcion = copiarCadena(funcion);
     nuevo->linea = linea;
+    nuevo->sufijo = sufijo;
+    nuevo->retorno = copiarCadena(retorno);
+    nuevo->tipogramatica = copiarCadena(tipogramatica);
     nuevo->siguiente = NULL;
+
     return nuevo;
 }
 
-void agregarFuncion(NodoFuncion **lista, const char *funcion, const int linea){
+void agregarFuncion(NodoFuncion **lista, const char *sufijo, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
     // Crear el nuevo nodo
-    NodoFuncion *nuevoNodo = crearNodoFuncion(funcion,linea);
+    NodoFuncion *nuevoNodo = crearNodoFuncion(funcion, sufijo, retorno, linea, tipogramatica);
 
     // Si la lista está vacía, el nuevo nodo es el primer nodo
     if (*lista == NULL) {
@@ -128,7 +135,7 @@ void imprimirFunciones(NodoFuncion *lista){
     }
 
     while (actual != NULL) {
-        printf("%s: %s, input: %s %s, retorna: %s, linea %d\n", actual->funcion, actual->linea);
+        //printf("%s: %s, input: %s, retorna: %s, linea %d\n", actual->funcion, actual->tipogramatica, actual->argumentos, actual->tipogramatica, actual->retorno, actual->linea);
         actual = actual->siguiente;
     }
 
@@ -162,8 +169,8 @@ NodoSentencia* crearNodoSentencia(const char *sentencia, const int linea, const 
     return nuevo;
 }
 
-void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int linea, const int columna){
-     // Crear el nuevo nodo
+void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int linea, const int columna) {
+    // Crear el nuevo nodo
     NodoSentencia *nuevoNodo = crearNodoSentencia(sentencia, linea, columna);
 
     // Si la lista está vacía, el nuevo nodo es el primer nodo
@@ -172,14 +179,25 @@ void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int li
         return;
     }
 
-    // Si la lista no está vacía, recorrer hasta el final
+    // Si la lista no está vacía, encontrar la posición correcta para insertar el nuevo nodo
     NodoSentencia *actual = *lista;
-    while (actual->siguiente != NULL) {
+    NodoSentencia *anterior = NULL;
+
+    while (actual != NULL && actual->linea < linea) {
+        anterior = actual;
         actual = actual->siguiente;
     }
 
-    // Enlazar el nuevo nodo al final de la lista
-    actual->siguiente = nuevoNodo;
+    // Insertar el nuevo nodo en la posición correcta
+    if (anterior == NULL) {
+        // Insertar al inicio de la lista
+        nuevoNodo->siguiente = *lista;
+        *lista = nuevoNodo;
+    } else {
+        // Insertar en medio o al final de la lista
+        nuevoNodo->siguiente = actual;
+        anterior->siguiente = nuevoNodo;
+    }
 }
 
 void imprimirSentencias(NodoSentencia *lista){
@@ -195,6 +213,7 @@ void imprimirSentencias(NodoSentencia *lista){
         printf("%s: linea %d, columna %d\n", actual->sentencia, actual->linea, actual->columna);
         actual = actual->siguiente;
     }
+    liberarSentencias(&listaSentencias);
 }
 
 void liberarSentencias(NodoSentencia *lista){
