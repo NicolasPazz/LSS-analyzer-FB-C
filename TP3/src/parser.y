@@ -82,6 +82,8 @@ expresion:
     | expresion_and                              { DBG_PRINT("expresion - EXPRESION_AND\n"); }
     | expresion_or                               { DBG_PRINT("expresion - EXPRESION_OR\n"); }
     | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); }
+    | error                                                     {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $<mystruct>1.cadena , @1.first_line); } 
+    ;
     ;
 expresion_primaria:
       IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
@@ -138,6 +140,8 @@ sentencia:
     //| continue: solo puede aparecer dentro de una sentencia de iteracion
     //| break: solo puede aparecer dentro de una sentencia_switch
     //| declaracion
+    | error                                                     {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $<mystruct>1.cadena , @1.first_line); } 
+    ;
     ;
 sentencia_de_expresion:
     expresion_op ';' {DBG_PRINT("sentencia_de_expresion\n");}
@@ -169,6 +173,7 @@ sentencia_if_else:
     ;
 sentencia_switch:
     SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { agregarSentencia(&listaSentencias, "switch", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_switch\n");}
+    ;
 sentencia_etiquetada:
     cases default
     ;
@@ -229,7 +234,7 @@ return:
       RETURN expresion_op ';'  { agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column); }
     | RETURN ';'               { agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column); }
     ;
-/*-----------------------------------------------------------------------------------------------------------*/
+
 declaracion:
       sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $<mystruct>3.cadena, $<mystruct>2.tipo, yylloc.last_line, $<mystruct>1.sufijo);*/ DBG_PRINT("declaracion de variable/s %s\n", $<mystruct>3.cadena); $<mystruct>1.sufijo = NULL;}
     | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $<mystruct>2.cadena, $<mystruct>1.tipo, yylloc.last_line, NULL);*/ DBG_PRINT("declaracion de variable/s \n"); }
@@ -238,7 +243,8 @@ declaracion:
     | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 2 %s %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena);}
     | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 3 %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena); }
     | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 4 %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena);}
-    | error                                               //{ yyclearin; yyerrok; printf("\n"); }
+    | error                                               {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $<mystruct>1.cadena , @1.first_line); } 
+
     ;
 
 lista_declaradores_variable:
@@ -305,10 +311,6 @@ argumento_definicion:
     | TIPODEDATO IDENTIFICADOR
     | VOID
     ;
-
-cadenas_no_reconocidas: 
-    error                                                  //    {agregarEstructuraNoReconocida(&listaCadenasNoReconocidas, yytext, @1.first_line, @1.first_column); } 
-    ;
 %%
 
 int main(int argc, char *argv[]) {
@@ -349,7 +351,7 @@ int main(int argc, char *argv[]) {
 
     //4
     imprimirEstructurasNoReconocidas(listaEstructurasNoReconocidas);
-    //liberarEstructurasNoReconocidas(listaEstructurasNoReconocidas);
+    liberarEstructurasNoReconocidas(listaEstructurasNoReconocidas);
     printf("\n");
 
     //5 

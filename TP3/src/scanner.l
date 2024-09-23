@@ -86,7 +86,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
                 }   
     [^ \t\n]+   {
                     yylval.mystruct.cadena = strdup(yytext);
-                    agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.last_column); 
+                    agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.first_column); 
                     yylloc.last_column += yyleng;
                     BEGIN(INITIAL); 
                     return NO_RECONOCIDO;
