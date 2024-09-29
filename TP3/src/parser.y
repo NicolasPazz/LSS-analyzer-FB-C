@@ -59,7 +59,8 @@ NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 %start input
 
 %%
-input:
+input
+    : /*empty*/ 
     | input line
     ;
 line: 
@@ -84,13 +85,13 @@ expresion:
     | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); }
     ;
 expresion_primaria:
-      IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
-    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", yylval.entero); }
-    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", yylval.real); }
-//  | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", yylval.cadena); }
-    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", yylval.cadena); }
-    | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");}
-    ;
+            IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1.cadena); }
+        | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1.entero); }
+        | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1.real); }
+//  | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", $1.cadena); }
+        | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1.cadena); }
+        | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");}
+        ;
 expresion_postfija:
       IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); }
     | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); }
@@ -341,7 +342,7 @@ int main(int argc, char *argv[]) {
 
     //3
     imprimirSentencias(listaSentencias);
-    liberarSentencias(&listaSentencias);
+    liberarSentencias(listaSentencias);
     printf("\n");
 
     //4

@@ -4,7 +4,7 @@
 #include "general.h"
 
 extern YYLTYPE yylloc;
-extern yyval;
+extern int yyval;
 void pausa(void)
 {
     printf("Presione ENTER para continuar...\n");
