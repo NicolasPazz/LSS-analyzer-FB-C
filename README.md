@@ -14,3 +14,4 @@ Repositorio designado para los trabajos prácticos de la asignatura "Sintáxis y
 | 208.961-0 | Di FIlippo | Carla | cdifilippo@frba.utn.edu.ar          |
 | 209.000-4 | Garrone | Juan | jgarrone@frba.utn.edu.ar          |
 | 208.352-8 | Perez | Matias | mperezmendoza@frba.utn.edu.ar          |
+| 176.324-6 | Garcia Alonso | Aixa Caterina | agarciaalonso@frba.utn.edu.ar          |
