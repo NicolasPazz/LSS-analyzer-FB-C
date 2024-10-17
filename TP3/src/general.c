@@ -116,7 +116,7 @@ void agregarFuncion(NodoFuncion **lista, const char *sufijo, const char *retorno
 
     // Si la lista no está vacía, recorrer hasta el final
     NodoFuncion *actual = *lista;
-    while (actual->siguiente != NULL) {
+    while (actual != NULL && actual->siguiente != NULL) {
         actual = actual->siguiente;
     }
 
