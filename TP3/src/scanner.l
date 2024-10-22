@@ -29,8 +29,8 @@ extern char* copiarCadena(const char *str);
 "=="|"!="                                                                   {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
     /*Tipos de datos*/
-char|double|enum|float|int|long|short|struct|union                          {yylval.tipo = copiarCadena(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
-void                                                                        {yylval.tipo = copiarCadena(yytext); yylloc.last_column += yyleng; return VOID;}
+char|double|enum|float|int|long|short|struct|union                          {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
+void                                                                        {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return VOID;}
 
     /*Estructuras de control*/
 break                                                                       {yylloc.last_column += yyleng; return BREAK;}
@@ -47,7 +47,7 @@ switch                                                                      {yyl
 while                                                                       {yylloc.last_column += yyleng; return WHILE;}
 
     /*Otros*/
-auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yylval.sufijo = copiarCadena(yytext); yylloc.last_column += yyleng; return SUFIJO;}
+auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return SUFIJO;}
 
     /*Constantes enteras*/
 0[0-7]*[uU]?[lL]{0,2}                                                       {yylval.entero = strtol(yytext, NULL, 8); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}

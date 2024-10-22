@@ -36,6 +36,7 @@ NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
         int entero;
         float real;
         char* cadena;
+        
 }
 
 %token <cadena> IDENTIFICADOR SUFIJO TIPODEDATO LITERAL_CADENA OP_ASIGNACION OP_RELACIONAL OP_INCREMENTO_DECREMENTO OP_MULTIPLICATIVO OP_ADITIVO OP_IGUALDAD NO_RECONOCIDO OP_AND OP_OR BREAK CASE CONTINUE DEFAULT DO ELSE FOR IF RETURN SWITCH WHILE GOTO VOID
@@ -242,7 +243,7 @@ lista_declaradores_variable:
     | lista_declaradores_variable ',' declarador_variable  { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
-    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, $1, yyval.tipo, yylloc.last_line, NULL); DBG_PRINT("declarador_variable \n"); }
+    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, $1, yyval.cadena, yylloc.last_line, NULL); DBG_PRINT("declarador_variable \n"); }
     ;
 inicializacion_variable:
     | OP_ASIGNACION expresion { DBG_PRINT("inicializacion de variable \n"); }
