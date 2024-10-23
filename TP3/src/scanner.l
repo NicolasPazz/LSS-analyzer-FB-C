@@ -58,9 +58,6 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
 [0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                     {yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
 [0-9]+([eE][+-]?[0-9]+)[fFlL]?                                              {yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
 
-    /*Constantes de caracter
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}*/
-
     /*Literal cadena*/
 \"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
 

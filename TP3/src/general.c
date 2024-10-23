@@ -92,11 +92,11 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
 }
 
 // FUNCIONES
-NodoFuncion* crearNodoFuncion(const char *funcion, const char *sufijo, const char *retorno, const int linea, const char* tipogramatica){
+NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
     NodoFuncion *nuevo = (NodoFuncion *)malloc(sizeof(NodoFuncion));
     nuevo->funcion = copiarCadena(funcion);
     nuevo->linea = linea;
-    nuevo->sufijo = sufijo;
+    nuevo->parametros = copiarCadena(listaParametros);
     nuevo->retorno = copiarCadena(retorno);
     nuevo->tipogramatica = copiarCadena(tipogramatica);
     nuevo->siguiente = NULL;
@@ -104,10 +104,9 @@ NodoFuncion* crearNodoFuncion(const char *funcion, const char *sufijo, const cha
     return nuevo;
 }
 
-void agregarFuncion(NodoFuncion **lista, const char *sufijo, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
+void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
     // Crear el nuevo nodo
-    NodoFuncion *nuevoNodo = crearNodoFuncion(funcion, sufijo, retorno, linea, tipogramatica);
-
+    NodoFuncion *nuevoNodo = crearNodoFuncion(retorno, funcion, linea, tipogramatica);
     // Si la lista está vacía, el nuevo nodo es el primer nodo
     if (*lista == NULL) {
         *lista = nuevoNodo;
@@ -122,19 +121,68 @@ void agregarFuncion(NodoFuncion **lista, const char *sufijo, const char *retorno
 
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
+    parametro = NULL;
+    listaParametros = NULL;
 }
 
-void imprimirFunciones(NodoFuncion *lista){
+char* unirParametros(const char* param1, const char* param2) {
+    // Aquí asumimos que ambos parámetros son no nulos
+
+    // Calculamos las longitudes de los parámetros
+    size_t longitud1 = strlen(param1);
+    size_t longitud2 = strlen(param2);
+
+    // Asignamos memoria para la cadena resultante
+    char* resultado = (char*)malloc(longitud1 + longitud2 + 2); // +2 para espacio y terminador nulo
+    if (resultado == NULL) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+
+    // Copiamos el primer parámetro
+    strcpy(resultado, param1);
+
+    // Agregamos un espacio
+    strcat(resultado, " ");
+
+    // Concatenamos el segundo parámetro
+    strcat(resultado, param2);
+
+    return resultado; // Retornamos la cadena resultante
+}
+
+void agregarParametro(char** lista, char* parametro) {
+    if (*lista == NULL) {
+        *lista = copiarCadena(parametro);
+    } else {
+        size_t newLength = strlen(*lista) + strlen(parametro) + 3;
+        char* nuevaLista = (char*)malloc(newLength);
+        if (nuevaLista == NULL) {
+            perror("malloc");
+            exit(EXIT_FAILURE);
+        }
+
+        strcpy(nuevaLista, *lista);
+        strcat(nuevaLista, ", ");
+        strcat(nuevaLista, parametro);
+
+        free(*lista);
+        *lista = nuevaLista;
+    }
+    parametro = NULL;
+}
+
+void imprimirFunciones(NodoFuncion *lista) {
     NodoFuncion *actual = lista;
     printf("* Listado de funciones declaradas o definidas:\n");
-    
+
     if (actual == NULL) {
         printf("-\n");
         return;
     }
 
     while (actual != NULL) {
-        //printf("%s: %s, input: %s, retorna: %s, linea %d\n", actual->funcion, actual->tipogramatica, actual->argumentos, actual->retorno, actual->linea);
+        printf("%s: %s, input: %s, retorna: %s, linea %d\n", actual->funcion, actual->tipogramatica, actual->parametros, actual->retorno, actual->linea);
         actual = actual->siguiente;
     }
 }
@@ -252,10 +300,10 @@ void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const cha
 
 void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
     NodoEstructuraNoReconocida *actual = lista;
-    printf("* Listado de estructuras sintácticas no reconocidas\n");
+    printf("* Listado de estructuras sintacticas no reconocidas\n");
     
     if (actual == NULL) {
-       // printf("-\n");
+        printf("-\n");
         return;
     }
 
