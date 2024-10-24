@@ -41,10 +41,10 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 // FUNCIONES
 typedef struct NodoFuncion {
     char *funcion;
-    char *sufijo;
     char *retorno;
     char *parametros;
     char *tipogramatica;
+    int linea;
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
