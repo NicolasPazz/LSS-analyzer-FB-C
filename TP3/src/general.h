@@ -43,14 +43,18 @@ typedef struct NodoFuncion {
     char *funcion;
     char *sufijo;
     char *retorno;
-    int linea;
+    char *parametros;
     char *tipogramatica;
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
-NodoFuncion* crearNodoFuncion(const char *funcion, const char *sufijo, const char *retorno, const int linea, const char *tipogramatica);
+NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, const char *sufijo, const char *retorno, const char *funcion, const int linea, const char *tipogramatica);
+void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
+
+void agregarParametro(char** lista, char* parametro);
+
+char* unirParametros(const char* param1, const char* param2);
 
 void imprimirFunciones(NodoFuncion *lista);
 
@@ -58,6 +62,9 @@ void liberarFunciones(NodoFuncion *lista);
 
 extern NodoFuncion* listaFunciones;
 
+extern char* listaParametros;
+
+extern char* parametro;
 
 // SENTENCIAS
 typedef struct NodoSentencia {
