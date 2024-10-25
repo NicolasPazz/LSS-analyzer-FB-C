@@ -21,7 +21,7 @@ NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 char* listaParametros = NULL;
 char* parametro = NULL;
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG
     #define DBG_PRINT(...) fprintf(stderr, __VA_ARGS__)
