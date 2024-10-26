@@ -18,6 +18,25 @@ void inicializarUbicacion(void);
 void reinicializarUbicacion(void);
 
 
+// Tabla de símbolos
+
+typedef struct NodoSimbolo
+{
+  char *nombre;
+  char *tipo;
+  union
+  {
+    NodoVariableDeclarada variable;
+    NodoFuncion funcion;
+  } nodo;
+  struct NodoSimbolo *next; //Puntero al siguiente nodo de la lista
+} NodoSimbolo;
+
+extern NodoSimbolo* tablaDeSimbolos;
+
+NodoSimbolo* crearNodoSimboloVariable(const char *nombre, const char *tipo, NodoVariableDeclarada variable);
+NodoSimbolo* crearNodoSimboloFuncion(const char *nombre, const char *tipo, NodoFuncion funcion);
+
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
     char *variableDeclarada;
