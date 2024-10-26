@@ -98,11 +98,10 @@ NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const in
     nuevo->funcion = copiarCadena(funcion);
     nuevo->linea = linea;
     nuevo->parametro = copiarCadena(listaParametros);
+    listaParametros = NULL;
     nuevo->retorno = copiarCadena(retorno);
     nuevo->tipogramatica = copiarCadena(tipogramatica);
     nuevo->siguiente = NULL;
-
-    listaParametros = NULL;
 
     return nuevo;
 }
@@ -151,8 +150,6 @@ void agregarParametro(char** lista, char* parametro) { //enum
         free(*lista);
         *lista = nuevaLista;
     }
-    //parametro = NULL;
-    fprintf(stderr, "reinicialListaParametros\n");
 }
 
 void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
@@ -172,20 +169,7 @@ void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcio
 
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
-    //reiniciarListaParametros(lista);
-  //  listaParametros = NULL;
-
- 
 }
-
-/*void reiniciarListaParametros(char **listaParametros) {
-    if (listaParametros != NULL) {
-        free(listaParametros);
-        listaParametros = NULL;  // Reinicia para la siguiente función
-    }
-      listaParametros = strdup("");
-}*/
-
 
 void imprimirFunciones(NodoFuncion *lista) {
     NodoFuncion *actual = lista;
@@ -201,8 +185,6 @@ void imprimirFunciones(NodoFuncion *lista) {
         actual = actual->siguiente;
     }
 }
-
-
 
 void liberarFunciones(NodoFuncion *lista){
     NodoFuncion *actual = lista;
