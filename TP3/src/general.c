@@ -94,35 +94,15 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
 // FUNCIONES
 NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
     NodoFuncion *nuevo = (NodoFuncion *)malloc(sizeof(NodoFuncion));
+    
     nuevo->funcion = copiarCadena(funcion);
     nuevo->linea = linea;
-    nuevo->parametros = copiarCadena(listaParametros);
+    nuevo->parametro = copiarCadena(listaParametros);
     nuevo->retorno = copiarCadena(retorno);
     nuevo->tipogramatica = copiarCadena(tipogramatica);
     nuevo->siguiente = NULL;
 
     return nuevo;
-}
-
-void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
-    // Crear el nuevo nodo
-    NodoFuncion *nuevoNodo = crearNodoFuncion(retorno, funcion, linea, tipogramatica);
-    // Si la lista está vacía, el nuevo nodo es el primer nodo
-    if (*lista == NULL) {
-        *lista = nuevoNodo;
-        return;
-    }
-
-    // Si la lista no está vacía, recorrer hasta el final
-    NodoFuncion *actual = *lista;
-    while (actual != NULL && actual->siguiente != NULL) {
-        actual = actual->siguiente;
-    }
-
-    // Enlazar el nuevo nodo al final de la lista
-    actual->siguiente = nuevoNodo;
-    parametro = NULL;
-    listaParametros = NULL;
 }
 
 char* unirParametros(const char* param1, const char* param2) {
@@ -151,7 +131,7 @@ char* unirParametros(const char* param1, const char* param2) {
     return resultado; // Retornamos la cadena resultante
 }
 
-void agregarParametro(char** lista, char* parametro) {
+void agregarParametro(char** lista, char* parametro) { //enum
     if (*lista == NULL) {
         *lista = copiarCadena(parametro);
     } else {
@@ -169,8 +149,42 @@ void agregarParametro(char** lista, char* parametro) {
         free(*lista);
         *lista = nuevaLista;
     }
-    parametro = NULL;
+    //parametro = NULL;
+    fprintf(stderr, "reinicialListaParametros\n");
+    reiniciarListaParametros(lista);
 }
+
+void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
+    // Crear el nuevo nodo
+    NodoFuncion *nuevoNodo = crearNodoFuncion(retorno, funcion, linea, tipogramatica);
+    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+        return;
+    }
+
+    // Si la lista no está vacía, recorrer hasta el final
+    NodoFuncion *actual = *lista;
+    while (actual != NULL && actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodo;
+    /*parametro = NULL;
+    lista = NULL;*/
+
+ 
+}
+
+void reiniciarListaParametros(NodoFuncion **listaParametros) {
+    if (listaParametros != NULL) {
+        free(listaParametros);
+        listaParametros = NULL;  // Reinicia para la siguiente función
+    }
+      listaParametros = strdup("");
+}
+
 
 void imprimirFunciones(NodoFuncion *lista) {
     NodoFuncion *actual = lista;
@@ -182,10 +196,12 @@ void imprimirFunciones(NodoFuncion *lista) {
     }
 
     while (actual != NULL) {
-        printf("%s: %s, input: %s, retorna: %s, linea %d\n", actual->funcion, actual->tipogramatica, actual->parametros, actual->retorno, actual->linea);
+        printf("%s: %s, input: %s, retorna: %s, linea %d\n\n", actual->funcion, actual->tipogramatica, actual->parametro, actual->retorno, actual->linea);
         actual = actual->siguiente;
     }
 }
+
+
 
 void liberarFunciones(NodoFuncion *lista){
     NodoFuncion *actual = lista;
@@ -198,7 +214,6 @@ void liberarFunciones(NodoFuncion *lista){
         actual = siguiente;
     }
 }
-
 
 // SENTENCIAS
 NodoSentencia* crearNodoSentencia(const char *sentencia, const int linea, const int columna){
