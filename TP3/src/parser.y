@@ -49,7 +49,7 @@ char* parametro = NULL;
 %token <real> CONSTANTE_REAL
 
 
-%type <cadena> lista_declaradores_funcion sufijo lista_declaradores_variable lista_declaradores_variable_prototipo lista_argumentos_definicion argumento_definicion lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion definidor_funcion definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_primaria expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion 
+%type <cadena> lista_declaradores_funcion  sufijo lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_primaria expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion 
 
 %left OP_AND OP_OR
 %left TIPODEDATO
@@ -232,6 +232,9 @@ return:
     | RETURN ';'               { agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column); }
     ;
 
+
+
+
 declaracion:
       sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $3, $2, yylloc.last_line, $1); DBG_PRINT("declaracion de variable/s %s\n", $3); $1 = NULL;*/}
     | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $2, $1, yylloc.last_line, NULL); DBG_PRINT("declaracion de variable/s \n");*/ }
@@ -266,17 +269,20 @@ lista_argumentos_prototipo:
       argumento_prototipo                                   { DBG_PRINT("argumento_prototipo\n"); }
     | lista_argumentos_prototipo ',' argumento_prototipo    { DBG_PRINT("argumento_prototipo\n"); }
     ;
+
+       
 argumento_prototipo
-    : /*VACIO*/                                     { parametro = ""; agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_vacio \n"); }
-    | IDENTIFICADOR                                 { parametro = copiarCadena($1); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
-    | TIPODEDATO IDENTIFICADOR                      { parametro = unirParametros($1,$2); $$ = copiarCadena(parametro); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_3 %s\n", parametro); }
-    | TIPODEDATO                                    { parametro = copiarCadena($1); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
-    | sufijo TIPODEDATO                             { parametro = unirParametros($1,$2); $$ = copiarCadena(parametro); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
-    | VOID                                          { parametro = "void"; agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
+    : /*VACIO*/                                     //{ parametro = ""; agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_vacio \n"); }
+    | IDENTIFICADOR                                 //{ parametro = copiarCadena($1); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
+    | TIPODEDATO IDENTIFICADOR                        { fprintf(stderr, "argumento_prototipo -> TIPODEDATO IDENTIFICADOR\n"); parametro = unirParametros($1,$2); $$ = copiarCadena(parametro); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_3 %s\n", parametro); }
+    | TIPODEDATO                                    //{ parametro = copiarCadena($1); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
+    | sufijo TIPODEDATO                              //{ parametro = unirParametros($1,$2); $$ = copiarCadena(parametro); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
+    | sufijo TIPODEDATO IDENTIFICADOR                //{ parametro = unirParametros($2,$3); $$ = copiarCadena(parametro); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
+    | VOID                                           //{ parametro = "void"; agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
     ;
 lista_declaradores_variable_prototipo:
       declarador_variable_prototipo                                               { DBG_PRINT("lista_declaradores_variable\n"); }
-    | lista_declaradores_variable_prototipo ',' declarador_variable_prototipo     { DBG_PRINT("lista_declaradores_variable\n"); }
+    | lista_declaradores_variable_prototipo ',' declarador_variable_prototipo     { DBG_PRINT("lista_declaradores_variable\n"); } 
     ;
 declarador_variable_prototipo:
     IDENTIFICADOR inicializacion_variable
@@ -296,23 +302,9 @@ definiciones_externas:
     ;
 
 definicion_funcion: 
-      TIPODEDATO definidor_funcion sentencia_compuesta   { DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
-    | VOID definidor_funcion sentencia_compuesta         { DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
+      TIPODEDATO lista_declaradores_funcion sentencia_compuesta   { agregarFuncion(&listaFunciones, $1, $2, yylloc.last_line, "definicion"); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
+    | VOID lista_declaradores_funcion sentencia_compuesta         { agregarFuncion(&listaFunciones, $1, $2, yylloc.last_line, "definicion"); DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
     ; 
-definidor_funcion:
-    IDENTIFICADOR '(' lista_argumentos_definicion ')' //{ agregarFuncion(&listaFunciones, $1, $3, yylloc.last_line, "definicion", NULL); DBG_PRINT("definidor_funcion\n"); }
-    ;
-lista_argumentos_definicion
-    : /*VACIO*/
-    | argumento_definicion                                    { DBG_PRINT("argumento_definicion\n"); }
-    | lista_argumentos_definicion ',' argumento_definicion    { DBG_PRINT("argumento_definicion\n"); }
-    ;
-argumento_definicion
-    : /*VACIO*/
-    | sufijo TIPODEDATO IDENTIFICADOR
-    | TIPODEDATO IDENTIFICADOR
-    | VOID
-    ;
 %%
 
 int main(int argc, char *argv[]) {

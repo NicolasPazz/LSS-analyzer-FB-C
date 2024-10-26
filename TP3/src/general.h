@@ -64,7 +64,7 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 typedef struct NodoFuncion {
     char *funcion;
     char *retorno;
-    char *parametros;
+    char *parametro;
     char *tipogramatica;
     int linea;
     struct NodoFuncion *siguiente;
@@ -143,10 +143,11 @@ void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
 extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
-
+void reiniciarListaParametros(char **listaParametros);
 
 // FUNCIONES
 
 char* copiarCadena(const char *str);
+
 
 #endif
