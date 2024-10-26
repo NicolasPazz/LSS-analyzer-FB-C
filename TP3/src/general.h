@@ -19,23 +19,26 @@ void reinicializarUbicacion(void);
 
 
 // Tabla de símbolos
+ typedef enum tipoSimbolo
+  {
+    VARIABLE,
+    FUNCION
+  } tipoSimbolo;
 
-typedef struct NodoSimbolo
+struct NodoSimbolo
 {
   char *nombre;
-  char *tipo;
-  union
-  {
-    NodoVariableDeclarada variable;
-    NodoFuncion funcion;
-  } nodo;
+  enum tipoSimbolo tipoSimbolo; 
+  void* nodo;  
   struct NodoSimbolo *next; //Puntero al siguiente nodo de la lista
-} NodoSimbolo;
+};
 
-extern NodoSimbolo* tablaDeSimbolos;
+//TODO:: hago un switch para saber si es variable o funcion typecast
 
-NodoSimbolo* crearNodoSimboloVariable(const char *nombre, const char *tipo, NodoVariableDeclarada variable);
-NodoSimbolo* crearNodoSimboloFuncion(const char *nombre, const char *tipo, NodoFuncion funcion);
+//extern NodoSimbolo* tablaDeSimbolos;
+
+//NodoSimbolo* crearNodoSimboloVariable(const char *nombre, const char *tipo, NodoVariableDeclarada variable);
+//NodoSimbolo* crearNodoSimboloFuncion(const char *nombre, const char *tipo, NodoFuncion funcion);
 
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
