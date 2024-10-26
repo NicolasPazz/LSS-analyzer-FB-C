@@ -102,6 +102,8 @@ NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const in
     nuevo->tipogramatica = copiarCadena(tipogramatica);
     nuevo->siguiente = NULL;
 
+    listaParametros = NULL;
+
     return nuevo;
 }
 
@@ -171,7 +173,7 @@ void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcio
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
     //reiniciarListaParametros(lista);
-    listaParametros = NULL;
+  //  listaParametros = NULL;
 
  
 }
