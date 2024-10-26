@@ -121,7 +121,7 @@ void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
 extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
-void reiniciarListaParametros(NodoFuncion **listaParametros) ;
+void reiniciarListaParametros(char **listaParametros);
 
 // FUNCIONES
 

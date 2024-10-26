@@ -151,7 +151,6 @@ void agregarParametro(char** lista, char* parametro) { //enum
     }
     //parametro = NULL;
     fprintf(stderr, "reinicialListaParametros\n");
-    reiniciarListaParametros(lista);
 }
 
 void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
@@ -171,19 +170,19 @@ void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcio
 
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
-    /*parametro = NULL;
-    lista = NULL;*/
+    //reiniciarListaParametros(lista);
+    listaParametros = NULL;
 
  
 }
 
-void reiniciarListaParametros(NodoFuncion **listaParametros) {
+/*void reiniciarListaParametros(char **listaParametros) {
     if (listaParametros != NULL) {
         free(listaParametros);
         listaParametros = NULL;  // Reinicia para la siguiente función
     }
       listaParametros = strdup("");
-}
+}*/
 
 
 void imprimirFunciones(NodoFuncion *lista) {
