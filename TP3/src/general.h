@@ -148,9 +148,73 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
 void reiniciarListaParametros(char **listaParametros);
 
+//ERRORES SEMANTICOS 
+typedef struct NodoErrorSemantico {
+    char *mensaje;
+    int linea;
+    int columna;
+    struct NodoSentencia *siguiente;
+} NodoErrorSemantico;
+
+NodoErrorSemantico* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna);
+
+void agregarErrorSemantico(NodoErrorSemantico **lista, const char *mensaje, const int linea, const int columna);
+//void agregarSentencia(listaSentencias, sentencia, tipoSentencia, linea, columna);
+
+void imprimirErrorSemantico(NodoErrorSemantico *lista);
+
+void liberarErrorSemantico(NodoErrorSemantico *lista);
+
+extern NodoErrorSemantico* listaErrorSemantico;
+
+
 // FUNCIONES
 
 char* copiarCadena(const char *str);
+
+//Rutinas
+
+// Define los tipos de datos posibles
+/*typedef enum {
+    TIPO_INT,
+    TIPO_FLOAT,
+    TIPO_ERROR
+     // Para manejar errores de tipo
+} Type;
+
+// Declara la función check_type para usar en el control de tipos
+Type check_type(char *left, char *right, const int linea, const int columna);
+
+//estructura para saber tipo de dato en cada token
+typedef struct{
+    char tipo[20];
+    union{
+        int numero;
+        char cadena[100];
+    } valor;
+}TokenInfo;*/
+
+//Rutinas
+
+// Define los tipos de datos posibles
+typedef enum {
+    TIPO_INT,
+    TIPO_FLOAT,
+    TIPO_ERROR
+     // Para manejar errores de tipo
+} Type;
+
+// Declara la función check_type para usar en el control de tipos
+Type check_type(char *left, char *right, const int linea, const int columna);
+
+//estructura para saber tipo de dato en cada token
+typedef struct{
+    char tipo[20];
+    union{
+        int numero;
+        char cadena[100];
+    } valor;
+}TokenInfo;
 
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
 

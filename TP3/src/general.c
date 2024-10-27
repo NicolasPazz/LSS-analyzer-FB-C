@@ -100,9 +100,6 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
 
     while (actual != NULL) {
         siguiente = actual->siguiente;
-        free(actual->variableDeclarada);
-        free(actual->tipoDato);
-        free(actual->sufijo);
         free(actual);
         actual = siguiente;
     }
@@ -449,6 +446,65 @@ NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo){
 }
 
 
+
+// ERRORES SEMANTICOS
+NodoErrorSemantico* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna){
+    NodoErrorSemantico *nuevo = (NodoErrorSemantico *)malloc(sizeof(NodoErrorSemantico));
+    nuevo->mensaje = copiarCadena(mensaje);
+    nuevo->linea = linea;
+    nuevo->columna = columna;
+    nuevo->siguiente = NULL;
+    return nuevo;
+}
+
+void agregarErrorSemantico(NodoErrorSemantico **lista, const char *mensaje, const int linea, const int columna){
+    // Crear el nuevo nodo
+    NodoErrorSemantico *nuevoNodo = crearNodoErrorSemantico(mensaje, linea, columna);
+
+    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+        return;
+    }
+
+    // Si la lista no esta vacia, recorrer hasta el final
+    NodoErrorSemantico *actual = *lista;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodo;
+}
+
+void imprimirErrorSemantico(NodoErrorSemantico *lista){
+    NodoErrorSemantico *actual = lista;
+    printf("* Listado de errores semanticos:\n");
+    
+    if (actual == NULL) {
+        printf("-\n");
+        return;
+    }
+    while (actual != NULL) {
+            printf("%d:%d %s\n", actual->linea, actual->columna, actual->mensaje);
+        actual = actual->siguiente;
+    }
+
+}
+
+void liberarErrorSemantico(NodoErrorSemantico *lista){
+    NodoErrorSemantico *actual = lista;
+    NodoErrorSemantico *siguiente = NULL;
+
+    while (actual != NULL) {
+        siguiente = actual->siguiente;
+        free(actual->mensaje);
+        free(actual);
+        actual = siguiente;
+    }
+}
+
+
 // Funciones de Utilidad
 char* copiarCadena(const char *str) {
     size_t len = strlen(str);  // Obtiene la longitud de la cadena de entrada
@@ -458,6 +514,31 @@ char* copiarCadena(const char *str) {
     }
     return copiado;  // Devuelve el puntero a la nueva cadena copiada
 }
+
+//Rutinas semanticas
+//Validacion de tipos 
+// Implementa check_type para manejar los tokens
+/*Type check_type(char *token1, char *token2, const int linea, const int columna) {
+    // Define las reglas de tipo para multiplicación (int * int = int, float * float = float, etc.)
+    if (strcmp(token1, "IDENTIFICADOR") == 0 || strcmp(token2, "IDENTIFICADOR") == 0) {
+        const char *mensaje = "Operandos invalidos del operador binario * (identificador)";
+        agregarErrorSemantico(&listaErrorSemantico, mensaje,linea,columna);
+        return TIPO_ERROR;
+    }
+     if (strcmp(token1, "CONSTANTE_ENTERA") == 0 || strcmp(token2, "CONSTANTE_ENTERA") == 0) {
+        return TIPO_INT;
+    } else  if ((strcmp(token1, "CONSTANTE_ENTERA") == 0 || strcmp(token2, "CONSTANTE_REAL") == 0) &&
+               (strcmp(token2, "CONSTANTE_ENTERA") == 0 || strcmp(token1, "CONSTANTE_REAL") == 0)) {
+        return TIPO_FLOAT;
+    } else if (strcmp(token1, "LITERAL_CADENA") == 0 || strcmp(token2, "LITERAL_CADENA") == 0) {
+        const char *mensaje = "Operandos invalidos del operador binario * (literal_cadena)";
+        agregarErrorSemantico(&listaErrorSemantico, mensaje, linea,columna);
+        return TIPO_ERROR;  // Multiplicación no soporta strings
+    }
+    return TIPO_ERROR;  // Devuelve error si no coincide con las reglas
+}*/
+
+
 
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea) {
     // Si es un carácter de corte, crea un nuevo nodo y lo agrega al final de la lista

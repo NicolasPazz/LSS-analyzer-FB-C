@@ -20,6 +20,7 @@ NodoSentencia* listaSentencias = NULL;
 NodoErrorSintactico* listaErrorSintactico = NULL;
 NodoErrorSintactico* listaSecuenciasLeidas = NULL;
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
+
 char* listaParametros = NULL;
 char* parametro = NULL;
 
@@ -99,6 +100,7 @@ expresion_postfija:
 expresion_unaria:
       OP_INCREMENTO_DECREMENTO IDENTIFICADOR      { DBG_PRINT("expresion_unaria - INCREMENTO/DECREMENTO:\n"); }
     ;
+
 expresion_multiplicativa:
       expresion OP_MULTIPLICATIVO expresion       { DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n"); }
     ;
