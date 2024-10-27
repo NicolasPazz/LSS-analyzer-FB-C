@@ -29,7 +29,7 @@ extern char* copiarCadena(const char *str);
 "=="|"!="                                                                   {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
     /*Tipos de datos*/
-char|double|enum|float|int|long|short|struct|union                          {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
+char|double|enum|float|int|long|short|struct|union                          {yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
 void                                                                        {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return VOID;}
 
     /*Estructuras de control*/
@@ -88,7 +88,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
                     agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.first_column); 
                     yylloc.last_column += yyleng;
                     BEGIN(INITIAL); 
-                    return NO_RECONOCIDO;
+                    //return NO_RECONOCIDO;
                 }
 }
 

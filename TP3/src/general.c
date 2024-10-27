@@ -25,20 +25,20 @@ void reinicializarUbicacion(void)
 
 
 // VARIABLES DECLARADAS
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo){
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo){
     NodoVariableDeclarada *nuevo = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
     nuevo->variableDeclarada = copiarCadena(variableDeclarada);
     nuevo->tipoDato = copiarCadena(tipoDato);
     nuevo->linea = linea;
+    nuevo->columna = columna;
     nuevo->sufijo = sufijo;
     nuevo->siguiente = NULL;
     return nuevo;
-    
 }
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo){
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo){
     // Crear el nuevo nodo
-    NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(variableDeclarada, tipoDato, linea, sufijo);
+    NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(variableDeclarada, tipoDato, linea, columna, sufijo);
 
     // Si la lista está vacía, el nuevo nodo es el primer nodo
     if (*lista == NULL) {
@@ -46,7 +46,7 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variabl
         return;
     }
 
-    // Si la lista no está vacía, recorrer hasta el final
+    // Si la lista no esta vacia, recorrer hasta el final
     NodoVariableDeclarada *actual = *lista;
     while (actual->siguiente != NULL) {
         actual = actual->siguiente;
@@ -68,14 +68,13 @@ void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
 
     while (actual != NULL) {
         if(actual->sufijo!=NULL){
-            printf("%s: %s %s, linea %d\n", actual->variableDeclarada, actual->sufijo, actual->tipoDato, actual->linea);
+            printf("%s: %s %s, linea %d, columna %d\n", actual->variableDeclarada, actual->sufijo, actual->tipoDato, actual->linea, actual->columna);
         }else{
-            printf("%s: %s, linea %d\n", actual->variableDeclarada, actual->tipoDato, actual->linea);
+            printf("%s: %s, linea %d, columna %d\n", actual->variableDeclarada, actual->tipoDato, actual->linea, actual->columna);
         }
         actual = actual->siguiente;
     }
 }
-
 
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
     NodoVariableDeclarada *actual = lista;
@@ -269,24 +268,24 @@ void liberarSentencias(NodoSentencia *lista){
 
 
 // ESTRUCTURAS NO RECONOCIDAS
-NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida, const int linea){
-    NodoEstructuraNoReconocida *nuevo = (NodoEstructuraNoReconocida *)malloc(sizeof(NodoEstructuraNoReconocida));
-    nuevo->estructuraNoReconocida = copiarCadena(estructuraNoReconocida);
+NodoErrorSintactico* crearNodoErrorSintactico(const char *errorSintactico, const int linea){
+    NodoErrorSintactico *nuevo = (NodoErrorSintactico *)malloc(sizeof(NodoErrorSintactico));
+    nuevo->errorSintactico = copiarCadena(errorSintactico);
     nuevo->linea = linea;
     nuevo->siguiente = NULL;
     return nuevo;
 }
 
-void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida, const int linea){
+void agregarErrorSintactico(NodoErrorSintactico **lista, const char *ErrorSintactico, const int linea){
     // Crear el nuevo nodo
-    NodoEstructuraNoReconocida *nuevoNodo = crearNodoEstructuraNoReconocida(estructuraNoReconocida,linea);
+    NodoErrorSintactico *nuevoNodo = crearNodoErrorSintactico(ErrorSintactico,linea);
     
     if (*lista == NULL) {
         *lista = nuevoNodo;
         return;
 
-    // Si la lista no está vacía, recorrer hasta el final
-    NodoEstructuraNoReconocida *actual = *lista;
+    // Si la lista no esta vacia, recorrer hasta el final
+    NodoErrorSintactico *actual = *lista;
     while (actual->siguiente != NULL) {
         actual = actual->siguiente;
     }
@@ -296,8 +295,8 @@ void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const cha
     }
 }
 
-void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
-    NodoEstructuraNoReconocida *actual = lista;
+void imprimirErrorSintactico(NodoErrorSintactico *lista){
+    NodoErrorSintactico *actual = lista;
     printf("* Listado de estructuras sintacticas no reconocidas\n");
     
     if (actual == NULL) {
@@ -306,18 +305,18 @@ void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
     }
 
     while (actual != NULL) {
-        printf("%s: linea %d\n", actual->estructuraNoReconocida, actual->linea);
+        printf("%s: linea %d\n", actual->errorSintactico, actual->linea);
         actual = actual->siguiente;
     }
 }
 
-void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista){
-    NodoEstructuraNoReconocida *actual = lista;
-    NodoEstructuraNoReconocida *siguiente = NULL;
+void liberarErrorSintactico(NodoErrorSintactico *lista){
+    NodoErrorSintactico *actual = lista;
+    NodoErrorSintactico *siguiente = NULL;
 
     while (actual != NULL) {
         siguiente = actual->siguiente;
-        free(actual->estructuraNoReconocida);
+        free(actual->errorSintactico);
         free(actual);
         actual = siguiente;
     }
@@ -357,7 +356,7 @@ void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *caden
 
 void  imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
    NodoCadenaNoReconocida *actual = lista;
-    printf("* Listado de cadenas no reconocidas:\n");
+    printf("* Listado de errores lexicos:\n");
     
     if (actual == NULL) {
         printf("-\n");

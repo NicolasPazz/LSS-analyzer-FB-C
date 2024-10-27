@@ -16,7 +16,7 @@ void yyerror(const char *s);
 NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
 NodoFuncion* listaFunciones = NULL;
 NodoSentencia* listaSentencias = NULL;
-NodoEstructuraNoReconocida* listaEstructurasNoReconocidas = NULL;
+NodoErrorSintactico* listaErrorSintactico = NULL;
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 char* listaParametros = NULL;
 char* parametro = NULL;
@@ -38,7 +38,7 @@ char* parametro = NULL;
     int entero;
     float real;
     char* cadena;
-    char* tipo;
+    char* tipoDeDato;
     char* sufijo;  
 }
 
@@ -47,7 +47,7 @@ char* parametro = NULL;
 %token <real> CONSTANTE_REAL
 
 
-%type <cadena> lista_declaradores_funcion  sufijo lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_primaria expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion 
+%type <cadena> lista_declaradores_funcion  sufijo lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_primaria expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion
 
 %left OP_AND OP_OR
 %left TIPODEDATO
@@ -66,8 +66,8 @@ input
 line: 
       sentencia 
     | declaracion
-    | definiciones_externas
-    | error //{ agregarEstructuraNoReconocida(listaEstructurasNoReconocidas, estructura, yylloc.first_line);/* yyclearin; yyerrok; printf("\n");*/}
+    | definiciones_externas 
+    | error                     { agregarErrorSintactico(listaErrorSintactico, errorSintactico ,yylloc.first_line);/* yyclearin; yyerrok; printf("\n");*/}
     ;
 
 expresion:
@@ -162,8 +162,10 @@ declaraciones
     | declaraciones declaracion
     ;
 sentencia_if_else:
-      IF '(' expresion ')' sentencia_compuesta                          { agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");}
-    | IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta { agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");}
+      IF '(' expresion ')' sentencia_compuesta                                      { agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");}
+    | IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta             { agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");}
+    | IF '(' expresion ')' sentencia_compuesta_sin_llaves                          { agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");}
+    | IF '(' expresion ')' sentencia_compuesta_sin_llaves ELSE sentencia_compuesta  { agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");}
     ;
 sentencia_switch:
     SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { agregarSentencia(&listaSentencias, "switch", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_switch\n");}
@@ -240,7 +242,6 @@ declaracion:
     | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, $2, $3, yylloc.last_line, "declaracion"); DBG_PRINT("declaracion de funcion 2 %s %s %s\n", $1, $2, $3);}
     | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, $1, $2, yylloc.last_line, "declaracion"); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); }
     | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, $1, $2, yylloc.last_line, "declaracion"); DBG_PRINT("declaracion de funcion 4 %s %s\n", $1, $2);}
-    | error                                              // {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $1 , @1.first_line); } 
     ;
 
 lista_declaradores_variable:
@@ -248,7 +249,7 @@ lista_declaradores_variable:
     | lista_declaradores_variable ',' declarador_variable  { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
-    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, $1, yyval.cadena, yylloc.last_line, NULL); DBG_PRINT("declarador_variable \n"); }
+    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, $1, yyval.tipoDeDato, yylloc.last_line, @1.first_column, NULL); DBG_PRINT("declarador_variable \n"); }
     ;
 inicializacion_variable
     : /*VACIO*/
@@ -326,7 +327,7 @@ int main(int argc, char *argv[]) {
     fclose(file);
 
 //Reporte
-/*    //1
+    //1
     imprimirVariablesDeclaradas(listaVariablesDeclaradas);
     //liberarVariablesDeclaradas(listaVariablesDeclaradas); 
     printf("\n");
@@ -342,14 +343,14 @@ int main(int argc, char *argv[]) {
     printf("\n");
 
     //4
-    imprimirEstructurasNoReconocidas(listaEstructurasNoReconocidas);
-    liberarEstructurasNoReconocidas(listaEstructurasNoReconocidas);
+    imprimirErrorSintactico(listaErrorSintactico);
+    liberarErrorSintactico(listaErrorSintactico);
     printf("\n");
 
     //5 
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
-    printf("\n"); */
+    printf("\n");
 
     return 0;
 }

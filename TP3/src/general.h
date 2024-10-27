@@ -45,13 +45,14 @@ typedef struct NodoVariableDeclarada {
     char *variableDeclarada;
     char *tipoDato;
     int linea;
+    int columna;
     char *sufijo;
     struct NodoVariableDeclarada *siguiente;
 } NodoVariableDeclarada;
 
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo);
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
@@ -109,21 +110,21 @@ extern NodoSentencia* listaSentencias;
 
 
 // ESTRUCTURAS NO RECONOCIDAS
-typedef struct NodoEstructuraNoReconocida {
-    char *estructuraNoReconocida;
+typedef struct NodoErrorSintactico {
+    char *errorSintactico;
     int linea;
-    struct NodoEstructuraNoReconocida *siguiente;
-} NodoEstructuraNoReconocida;
+    struct NodoErrorSintactico *siguiente;
+} NodoErrorSintactico;
 
-NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida, int linea);
+NodoErrorSintactico* crearNodoErrorSintactico(const char *errorSintactico, const int linea);
 
-void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida, int linea);
+void agregarErrorSintactico(NodoErrorSintactico **lista, const char *ErrorSintactico, const int linea);
 
-void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
+void imprimirErrorSintactico(NodoErrorSintactico *lista);
 
-void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
+void liberarErrorSintactico(NodoErrorSintactico *lista);
 
-extern NodoEstructuraNoReconocida* listaEstructurasNoReconocidas;
+extern NodoErrorSintactico* listaErrorSintactico;
 
 
 // CADENAS NO RECONOCIDAS
