@@ -36,6 +36,7 @@ char* parametro = NULL;
 
 
 %union {
+    TokenInfo tokenInfo;
     int entero;
     float real;
     char* cadena;
@@ -48,7 +49,9 @@ char* parametro = NULL;
 %token <real> CONSTANTE_REAL
 
 
-%type <cadena> lista_declaradores_funcion  sufijo lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_primaria expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion
+%type <cadena> lista_declaradores_funcion  sufijo lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_postfija expresion_unaria expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion 
+
+%type <tokenInfo> expresion_primaria expresion_multiplicativa 
 
 %left OP_AND OP_OR
 %left TIPODEDATO
@@ -84,12 +87,36 @@ expresion:
     | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); }
     ;
 expresion_primaria: 
-      IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
-    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1); }
-    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1); }
-    | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", $1); }
-    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1); }
-    | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");}
+      IDENTIFICADOR                             { TokenInfo token;
+        memset(&token, 0, sizeof(TokenInfo)); 
+        strcpy(token.tipo, "IDENTIFICADOR");
+        $$ = token;
+         DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
+    | CONSTANTE_ENTERA                          { TokenInfo token;
+        memset(&token, 0, sizeof(TokenInfo)); 
+        strcpy(token.tipo, "CONSTANTE_ENTERA");
+        $$ = token;
+         DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1); }
+    | CONSTANTE_REAL                            { TokenInfo token;
+        memset(&token, 0, sizeof(TokenInfo)); 
+        strcpy(token.tipo, "CONSTANTE_REAL");
+        $$ = token;
+         DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1); }
+    | CONSTANTE_CARACTER                        { TokenInfo token;
+        memset(&token, 0, sizeof(TokenInfo)); 
+        strcpy(token.tipo, "LITERAL_CADENA");
+        $$ = token;
+         DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", $1); }
+    | LITERAL_CADENA                            { TokenInfo token;
+        memset(&token, 0, sizeof(TokenInfo)); 
+        strcpy(token.tipo, "LITERAL_CADENA");
+        $$ = token;
+         DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1); }
+    | '(' expresion ')'                         { TokenInfo token;
+        memset(&token, 0, sizeof(TokenInfo)); 
+        strcpy(token.tipo, "IDENTIFICADOR");
+        $$ = token;
+         DBG_PRINT("expresion_primaria - (EXP)\n");}
     ;
 expresion_postfija:
       IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); }
@@ -98,8 +125,21 @@ expresion_postfija:
 expresion_unaria:
       OP_INCREMENTO_DECREMENTO IDENTIFICADOR      { DBG_PRINT("expresion_unaria - INCREMENTO/DECREMENTO:\n"); }
     ;
+
 expresion_multiplicativa:
-      expresion OP_MULTIPLICATIVO expresion       { DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n"); }
+      expresion_primaria OP_MULTIPLICATIVO expresion_primaria       { DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n");
+                     // Llamada a check_type pasando los tokens de ambos operandos
+            fprintf(stdout, "tipo1 %s tipo2 %s \n", $1.tipo, $3.tipo);
+          Type tipoResultado = check_type($1.tipo, $3.tipo);
+          if (tipoResultado == TIPO_ERROR) {
+              fprintf(stderr, "Error de tipo en la operación multiplicativa entre %s y %s en la línea %d.\n", $1.tipo, $3.tipo, 4);
+          } else {
+              fprintf(stderr, "Tipo de resultado de la operación: %d\n", tipoResultado);
+          }
+
+          // Almacena el tipo de resultado en $$.tipo para su uso posterior
+          //$$.tipo = tipoResultado;                                              
+          }
     ;
 expresion_aditiva:
       expresion OP_ADITIVO expresion              { DBG_PRINT("expresion_aditiva: EXP1 +/- EXP2\n"); } 

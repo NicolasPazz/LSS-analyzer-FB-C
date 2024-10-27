@@ -149,5 +149,27 @@ void reiniciarListaParametros(char **listaParametros);
 
 char* copiarCadena(const char *str);
 
+//Rutinas
+
+// Define los tipos de datos posibles
+typedef enum {
+    TIPO_INT,
+    TIPO_FLOAT,
+    TIPO_ERROR
+     // Para manejar errores de tipo
+} Type;
+
+// Declara la función check_type para usar en el control de tipos
+Type check_type(char *left, char *right);
+
+//estructura para saber tipo de dato en cada token
+typedef struct{
+    char tipo[20];
+    union{
+        int numero;
+        char cadena[100];
+    } valor;
+}TokenInfo;
+
 
 #endif
