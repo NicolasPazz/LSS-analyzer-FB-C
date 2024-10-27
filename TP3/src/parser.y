@@ -239,8 +239,6 @@ declaracion:
     | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 2 %s %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena, $<mystruct>3.cadena);}
     | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 3 %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena); }
     | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, NULL, $<mystruct>1.cadena, $<mystruct>2.cadena, yylloc.last_line, "declaracion"); printf("declaracion de funcion 4 %s %s\n", $<mystruct>1.cadena, $<mystruct>2.cadena);}
-    | error                                              // {agregarEstructuraNoReconocida(&listaEstructurasNoReconocidas, $<mystruct>1.cadena , @1.first_line); } 
-
     ;
 
 lista_declaradores_variable:
