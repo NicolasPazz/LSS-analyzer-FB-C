@@ -479,9 +479,7 @@ void liberarErrorSemantico(NodoErrorSemantico *lista){
 
     while (actual != NULL) {
         siguiente = actual->siguiente;
-        free(actual->variableDeclarada);
-        free(actual->tipoDato);
-        free(actual->sufijo);
+        free(actual->mensaje);
         free(actual);
         actual = siguiente;
     }
@@ -501,11 +499,12 @@ char* copiarCadena(const char *str) {
 //Rutinas semanticas
 //Validacion de tipos 
 // Implementa check_type para manejar los tokens
-Type check_type(char *token1, char *token2) {
+Type check_type(char *token1, char *token2, const int linea, const int columna) {
     // Define las reglas de tipo para multiplicación (int * int = int, float * float = float, etc.)
     if (strcmp(token1, "IDENTIFICADOR") == 0 || strcmp(token2, "IDENTIFICADOR") == 0) {
+        const char *mensaje = "Operandos invalidos del operador binario * (identificador)";
+        agregarErrorSemantico(&listaErrorSemantico, mensaje,linea,columna);
         return TIPO_ERROR;
-
     }
      if (strcmp(token1, "CONSTANTE_ENTERA") == 0 || strcmp(token2, "CONSTANTE_ENTERA") == 0) {
         return TIPO_INT;
@@ -513,6 +512,8 @@ Type check_type(char *token1, char *token2) {
                (strcmp(token2, "CONSTANTE_ENTERA") == 0 || strcmp(token1, "CONSTANTE_REAL") == 0)) {
         return TIPO_FLOAT;
     } else if (strcmp(token1, "LITERAL_CADENA") == 0 || strcmp(token2, "LITERAL_CADENA") == 0) {
+        const char *mensaje = "Operandos invalidos del operador binario * (literal_cadena)";
+        agregarErrorSemantico(&listaErrorSemantico, mensaje, linea,columna);
         return TIPO_ERROR;  // Multiplicación no soporta strings
     }
     return TIPO_ERROR;  // Devuelve error si no coincide con las reglas

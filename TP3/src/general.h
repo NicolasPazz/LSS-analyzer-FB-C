@@ -180,7 +180,7 @@ typedef enum {
 } Type;
 
 // Declara la función check_type para usar en el control de tipos
-Type check_type(char *left, char *right);
+Type check_type(char *left, char *right, const int linea, const int columna);
 
 //estructura para saber tipo de dato en cada token
 typedef struct{

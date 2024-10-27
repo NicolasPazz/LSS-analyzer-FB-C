@@ -19,6 +19,8 @@ NodoFuncion* listaFunciones = NULL;
 NodoSentencia* listaSentencias = NULL;
 NodoErrorSintactico* listaErrorSintactico = NULL;
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
+NodoErrorSemantico* listaErrorSemantico = NULL;
+
 char* listaParametros = NULL;
 char* parametro = NULL;
 
@@ -130,7 +132,8 @@ expresion_multiplicativa:
       expresion_primaria OP_MULTIPLICATIVO expresion_primaria       { DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n");
                      // Llamada a check_type pasando los tokens de ambos operandos
             fprintf(stdout, "tipo1 %s tipo2 %s \n", $1.tipo, $3.tipo);
-          Type tipoResultado = check_type($1.tipo, $3.tipo);
+            check_type($1.tipo, $3.tipo, @1.first_line, @1.first_column);
+          Type tipoResultado = check_type($1.tipo, $3.tipo, @1.first_line, @1.first_column);
           if (tipoResultado == TIPO_ERROR) {
               fprintf(stderr, "Error de tipo en la operación multiplicativa entre %s y %s en la línea %d.\n", $1.tipo, $3.tipo, 4);
           } else {
@@ -391,6 +394,11 @@ int main(int argc, char *argv[]) {
     //5 
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
+    printf("\n");
+
+    //6
+    imprimirErrorSemantico(listaErrorSemantico);
+    liberarErrorSemantico(listaErrorSemantico);
     printf("\n");
 
     return 0;
