@@ -145,6 +145,26 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
 void reiniciarListaParametros(char **listaParametros);
 
+//ERRORES SEMANTICOS 
+typedef struct NodoErrorSemantico {
+    char *mensaje;
+    int linea;
+    int columna;
+    struct NodoSentencia *siguiente;
+} NodoErrorSemantico;
+
+NodoErrorSemantico* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna);
+
+void agregarErrorSemantico(NodoErrorSemantico **lista, const char *mensaje, const int linea, const int columna);
+//void agregarSentencia(listaSentencias, sentencia, tipoSentencia, linea, columna);
+
+void imprimirErrorSemantico(NodoErrorSemantico *lista);
+
+void liberarErrorSemantico(NodoErrorSemantico *lista);
+
+extern NodoErrorSemantico* listaErrorSemantico;
+
+
 // FUNCIONES
 
 char* copiarCadena(const char *str);

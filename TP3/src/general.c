@@ -427,6 +427,67 @@ NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo){
 }
 
 
+
+// ERRORES SEMANTICOS
+NodoErrorSemantico* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna){
+    NodoErrorSemantico *nuevo = (NodoErrorSemantico *)malloc(sizeof(NodoErrorSemantico));
+    nuevo->mensaje = copiarCadena(mensaje);
+    nuevo->linea = linea;
+    nuevo->columna = columna;
+    nuevo->siguiente = NULL;
+    return nuevo;
+}
+
+void agregarErrorSemantico(NodoErrorSemantico **lista, const char *mensaje, const int linea, const int columna){
+    // Crear el nuevo nodo
+    NodoErrorSemantico *nuevoNodo = crearNodoErrorSemantico(mensaje, linea, columna);
+
+    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    if (*lista == NULL) {
+        *lista = nuevoNodo;
+        return;
+    }
+
+    // Si la lista no esta vacia, recorrer hasta el final
+    NodoErrorSemantico *actual = *lista;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodo;
+}
+
+void imprimirErrorSemantico(NodoErrorSemantico *lista){
+    NodoErrorSemantico *actual = lista;
+    printf("* Listado de errores semanticos:\n");
+    
+    if (actual == NULL) {
+        printf("-\n");
+        return;
+    }
+    while (actual != NULL) {
+            printf("%d:%d %s\n", actual->linea, actual->columna, actual->mensaje);
+        actual = actual->siguiente;
+    }
+
+}
+
+void liberarErrorSemantico(NodoErrorSemantico *lista){
+    NodoErrorSemantico *actual = lista;
+    NodoErrorSemantico *siguiente = NULL;
+
+    while (actual != NULL) {
+        siguiente = actual->siguiente;
+        free(actual->variableDeclarada);
+        free(actual->tipoDato);
+        free(actual->sufijo);
+        free(actual);
+        actual = siguiente;
+    }
+}
+
+
 // Funciones de Utilidad
 char* copiarCadena(const char *str) {
     size_t len = strlen(str);  // Obtiene la longitud de la cadena de entrada
