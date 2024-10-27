@@ -117,7 +117,9 @@ typedef struct NodoErrorSintactico {
 
 NodoErrorSintactico* crearNodoErrorSintactico(const char *errorSintactico, const int linea);
 
-void agregarErrorSintactico(NodoErrorSintactico **lista, const char *ErrorSintactico, const int linea);
+void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoErrorSintactico **listaSecuenciasLeidas);
+
+void eliminarEspacios(char *cadena);
 
 void imprimirErrorSintactico(NodoErrorSintactico *lista);
 
@@ -125,6 +127,7 @@ void liberarErrorSintactico(NodoErrorSintactico *lista);
 
 extern NodoErrorSintactico* listaErrorSintactico;
 
+extern NodoErrorSintactico* listaSecuenciasLeidas;
 
 // CADENAS NO RECONOCIDAS
 typedef struct NodoCadenaNoReconocida {
@@ -149,5 +152,6 @@ void reiniciarListaParametros(char **listaParametros);
 
 char* copiarCadena(const char *str);
 
+void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
 
 #endif

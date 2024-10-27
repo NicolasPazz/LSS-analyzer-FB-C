@@ -12,66 +12,67 @@ extern char* copiarCadena(const char *str);
 
 %%
     /*Operadores*/
-"("                                                                         {yylloc.last_column += yyleng; return '(';}
-")"                                                                         {yylloc.last_column += yyleng; return ')';}
-"{"                                                                         {yylloc.last_column += yyleng; return '{';}
-"}"                                                                         {yylloc.last_column += yyleng; return '}';}
-";"                                                                         {yylloc.last_column += yyleng; return ';';}
-","                                                                         {yylloc.last_column += yyleng; return ',';}
-":"                                                                         {yylloc.last_column += yyleng; return ':';}
-"="|"*="|"/="|"+="|"-="                                                     {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_ASIGNACION;}
-"<"|">"|"<="|">="                                                           {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_RELACIONAL;}
-"&&"                                                                        {yylloc.last_column += yyleng; return OP_AND;}
-"||"                                                                        {yylloc.last_column += yyleng; return OP_OR;}
-"++"|"--"                                                                   {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_INCREMENTO_DECREMENTO;}
-[*/]                                                                        {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_MULTIPLICATIVO;}
-[+-]                                                                        {yylloc.last_column += yyleng; return OP_ADITIVO;}
-"=="|"!="                                                                   {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
+"("                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return '(';}
+")"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ')';}
+"{"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return '{';}
+"}"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return '}';}
+";"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ';';}
+","                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ',';}
+":"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ':';}
+"="|"*="|"/="|"+="|"-="                                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_ASIGNACION;}
+"<"|">"|"<="|">="                                                           {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_RELACIONAL;}
+"&&"                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return OP_AND;}
+"||"                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return OP_OR;}
+"++"|"--"                                                                   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_INCREMENTO_DECREMENTO;}
+[*/]                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_MULTIPLICATIVO;}
+[+-]                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return OP_ADITIVO;}
+"=="|"!="                                                                   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
     /*Tipos de datos*/
-char|double|enum|float|int|long|short|struct|union                          {yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
-void                                                                        {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return VOID;}
+char|double|enum|float|int|long|short|struct|union                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
+void                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return VOID;}
 
     /*Estructuras de control*/
-break                                                                       {yylloc.last_column += yyleng; return BREAK;}
-case                                                                        {yylloc.last_column += yyleng; return CASE;}
-continue                                                                    {yylloc.last_column += yyleng; return CONTINUE;}
-default                                                                     {yylloc.last_column += yyleng; return DEFAULT;}
-do                                                                          {yylloc.last_column += yyleng; return DO;}
-else                                                                        {yylloc.last_column += yyleng; return ELSE;}
-for                                                                         {yylloc.last_column += yyleng; return FOR;}
-goto                                                                        {yylloc.last_column += yyleng; return GOTO;}
-if                                                                          {yylloc.last_column += yyleng; return IF;}
-return                                                                      {yylloc.last_column += yyleng; return RETURN;}
-switch                                                                      {yylloc.last_column += yyleng; return SWITCH;}
-while                                                                       {yylloc.last_column += yyleng; return WHILE;}
+break                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return BREAK;}
+case                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return CASE;}
+continue                                                                    {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return CONTINUE;}
+default                                                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return DEFAULT;}
+do                                                                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return DO;}
+else                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ELSE;}
+for                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return FOR;}
+goto                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return GOTO;}
+if                                                                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return IF;}
+return                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return RETURN;}
+switch                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return SWITCH;}
+while                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return WHILE;}
 
     /*Otros*/
-auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return SUFIJO;}
+auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return SUFIJO;}
 
     /*Constantes enteras*/
-0[0-7]*[uU]?[lL]{0,2}                                                       {yylval.entero = strtol(yytext, NULL, 8); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
-0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                             {yylval.entero = strtol(yytext, NULL, 16); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
-[1-9][0-9]*[uU]?[lL]{0,2}                                                   {yylval.entero = strtol(yytext, NULL, 10); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
+0[0-7]*[uU]?[lL]{0,2}                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.entero = strtol(yytext, NULL, 8); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
+0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                             {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.entero = strtol(yytext, NULL, 16); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
+[1-9][0-9]*[uU]?[lL]{0,2}                                                   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.entero = strtol(yytext, NULL, 10); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
 
     /*Constantes reales*/
-[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                     {yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
-[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                              {yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
+[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
+[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                              {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
 
     /*Constantes de caracter*/
-\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}
 
     /*Literal cadena*/
-\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
+\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
 
     /*Identificadores*/
-[a-zA-Z_][a-zA-Z0-9_]*                                                      {yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
+[a-zA-Z_][a-zA-Z0-9_]*                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
 
     /*Espacio y tabulacion*/
-[ \t]                                                                       {yylloc.first_column += yyleng;}
+[\t]                                                                      {yylloc.first_column += yyleng;}
+[ ]                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.first_column += yyleng;}
 
     /*Salto de linea*/
-\n                                                                          { yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n'; printf("\n\n"); yylloc.last_line += 1;*/}
+\n                                                                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n'; printf("\n\n"); yylloc.last_line += 1;*/}
 
 [^ \t\n]                                                                    {unput(yytext[0]); BEGIN(tokenNoReconocido);}
 
@@ -84,6 +85,7 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
                     BEGIN(INITIAL);
                 }   
     [^ \t\n]+   {
+                    concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); 
                     yylval.cadena = copiarCadena(yytext);
                     agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.first_column); 
                     yylloc.last_column += yyleng;
@@ -91,7 +93,6 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {yyl
                     //return NO_RECONOCIDO;
                 }
 }
-
     /*Fin de archivo*/
 <<EOF>> {return EOF;}
 %%

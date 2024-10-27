@@ -312,28 +312,51 @@ NodoErrorSintactico* crearNodoErrorSintactico(const char *errorSintactico, const
     return nuevo;
 }
 
-void agregarErrorSintactico(NodoErrorSintactico **lista, const char *ErrorSintactico, const int linea){
-    // Crear el nuevo nodo
-    NodoErrorSintactico *nuevoNodo = crearNodoErrorSintactico(ErrorSintactico,linea);
-    
-    if (*lista == NULL) {
-        *lista = nuevoNodo;
-        return;
+void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoErrorSintactico **listaSecuenciasLeidas) {
+    if (*listaSecuenciasLeidas == NULL) return; // No hay nada en la lista de secuencias leídas
 
-    // Si la lista no esta vacia, recorrer hasta el final
-    NodoErrorSintactico *actual = *lista;
-    while (actual->siguiente != NULL) {
-        actual = actual->siguiente;
+    NodoErrorSintactico *nodoError = NULL;
+    NodoErrorSintactico *actual = *listaSecuenciasLeidas;
+
+    // Verificar si hay solo un nodo
+    if (actual->siguiente == NULL) {
+        // Si solo hay un nodo, copiar ese nodo
+        nodoError = crearNodoErrorSintactico(actual->errorSintactico, actual->linea);
+    } else {
+        // Recorrer hasta el anteultimo nodo
+        while (actual->siguiente->siguiente->siguiente != NULL) {
+            actual = actual->siguiente;
+        }
+        // Ahora `actual` es el anteultimo nodo
+        eliminarEspacios(actual->errorSintactico);
+        nodoError = crearNodoErrorSintactico(actual->errorSintactico, actual->linea); // Copiar el anteúltimo nodo
     }
 
-    // Enlazar el nuevo nodo al final de la lista
-    actual->siguiente = nuevoNodo;    
+    // Agregar el nodo seleccionado a la lista de errores sintácticos
+    nodoError->siguiente = *listaErroresSintacticos;
+    *listaErroresSintacticos = nodoError;
+}
+
+void eliminarEspacios(char *cadena) {
+    char *src = cadena; // Puntero para recorrer la cadena
+    char *dst = cadena; // Puntero para la posición de escritura
+
+    // Mover el puntero src hasta el primer carácter no espacio
+    while (*src == ' ') {
+        src++;
     }
+
+    // Copiar el resto de la cadena, omitiendo los espacios al inicio
+    while (*src) {
+        *dst++ = *src++;
+    }
+
+    *dst = '\0'; // Terminar la cadena resultante
 }
 
 void imprimirErrorSintactico(NodoErrorSintactico *lista){
     NodoErrorSintactico *actual = lista;
-    printf("* Listado de estructuras sintacticas no reconocidas\n");
+    printf("* Listado de errores sintacticos\n");
     
     if (actual == NULL) {
         printf("-\n");
@@ -341,7 +364,7 @@ void imprimirErrorSintactico(NodoErrorSintactico *lista){
     }
 
     while (actual != NULL) {
-        printf("%s: linea %d\n", actual->errorSintactico, actual->linea);
+        printf("\"%s\": linea %d\n", actual->errorSintactico, actual->linea);
         actual = actual->siguiente;
     }
 }
@@ -359,7 +382,6 @@ void liberarErrorSintactico(NodoErrorSintactico *lista){
 }
 
 
-
 // CADENAS NO RECONOCIDAS
 NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *cadenaNoReconocida, int linea, int columna) {
     NodoCadenaNoReconocida *nuevo = (NodoCadenaNoReconocida *)malloc(sizeof(NodoCadenaNoReconocida));
@@ -374,13 +396,13 @@ void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *caden
     // Crear el nuevo nodo
     NodoCadenaNoReconocida *nuevoNodo = crearNodoCadenaNoReconocida(cadenaNoReconocida, linea, columna);
 
-    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    // Si la lista esta vacia, el nuevo nodo es el primer nodo
     if (*lista == NULL) {
         *lista = nuevoNodo;
         return;
     }
 
-    // Si la lista no está vacía, recorrer hasta el final
+    // Si la lista no esta vacia, recorrer hasta el final
     NodoCadenaNoReconocida *actual = *lista;
     while (actual->siguiente != NULL) {
         actual = actual->siguiente;
@@ -435,4 +457,52 @@ char* copiarCadena(const char *str) {
         strcpy(copiado, str);  // Copia el contenido de la cadena de entrada a la nueva cadena
     }
     return copiado;  // Devuelve el puntero a la nueva cadena copiada
+}
+
+void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea) {
+    // Si es un carácter de corte, crea un nuevo nodo y lo agrega al final de la lista
+    if (strcmp(yytext, ";") == 0 || strcmp(yytext, "\n") == 0) {
+        if (*listaSecuenciasLeidas == NULL) {
+            // Si la lista está vacía, crea el primer nodo
+            *listaSecuenciasLeidas = crearNodoErrorSintactico("", linea);
+        } else {
+            // Si hay nodos, busca el final de la lista
+            NodoErrorSintactico *nuevoNodo = crearNodoErrorSintactico("", linea);
+            NodoErrorSintactico *actual = *listaSecuenciasLeidas;
+            
+            // Recorrer hasta el último nodo
+            while (actual->siguiente != NULL) {
+                actual = actual->siguiente;
+            }
+            // Enlazar el nuevo nodo al final
+            actual->siguiente = nuevoNodo;
+        }
+    } else {
+        // Si la lista está vacía, crea el primer nodo
+        if (*listaSecuenciasLeidas == NULL) {
+            *listaSecuenciasLeidas = crearNodoErrorSintactico(yytext, linea);
+        } else {
+            // Encuentra el último nodo en la lista y concatena yytext a su errorSintactico
+            NodoErrorSintactico *actual = *listaSecuenciasLeidas;
+            
+            // Recorrer hasta el último nodo
+            while (actual->siguiente != NULL) {
+                actual = actual->siguiente;
+            }
+
+            size_t nuevoTamanio = strlen(actual->errorSintactico) + strlen(yytext) + 1;
+            
+            // Redimensiona y concatena la nueva cadena
+            char *nuevaCadena = realloc(actual->errorSintactico, nuevoTamanio);
+            if (nuevaCadena == NULL) {
+                perror("realloc");
+                exit(EXIT_FAILURE);
+            }
+            actual->errorSintactico = nuevaCadena;
+            strcat(actual->errorSintactico, yytext);
+
+            // Actualiza la línea en caso de que el nodo se haya iniciado antes de esta línea
+            actual->linea = linea;
+        }
+    }
 }

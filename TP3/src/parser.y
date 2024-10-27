@@ -18,6 +18,7 @@ NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
 NodoFuncion* listaFunciones = NULL;
 NodoSentencia* listaSentencias = NULL;
 NodoErrorSintactico* listaErrorSintactico = NULL;
+NodoErrorSintactico* listaSecuenciasLeidas = NULL;
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 char* listaParametros = NULL;
 char* parametro = NULL;
@@ -68,7 +69,7 @@ line:
       sentencia 
     | declaracion
     | definiciones_externas 
-    | error                     { agregarErrorSintactico(&listaErrorSintactico, "errorSintactico" ,yylloc.first_line); /*yyclearin; yyerrok; printf("\n");*/}
+    | error ';'                    { agregarErrorSintactico(&listaErrorSintactico, &listaSecuenciasLeidas); yyclearin; yyerrok; DBG_PRINT("error sintactico\n"); }
     ;
 
 expresion:
@@ -111,7 +112,7 @@ expresion_de_igualdad:
       expresion OP_IGUALDAD expresion             { DBG_PRINT("expresion_de_igualdad: EXP1 ==/!= EXP2\n"); }
     ;
 expresion_and:
-      expresion_op OP_AND expresion_op                  { DBG_PRINT("expresion_and\n"); }
+      expresion_op OP_AND expresion_op            { DBG_PRINT("expresion_and\n"); }
     ;
 expresion_or:
       expresion OP_OR expresion                   { DBG_PRINT("expresion_or\n"); } 
@@ -145,7 +146,8 @@ sentencia_compuesta:
     ;
 sentencia_compuesta_sin_llaves:
       declaracion
-    | sentencia     {DBG_PRINT("sentencia_compuesta_sin_llaves\n");}
+    | sentencia                     {DBG_PRINT("sentencia_compuesta_sin_llaves\n");}
+    | error ';'                     { agregarErrorSintactico(&listaErrorSintactico, &listaSecuenciasLeidas); yyclearin; yyerrok; DBG_PRINT("error sintactico\n"); }
     ;
 sentencias_compuestas_sin_llaves
     : /*VACIO*/
@@ -163,26 +165,26 @@ declaraciones
     | declaraciones declaracion
     ;
 sentencia_if_else:
-      IF '(' expresion ')' sentencia_compuesta                                      { agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");}
-    | IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta             { agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");}
-    | IF '(' expresion ')' sentencia_compuesta_sin_llaves                          { agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");}
-    | IF '(' expresion ')' sentencia_compuesta_sin_llaves ELSE sentencia_compuesta  { agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");}
+      IF '(' expresion ')' sentencia_compuesta                                      { /*agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");*/}
+    | IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta             { /*agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");*/}
+    | IF '(' expresion ')' sentencia_compuesta_sin_llaves                          { /*agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");*/}
+    | IF '(' expresion ')' sentencia_compuesta_sin_llaves ELSE sentencia_compuesta  { /*agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");*/}
     ;
 sentencia_switch:
-    SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { agregarSentencia(&listaSentencias, "switch", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_switch\n");}
+    SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { /*agregarSentencia(&listaSentencias, "switch", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_switch\n");*/}
 sentencia_etiquetada:
     cases default
     ;
 case:
-      CASE expresion ':' sentencias_compuestas_sin_llaves   { agregarSentencia(&listaSentencias, "case", @1.first_line, @1.first_column);}
+      CASE expresion ':' sentencias_compuestas_sin_llaves   { /*agregarSentencia(&listaSentencias, "case", @1.first_line, @1.first_column);*/}
     | CASE expresion ':' sentencias_compuestas_sin_llaves 
-      BREAK                                                 { agregarSentencia(&listaSentencias, "case/break", @1.first_line, @1.first_column);}
+      BREAK                                                 { /*agregarSentencia(&listaSentencias, "case/break", @1.first_line, @1.first_column);*/}
     ;
 default
     : /*VACIO*/
-    | DEFAULT ':' sentencias    { agregarSentencia(&listaSentencias, "default", @1.first_line, @1.first_column); }
+    | DEFAULT ':' sentencias    { /*agregarSentencia(&listaSentencias, "default", @1.first_line, @1.first_column); */}
     | DEFAULT ':' sentencias 
-      BREAK                     { agregarSentencia(&listaSentencias, "default/break", @1.first_line, @1.first_column);}
+      BREAK                     { /*agregarSentencia(&listaSentencias, "default/break", @1.first_line, @1.first_column);*/}
     ;
 cases
     : /*VACIO*/
@@ -191,12 +193,12 @@ cases
     ;
 
 sentencia_do_while:
-      WHILE '(' expresion ')' sentencia_compuesta           { agregarSentencia(&listaSentencias, "while", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_while\n");}
-    | DO sentencia_compuesta WHILE '(' expresion ')' ';'    { agregarSentencia(&listaSentencias, "do/while", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_do_while\n");}
+      WHILE '(' expresion ')' sentencia_compuesta           { /*agregarSentencia(&listaSentencias, "while", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_while\n");*/}
+    | DO sentencia_compuesta WHILE '(' expresion ')' ';'    { /*agregarSentencia(&listaSentencias, "do/while", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_do_while\n");*/}
     ;
 sentencia_for:
     FOR '(' primera_parte_for ';' expresion_op ';' expresion_op ')' 
-    sentencia_compuesta     { agregarSentencia(&listaSentencias, "for", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_for\n");}
+    sentencia_compuesta     { /*agregarSentencia(&listaSentencias, "for", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_for\n");*/}
     ;
 expresion_op
     : /*VACIO*/
@@ -224,14 +226,14 @@ sentencia_de_salto:
     | return
     ;
 continue:
-    CONTINUE ';'    { agregarSentencia(&listaSentencias, "continue", @1.first_line, @1.first_column); }
+    CONTINUE ';'    { /*agregarSentencia(&listaSentencias, "continue", @1.first_line, @1.first_column);*/ }
     ;
 break:
-    BREAK ';'   { agregarSentencia(&listaSentencias, "break", @1.first_line, @1.first_column); }
+    BREAK ';'   { /*agregarSentencia(&listaSentencias, "break", @1.first_line, @1.first_column);*/ }
     ;
 return:
-      RETURN expresion_op ';'  { agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column); }
-    | RETURN ';'               { agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column); }
+      RETURN expresion_op ';'  { /*agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column);*/ }
+    | RETURN ';'               { /*agregarSentencia(&listaSentencias, "return", @1.first_line, @1.first_column);*/ }
     ;
 
 
@@ -338,10 +340,10 @@ int main(int argc, char *argv[]) {
     liberarFunciones(listaFunciones);
     printf("\n");
 
-    //3
+/*    //3
     imprimirSentencias(listaSentencias);
     liberarSentencias(listaSentencias);
-    printf("\n");
+    printf("\n");*/
 
     //4
     imprimirErrorSintactico(listaErrorSintactico);
@@ -352,7 +354,6 @@ int main(int argc, char *argv[]) {
     imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
     liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
     printf("\n");
-
     return 0;
 }
 
