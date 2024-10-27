@@ -181,7 +181,7 @@ void imprimirFunciones(NodoFuncion *lista) {
     }
 
     while (actual != NULL) {
-        printf("%s: %s, input: %s, retorna: %s, linea %d\n\n", actual->funcion, actual->tipogramatica, actual->parametro, actual->retorno, actual->linea);
+        printf("%s: %s, input: %s, retorna: %s, linea %d\n", actual->funcion, actual->tipogramatica, actual->parametro, actual->retorno, actual->linea);
         actual = actual->siguiente;
     }
 }
