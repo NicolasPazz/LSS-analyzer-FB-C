@@ -100,9 +100,6 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
 
     while (actual != NULL) {
         siguiente = actual->siguiente;
-        free(actual->variableDeclarada);
-        free(actual->tipoDato);
-        free(actual->sufijo);
         free(actual);
         actual = siguiente;
     }
