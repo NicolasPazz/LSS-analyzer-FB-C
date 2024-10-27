@@ -25,20 +25,19 @@ void reinicializarUbicacion(void);
     FUNCION
   } tipoSimbolo;
 
-struct NodoSimbolo
+typedef struct NodoSimbolo
 {
   char *nombre;
-  enum tipoSimbolo tipoSimbolo; 
-  void* nodo;  
-  struct NodoSimbolo *next; //Puntero al siguiente nodo de la lista
-};
+  enum tipoSimbolo tipo;
+  void* nodo;
+  struct NodoSimbolo *siguiente; //Puntero al siguiente nodo de la lista
+} NodoSimbolo;
+
+extern NodoSimbolo* tablaSimbolos;
 
 //TODO:: hago un switch para saber si es variable o funcion typecast
 
-//extern NodoSimbolo* tablaDeSimbolos;
-
-//NodoSimbolo* crearNodoSimboloVariable(const char *nombre, const char *tipo, NodoVariableDeclarada variable);
-//NodoSimbolo* crearNodoSimboloFuncion(const char *nombre, const char *tipo, NodoFuncion funcion);
+NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo);
 
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
@@ -52,7 +51,7 @@ typedef struct NodoVariableDeclarada {
 
 NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
@@ -73,7 +72,7 @@ typedef struct NodoFuncion {
 
 NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
 
 void agregarParametro(char** lista, char* parametro);
 

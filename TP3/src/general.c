@@ -36,7 +36,7 @@ NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada,
     return nuevo;
 }
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo){
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo){
     // Crear el nuevo nodo
     NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(variableDeclarada, tipoDato, linea, columna, sufijo);
 
@@ -54,6 +54,24 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variabl
 
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
+
+    // Crear el nuevo NodoSimbolo
+    NodoSimbolo *nuevoNodoSimbolo = crearNodoSimbolo(variableDeclarada, VARIABLE, nuevoNodo);
+
+    // Si la lista está vacía, el nuevo NodoSimbolo es el primer NodoSimbolo
+    if (*tablaSimbolos == NULL) {
+        *tablaSimbolos = nuevoNodoSimbolo;
+        return;
+    }
+
+    // Si la lista no esta vacia, recorrer hasta el final
+    NodoSimbolo *actual = *tablaSimbolos;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodoSimbolo;
 
 }
 
@@ -151,7 +169,7 @@ void agregarParametro(char** lista, char* parametro) { //enum
     }
 }
 
-void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
     // Crear el nuevo nodo
     NodoFuncion *nuevoNodo = crearNodoFuncion(retorno, funcion, linea, tipogramatica);
     // Si la lista está vacía, el nuevo nodo es el primer nodo
@@ -162,12 +180,30 @@ void agregarFuncion(NodoFuncion **lista, const char *retorno, const char *funcio
 
     // Si la lista no está vacía, recorrer hasta el final
     NodoFuncion *actual = *lista;
-    while (actual != NULL && actual->siguiente != NULL) {
+    while (actual->siguiente != NULL) {
         actual = actual->siguiente;
     }
 
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
+
+    // Crear el nuevo NodoSimbolo
+    NodoSimbolo *nuevoNodoSimbolo = crearNodoSimbolo(funcion, FUNCION, nuevoNodo);
+
+    // Si la lista está vacía, el nuevo NodoSimbolo es el primer NodoSimbolo
+    if (*tablaSimbolos == NULL) {
+        *tablaSimbolos = nuevoNodoSimbolo;
+        return;
+    }
+
+    // Si la lista no esta vacia, recorrer hasta el final
+    NodoSimbolo *actual = *tablaSimbolos;
+    while (actual->siguiente != NULL) {
+        actual = actual->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final de la lista
+    actual->siguiente = nuevoNodoSimbolo;
 }
 
 void imprimirFunciones(NodoFuncion *lista) {
@@ -379,6 +415,15 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista) {
         free(actual);
         actual = siguiente;
     }
+}
+
+NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo){
+    NodoSimbolo *nuevo = (NodoSimbolo *)malloc(sizeof(NodoSimbolo));
+    nuevo->nombre = copiarCadena(nombre);
+    nuevo->tipo = tipo;
+    nuevo->nodo = nodo;
+    nuevo->siguiente = NULL;
+    return nuevo;
 }
 
 
