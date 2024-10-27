@@ -68,7 +68,7 @@ line:
       sentencia 
     | declaracion
     | definiciones_externas 
-    | error                     { agregarErrorSintactico(listaErrorSintactico, errorSintactico ,yylloc.first_line);/* yyclearin; yyerrok; printf("\n");*/}
+    | error                     { agregarErrorSintactico(&listaErrorSintactico, "errorSintactico" ,yylloc.first_line); /*yyclearin; yyerrok; printf("\n");*/}
     ;
 
 expresion:

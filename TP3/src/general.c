@@ -65,13 +65,13 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tabla
     }
 
     // Si la lista no esta vacia, recorrer hasta el final
-    NodoSimbolo *actual = *tablaSimbolos;
-    while (actual->siguiente != NULL) {
-        actual = actual->siguiente;
+    NodoSimbolo *actual_simbolo = *tablaSimbolos;
+    while (actual_simbolo->siguiente != NULL) {
+        actual_simbolo = actual_simbolo->siguiente;
     }
 
     // Enlazar el nuevo nodo al final de la lista
-    actual->siguiente = nuevoNodoSimbolo;
+    actual_simbolo->siguiente = nuevoNodoSimbolo;
 
 }
 
@@ -197,13 +197,13 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char
     }
 
     // Si la lista no esta vacia, recorrer hasta el final
-    NodoSimbolo *actual = *tablaSimbolos;
-    while (actual->siguiente != NULL) {
-        actual = actual->siguiente;
+    NodoSimbolo *actual_simbolo = *tablaSimbolos;
+    while (actual_simbolo->siguiente != NULL) {
+        actual_simbolo = actual_simbolo->siguiente;
     }
 
     // Enlazar el nuevo nodo al final de la lista
-    actual->siguiente = nuevoNodoSimbolo;
+    actual_simbolo->siguiente = nuevoNodoSimbolo;
 }
 
 void imprimirFunciones(NodoFuncion *lista) {
