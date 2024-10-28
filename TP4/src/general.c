@@ -81,13 +81,13 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tabla
             NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodoPrevio->nodo;
             char mensaje[256];
             snprintf(mensaje, sizeof(mensaje), "%d:%d '%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", linea, columna, variableDeclarada, variableDeclarada, elemento->tipoDato, elemento->linea, elemento->columna);
-            agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
+            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         }
         else if (nodoPrevio->tipo == FUNCION){
             NodoFuncion* elemento = nodoPrevio->nodo;
             char mensaje[256];
             snprintf(mensaje, sizeof(mensaje), "%d:%d '%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", linea, columna, variableDeclarada, variableDeclarada, elemento->retorno, elemento->linea, elemento->columna);
-            agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
+            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         }        
     }
 }
