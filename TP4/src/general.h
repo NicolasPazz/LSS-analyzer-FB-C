@@ -100,26 +100,6 @@ extern char* listaParametros;
 
 extern char* parametro;
 
-// SENTENCIAS
-typedef struct NodoSentencia {
-    char *sentencia;
-    int linea;
-    int columna;
-    struct NodoSentencia *siguiente;
-} NodoSentencia;
-
-NodoSentencia* crearNodoSentencia(const char *sentencia, const int linea, const int columna);
-
-void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int linea, const int columna);
-//void agregarSentencia(listaSentencias, sentencia, tipoSentencia, linea, columna);
-
-void imprimirSentencias(NodoSentencia *lista);
-
-void liberarSentencias(NodoSentencia *lista);
-
-extern NodoSentencia* listaSentencias;
-
-
 // ESTRUCTURAS NO RECONOCIDAS
 typedef struct NodoErrorSintactico {
     char *errorSintactico;
@@ -162,19 +142,18 @@ NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo);
 extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
 //void reiniciarListaParametros(char **listaParametros);
 
-//ERRORES SEMANTICOS 
 
+//ERRORES SEMANTICOS 
 
 NodoErroresSemanticos* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna);
 
 void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, const int linea, const int columna);
-//void agregarSentencia(listaSentencias, sentencia, tipoSentencia, linea, columna);
 
 void imprimirErrorSemantico(NodoErroresSemanticos *lista);
 
 void liberarErrorSemantico(NodoErroresSemanticos *lista);
 
-extern NodoErroresSemanticos* listaErrorSemantico;
+extern NodoErroresSemanticos* listaErroresSemanticos;
 
 
 // FUNCIONES

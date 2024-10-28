@@ -16,7 +16,6 @@ void yyerror(const char *s);
 NodoSimbolo* tablaSimbolos = NULL;
 NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
 NodoFuncion* listaFunciones = NULL;
-NodoSentencia* listaSentencias = NULL;
 NodoErroresSemanticos* listaErroresSemanticos = NULL;
 NodoErrorSintactico* listaErrorSintactico = NULL;
 NodoErrorSintactico* listaSecuenciasLeidas = NULL;
@@ -241,8 +240,8 @@ return:
 
 
 declaracion:
-      sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $3, $2, yylloc.last_line, $1); DBG_PRINT("declaracion de variable/s %s\n", $3); $1 = NULL;*/ yyval.tipoDeDato = $2;}
-    | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $2, $1, yylloc.last_line, NULL); DBG_PRINT("declaracion de variable/s \n");*/ yyval.tipoDeDato = $1; }
+      sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $3, $2, yylloc.last_line, $1); DBG_PRINT("declaracion de variable/s %s\n", $3); $1 = NULL;*/ yyval.tipoDeDato = $2; yyval.sufijo = $1; }
+    | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $2, $1, yylloc.last_line, NULL); DBG_PRINT("declaracion de variable/s \n");*/ yyval.tipoDeDato = $1; yyval.sufijo = NULL;}
     
     | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, $3, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 1 %s %s %s\n", $1, $2, $3);}
     | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, $3, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 2 %s %s %s\n", $1, $2, $3);}
@@ -255,7 +254,7 @@ lista_declaradores_variable:
     | lista_declaradores_variable ',' declarador_variable  { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
-    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, listaErroresSemanticos, $1, yyval.tipoDeDato, yylloc.last_line, @1.first_column, NULL); DBG_PRINT("declarador_variable \n"); }
+    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.tipoDeDato, yylloc.last_line, @1.first_column, yyval.sufijo); DBG_PRINT("declarador_variable \n"); }
     ;
 inicializacion_variable
     : /*VACIO*/
@@ -345,8 +344,6 @@ int main(int argc, char *argv[]) {
 
    //3
     imprimirErrorSemantico(listaErroresSemanticos);
-    //imprimirSentencias(listaSentencias);
-    //liberarSentencias(listaSentencias);
     printf("\n");
 
     //4
@@ -362,5 +359,5 @@ int main(int argc, char *argv[]) {
 }
 
 void yyerror(const char *s) {
-    fprintf(stderr, "ERROR en linea %d columna %d: %s\n", yylloc.last_line, yylloc.last_column, s);
+    fprintf(stderr, "ERROR en linea %d columna %d: %s\n\n", yylloc.last_line, yylloc.last_column, s);
 }

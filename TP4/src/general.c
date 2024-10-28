@@ -77,18 +77,18 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tabla
         
     }
     else {
-        NodoVariableDeclarada *elemento;
-
         if (nodoPrevio->tipo == VARIABLE){
-            elemento = (NodoVariableDeclarada*) nodoPrevio->nodo;
+            NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodoPrevio->nodo;
+            char mensaje[256];
+            snprintf(mensaje, sizeof(mensaje), "%d:%d '%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", linea, columna, variableDeclarada, variableDeclarada, elemento->tipoDato, elemento->linea, elemento->columna);
+            agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
         }
         else if (nodoPrevio->tipo == FUNCION){
-            elemento = (NodoFuncion*) nodoPrevio->nodo;
-        }
-
-        
-      //agregarErrorSemantico(&listaErroresSemanticos, ("%d:%d '%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", linea, columna, variableDeclarada, variableDeclarada, tipoDato, elemento->linea, elemento->columna), (linea), (columna));
-        
+            NodoFuncion* elemento = nodoPrevio->nodo;
+            char mensaje[256];
+            snprintf(mensaje, sizeof(mensaje), "%d:%d '%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", linea, columna, variableDeclarada, variableDeclarada, elemento->retorno, elemento->linea, elemento->columna);
+            agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
+        }        
     }
 }
 
@@ -251,92 +251,6 @@ void liberarFunciones(NodoFuncion *lista){
         actual = siguiente;
     }
 }
-
-// SENTENCIAS
-NodoSentencia* crearNodoSentencia(const char *sentencia, const int linea, const int columna){
-    NodoSentencia *nuevo = (NodoSentencia *)malloc(sizeof(NodoSentencia));
-    nuevo->sentencia = copiarCadena(sentencia);
-    nuevo->linea = linea;
-    nuevo->columna = columna;
-    nuevo->siguiente = NULL;
-    return nuevo;
-}
-
-void agregarSentencia(NodoSentencia **lista, const char *sentencia, const int linea, const int columna) {
-    // Crear el nuevo nodo
-    NodoSentencia *nuevoNodo = crearNodoSentencia(sentencia, linea, columna);
-
-    // Si la lista está vacía, el nuevo nodo es el primer nodo
-    if (*lista == NULL) {
-        *lista = nuevoNodo;
-        return;
-    }
-
-    // Si la lista no está vacía, encontrar la posición correcta para insertar el nuevo nodo
-    NodoSentencia *actual = *lista;
-    NodoSentencia *anterior = NULL;
-
-    while (actual != NULL && actual->linea < linea) {
-        anterior = actual;
-        actual = actual->siguiente;
-    }
-
-    // Insertar el nuevo nodo en la posición correcta
-    if (anterior == NULL) {
-        // Insertar al inicio de la lista
-        nuevoNodo->siguiente = *lista;
-        *lista = nuevoNodo;
-    } else {
-        // Insertar en medio o al final de la lista
-        nuevoNodo->siguiente = actual;
-        anterior->siguiente = nuevoNodo;
-    }
-}
-
-void imprimirSentencias(NodoSentencia *lista){
-    NodoSentencia *actual = lista;
-    printf("* Listado de sentencias indicando tipo, numero de linea y de columna:\n");
-    
-    if (actual == NULL) {
-        printf("-\n");
-        return;
-    }
-
-    while (actual != NULL) {
-        printf("%s: linea %d, columna %d\n", actual->sentencia, actual->linea, actual->columna);
-        actual = actual->siguiente;
-    }
-}
-
-void liberarSentencias(NodoSentencia *lista){
-    NodoSentencia *actual = lista;
-    NodoSentencia *siguiente = NULL;
-
-    while (actual != NULL) {
-        siguiente = actual->siguiente;
-        free(actual->sentencia);
-        free(actual);
-        actual = siguiente;
-    }
-}
-
-
-// ERRORES SEMANTICOS
-/*void imprimirErroresSemanticos(NodoErroresSemanticos *lista){
-    NodoErroresSemanticos *actual = lista;
-    printf("* Listado de errores semanticos:\n");
-    
-    if (actual == NULL) {
-        printf("-\n");
-        return;
-    }
-
-    while (actual != NULL) {
-        //printf(" ", );
-        actual = actual->siguiente;
-    }
-}*/
-
 
 // ESTRUCTURAS NO RECONOCIDAS
 NodoErrorSintactico* crearNodoErrorSintactico(const char *errorSintactico, const int linea){
@@ -509,6 +423,11 @@ NodoSimbolo* buscarSimbolo(const char *nombre) {
 void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, const int linea, const int columna){
     // Crear el nuevo nodo
     NodoErroresSemanticos *nuevoNodo = crearNodoErroresSemanticos(mensaje, linea, columna);
+    
+    if (nuevoNodo == NULL) {
+        fprintf(stderr, "Error al crear el nodo de error semántico.\n");
+        return; // Manejo de error
+    }
 
     // Si la lista está vacía, el nuevo nodo es el primer nodo
     if (*lista == NULL) {
@@ -516,7 +435,7 @@ void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, c
         return;
     }
 
-    // Si la lista no esta vacia, recorrer hasta el final
+    // Si la lista no está vacía, recorrer hasta el final
     NodoErroresSemanticos *actual = *lista;
     while (actual->siguiente != NULL) {
         actual = actual->siguiente;
@@ -525,6 +444,7 @@ void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, c
     // Enlazar el nuevo nodo al final de la lista
     actual->siguiente = nuevoNodo;
 }
+
 
 void imprimirErrorSemantico(NodoErroresSemanticos *lista){
     NodoErroresSemanticos *actual = lista;
@@ -586,8 +506,6 @@ char* copiarCadena(const char *str) {
     }
     return TIPO_ERROR;  // Devuelve error si no coincide con las reglas
 }*/
-
-
 
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea) {
     // Si es un carácter de corte, crea un nuevo nodo y lo agrega al final de la lista
@@ -658,12 +576,13 @@ NodoSimbolo *buscar_simbolo(char *nombre) {
     NodoSimbolo *nodo_actual = tablaSimbolos;
     while (nodo_actual != NULL) {
         if (strcmp(nodo_actual->nombre, nombre) == 0) {
-            return &(nodo_actual->nodo);
+            return nodo_actual; // Retornar el nodo encontrado
         }
-        nodo_actual = nodo_actual->siguiente;
+        nodo_actual = nodo_actual->siguiente; // Mover al siguiente nodo
     }
-    return NULL;
+    return NULL; // Retornar NULL si no se encuentra el nodo
 }
+
 // Validación de operaciones específicas
 int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador) {
     if (!simbolo1 || !simbolo2) {
