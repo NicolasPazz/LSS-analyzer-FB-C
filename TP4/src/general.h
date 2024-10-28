@@ -10,6 +10,13 @@ typedef struct YYLTYPE
   int last_column;
 } YYLTYPE;
 
+typedef struct NodoErroresSemanticos {
+    char *mensaje;
+    int linea;
+    int columna;
+    struct NodoSentencia *siguiente;
+} NodoErroresSemanticos;
+
 #define INICIO_CONTEO_LINEA 1
 #define INICIO_CONTEO_COLUMNA 1
 
@@ -19,25 +26,29 @@ void reinicializarUbicacion(void);
 
 
 // Tabla de símbolos
- typedef enum tipoSimbolo
-  {
+ typedef enum tipoSimbolo{
     VARIABLE,
     FUNCION
-  } tipoSimbolo;
+  }tipoSimbolo;
 
-typedef struct NodoSimbolo
-{
+typedef struct NodoSimbolo{
   char *nombre;
   enum tipoSimbolo tipo;
   void* nodo;
   struct NodoSimbolo *siguiente; //Puntero al siguiente nodo de la lista
-} NodoSimbolo;
+}NodoSimbolo;
 
 extern NodoSimbolo* tablaSimbolos;
 
+NodoSimbolo* buscarSimbolo(const char *nombre);
+
+//NodoSimbolo *agregarSimboloTS (char const *, int);
+//NodoSimbolo *obtenerSimboloTS (char const *);
+
+
+
 //TODO:: hago un switch para saber si es variable o funcion typecast
 
-NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo);
 
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
@@ -51,7 +62,7 @@ typedef struct NodoVariableDeclarada {
 
 NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
@@ -67,12 +78,13 @@ typedef struct NodoFuncion {
     char *parametro;
     char *tipogramatica;
     int linea;
+    int columna;
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
 NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, const char *funcion, const int linea, const char* tipogramatica, const int columna);
 
 void agregarParametro(char** lista, char* parametro);
 
@@ -145,27 +157,24 @@ void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
+NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo);
+
 extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
-void reiniciarListaParametros(char **listaParametros);
+//void reiniciarListaParametros(char **listaParametros);
 
 //ERRORES SEMANTICOS 
-typedef struct NodoErrorSemantico {
-    char *mensaje;
-    int linea;
-    int columna;
-    struct NodoSentencia *siguiente;
-} NodoErrorSemantico;
 
-NodoErrorSemantico* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna);
 
-void agregarErrorSemantico(NodoErrorSemantico **lista, const char *mensaje, const int linea, const int columna);
+NodoErroresSemanticos* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna);
+
+void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, const int linea, const int columna);
 //void agregarSentencia(listaSentencias, sentencia, tipoSentencia, linea, columna);
 
-void imprimirErrorSemantico(NodoErrorSemantico *lista);
+void imprimirErrorSemantico(NodoErroresSemanticos *lista);
 
-void liberarErrorSemantico(NodoErrorSemantico *lista);
+void liberarErrorSemantico(NodoErroresSemanticos *lista);
 
-extern NodoErrorSemantico* listaErrorSemantico;
+extern NodoErroresSemanticos* listaErrorSemantico;
 
 
 // FUNCIONES
@@ -218,4 +227,14 @@ typedef struct{
 
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
 
+
+//NodoSimbolo *agregarSimboloTS (char const *sym_name, int sym_type);
+//NodoSimbolo *obtenerSimboloTS (char const *sym_name);
+
+int validar_invocacion_funcion(NodoSimbolo *simbolo, int num_args);
+int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der);
+int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador) ;
+int insertar_simbolo(const char *nombre, tipoSimbolo tipo, void *nodo) ;
+NodoSimbolo *buscar_simbolo(char *nombre);
 #endif
+

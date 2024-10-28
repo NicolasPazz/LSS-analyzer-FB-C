@@ -17,6 +17,7 @@ NodoSimbolo* tablaSimbolos = NULL;
 NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
 NodoFuncion* listaFunciones = NULL;
 NodoSentencia* listaSentencias = NULL;
+NodoErroresSemanticos* listaErroresSemanticos = NULL;
 NodoErrorSintactico* listaErrorSintactico = NULL;
 NodoErrorSintactico* listaSecuenciasLeidas = NULL;
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
@@ -240,13 +241,13 @@ return:
 
 
 declaracion:
-      sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $3, $2, yylloc.last_line, $1); DBG_PRINT("declaracion de variable/s %s\n", $3); $1 = NULL;*/}
-    | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $2, $1, yylloc.last_line, NULL); DBG_PRINT("declaracion de variable/s \n");*/ }
+      sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $3, $2, yylloc.last_line, $1); DBG_PRINT("declaracion de variable/s %s\n", $3); $1 = NULL;*/ yyval.tipoDeDato = $2;}
+    | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, $2, $1, yylloc.last_line, NULL); DBG_PRINT("declaracion de variable/s \n");*/ yyval.tipoDeDato = $1; }
     
-    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, $3, yylloc.last_line, "declaracion"); DBG_PRINT("declaracion de funcion 1 %s %s %s\n", $1, $2, $3);}
-    | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, $3, yylloc.last_line, "declaracion"); DBG_PRINT("declaracion de funcion 2 %s %s %s\n", $1, $2, $3);}
-    | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "declaracion"); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); }
-    | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "declaracion"); DBG_PRINT("declaracion de funcion 4 %s %s\n", $1, $2);}
+    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, $3, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 1 %s %s %s\n", $1, $2, $3);}
+    | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, $3, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 2 %s %s %s\n", $1, $2, $3);}
+    | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); }
+    | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 4 %s %s\n", $1, $2);}
     ;
 
 lista_declaradores_variable:
@@ -254,7 +255,7 @@ lista_declaradores_variable:
     | lista_declaradores_variable ',' declarador_variable  { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
-    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, $1, yyval.tipoDeDato, yylloc.last_line, @1.first_column, NULL); DBG_PRINT("declarador_variable \n"); }
+    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, listaErroresSemanticos, $1, yyval.tipoDeDato, yylloc.last_line, @1.first_column, NULL); DBG_PRINT("declarador_variable \n"); }
     ;
 inicializacion_variable
     : /*VACIO*/
@@ -278,7 +279,7 @@ lista_argumentos_prototipo:
 argumento_prototipo
     : /*VACIO*/                                     { parametro = ""; agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_vacio \n"); }
     | IDENTIFICADOR                                 { parametro = copiarCadena($1); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
-    | TIPODEDATO IDENTIFICADOR                      { /*fprintf(stderr, "argumento_prototipo -> TIPODEDATO IDENTIFICADOR\n");*/ parametro = unirParametros($1,$2); $$ = copiarCadena(parametro); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_3 %s\n", parametro); }
+    | TIPODEDATO IDENTIFICADOR                      { parametro = unirParametros($1,$2); $$ = copiarCadena(parametro); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_3 %s\n", parametro); }
     | TIPODEDATO                                    { parametro = copiarCadena($1); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
     | sufijo TIPODEDATO                             { parametro = unirParametros($1,$2); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
     | sufijo TIPODEDATO IDENTIFICADOR               { parametro = unirParametros($2,$3); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
@@ -306,8 +307,8 @@ definiciones_externas:
     ;
 
 definicion_funcion: 
-      TIPODEDATO declarador_funcion sentencia_compuesta   { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "definicion"); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
-    | VOID declarador_funcion sentencia_compuesta         { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "definicion"); DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
+      TIPODEDATO declarador_funcion sentencia_compuesta   { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
+    | VOID declarador_funcion sentencia_compuesta         { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
     ; 
 %%
 
@@ -342,10 +343,11 @@ int main(int argc, char *argv[]) {
     liberarFunciones(listaFunciones);
     printf("\n");
 
-/*    //3
-    imprimirSentencias(listaSentencias);
-    liberarSentencias(listaSentencias);
-    printf("\n");*/
+   //3
+    imprimirErrorSemantico(listaErroresSemanticos);
+    //imprimirSentencias(listaSentencias);
+    //liberarSentencias(listaSentencias);
+    printf("\n");
 
     //4
     imprimirErrorSintactico(listaErrorSintactico);
