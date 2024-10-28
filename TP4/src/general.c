@@ -36,7 +36,7 @@ NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada,
     return nuevo;
 }
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo){
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo){
     NodoSimbolo *nodoPrevio = buscar_simbolo(variableDeclarada);
     if (nodoPrevio == NULL){
         // Crear el nuevo nodo
@@ -183,7 +183,7 @@ void agregarParametro(char** lista, char* parametro) { //enum
     }
 }
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, const char *funcion, const int linea, const char* tipogramatica, const int columna){
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, char *funcion, const int linea, const char* tipogramatica, const int columna){
     if (buscar_simbolo(funcion) == NULL){
     // Crear el nuevo nodo
     NodoFuncion *nuevoNodo = crearNodoFuncion(retorno, funcion, linea, tipogramatica);
@@ -556,7 +556,7 @@ void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yy
 }
 
 // Inserción de símbolo en la tabla
-int insertar_simbolo(const char *nombre, tipoSimbolo tipo, void *nodo) {
+int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) {
     NodoSimbolo *simbolo_existente = buscar_simbolo(nombre);
     if (simbolo_existente) {
         // Ya existe un símbolo con ese nombre
@@ -608,7 +608,7 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
 }
 
 // Validación de invocación de función
-int validar_invocacion_funcion(NodoSimbolo *simbolo, int num_args) {
+int validar_invocacion_funcion(NodoSimbolo *simbolo, int num_args) { //Esta función no la entiendo, hice validarInvocacionAFuncion() que anda bien, pero no borro esta por las dudas
     if (!simbolo || simbolo->tipo != FUNCION) {
         printf("Error: '%s' no es una función declarada.\n", simbolo->nombre);
         return -1;
@@ -633,6 +633,37 @@ int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_
         return -1;
     }
     return 0;
+}
+
+void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna){
+    NodoSimbolo *nodoPrevio = buscar_simbolo(identificador);
+    if (nodoPrevio == NULL){
+        char mensaje[256];
+        snprintf(mensaje, sizeof(mensaje), " Funcion %s sin declarar", identificador);
+        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+    }
+    else if (nodoPrevio->tipo != FUNCION){
+        NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodoPrevio->nodo;
+        char mensaje[256];
+        snprintf(mensaje, sizeof(mensaje), " El objeto invocado %s no es una funcion o un puntero a una funcion\n Nota: declarado aqui %d:%d", identificador, elemento->linea, elemento->columna);
+        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+    }
+//    else {
+//        char mensaje[256];
+//        snprintf(mensaje, sizeof(mensaje), " Lista de argumentos %d", listaDeArgumentos);
+//        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+//    }
+}
+
+int contarArgumentos(char *listaDeArgumentos) {
+    int contador = 0;
+    char *token;
+    token = strtok(listaDeArgumentos, ",");
+    while (token != NULL) {
+        contador++;
+        token = strtok(NULL, ",");
+    }
+    return contador;
 }
 
 /*NodoSimbolo *agregarSimboloTS (char const *sym_name, int sym_type){

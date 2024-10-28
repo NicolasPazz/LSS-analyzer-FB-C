@@ -62,7 +62,7 @@ typedef struct NodoVariableDeclarada {
 
 NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
@@ -84,7 +84,7 @@ typedef struct NodoFuncion {
 
 NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, const char *funcion, const int linea, const char* tipogramatica, const int columna);
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, char *funcion, const int linea, const char* tipogramatica, const int columna);
 
 void agregarParametro(char** lista, char* parametro);
 
@@ -213,7 +213,8 @@ void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yy
 int validar_invocacion_funcion(NodoSimbolo *simbolo, int num_args);
 int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der);
 int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador) ;
-int insertar_simbolo(const char *nombre, tipoSimbolo tipo, void *nodo) ;
+int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
 NodoSimbolo *buscar_simbolo(char *nombre);
+void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna);
 #endif
 
