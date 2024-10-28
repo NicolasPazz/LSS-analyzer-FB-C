@@ -20,9 +20,8 @@ NodoErroresSemanticos* listaErroresSemanticos = NULL;
 NodoErrorSintactico* listaErrorSintactico = NULL;
 NodoErrorSintactico* listaSecuenciasLeidas = NULL;
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
-
-char* listaParametros = NULL;
-char* parametro = NULL;
+Parametro* listaDeParametros = NULL;
+NodoFuncion* nodoGenericoFuncion = NULL;
 
 #define DEBUG 0
 
@@ -257,8 +256,8 @@ declarador_variable:
     ;
 inicializacion_variable
     : /*VACIO*/
-    | OP_ASIGNACION OP_ADITIVO expresion   { DBG_PRINT("inicializacion de variable \n"); }
-    | OP_ASIGNACION expresion   { DBG_PRINT("inicializacion de variable \n"); }
+    | OP_ASIGNACION OP_ADITIVO expresion    { DBG_PRINT("inicializacion de variable \n"); }
+    | OP_ASIGNACION expresion               { DBG_PRINT("inicializacion de variable \n"); }
     ;
 
 lista_declaradores_funcion:
@@ -266,7 +265,7 @@ lista_declaradores_funcion:
     | lista_declaradores_funcion ',' declarador_funcion    { DBG_PRINT("lista_declaradores_funcion\n"); }
     ;
 declarador_funcion:
-    IDENTIFICADOR '(' lista_argumentos_prototipo ')'    { DBG_PRINT("declarador_funcion %s\n", $$);}
+    IDENTIFICADOR '(' lista_argumentos_prototipo ')'    { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $$);}
     ;
 lista_argumentos_prototipo:
       argumento_prototipo                                   { DBG_PRINT("argumento_prototipo\n"); }
@@ -275,13 +274,13 @@ lista_argumentos_prototipo:
 
        
 argumento_prototipo
-    : /*VACIO*/                                     { parametro = ""; agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_vacio \n"); }
-    | IDENTIFICADOR                                 { parametro = copiarCadena($1); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
-    | TIPODEDATO IDENTIFICADOR                      { parametro = unirParametros($1,$2); $$ = copiarCadena(parametro); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final_3 %s\n", parametro); }
-    | TIPODEDATO                                    { parametro = copiarCadena($1); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
-    | sufijo TIPODEDATO                             { parametro = unirParametros($1,$2); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
-    | sufijo TIPODEDATO IDENTIFICADOR               { parametro = unirParametros($2,$3); agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
-    | VOID                                          { parametro = "void"; agregarParametro(&listaParametros, parametro); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
+    : /*VACIO*/                                     { agregarParametro(&listaDeParametros, "", NULL); DBG_PRINT("argumento_prototipo_final_vacio \n"); }
+    | IDENTIFICADOR                                 { agregarParametro(&listaDeParametros, NULL, $1); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
+    | TIPODEDATO IDENTIFICADOR                      { agregarParametro(&listaDeParametros, $1, $2); DBG_PRINT("argumento_prototipo_final_3 %s\n", parametro); }
+    | TIPODEDATO                                    { agregarParametro(&listaDeParametros, $1, NULL); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
+    | sufijo TIPODEDATO                             { agregarParametro(&listaDeParametros, $2, NULL); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
+    | sufijo TIPODEDATO IDENTIFICADOR               { agregarParametro(&listaDeParametros, $2, $3); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
+    | VOID                                          { agregarParametro(&listaDeParametros, $1, NULL); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
     ;
 lista_declaradores_variable_prototipo:
       declarador_variable_prototipo                                               { DBG_PRINT("lista_declaradores_variable\n"); }

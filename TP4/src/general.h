@@ -72,21 +72,29 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 
 
 // FUNCIONES
+
+
+typedef struct Parametro {
+    char *tipo;
+    char *identificador;
+    struct Parametro *siguiente;
+} Parametro;
 typedef struct NodoFuncion {
     char *funcion;
     char *retorno;
-    char *parametro;
+    Parametro *listaDeParametros;
     char *tipogramatica;
     int linea;
     int columna;
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
-NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, char *funcion, const int linea, const char* tipogramatica, const int columna);
+NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno, const char *funcion, int linea, const char* tipogramatica);
 
-void agregarParametro(char** lista, char* parametro);
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion *nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna);
+
+//void agregarParametro(char** lista, char* parametro);
 
 char* unirParametros(const char* param1, const char* param2);
 
@@ -96,9 +104,9 @@ void liberarFunciones(NodoFuncion *lista);
 
 extern NodoFuncion* listaFunciones;
 
-extern char* listaParametros;
+extern Parametro* listaDeParametros;
 
-extern char* parametro;
+extern NodoFuncion* nodoGenericoFuncion;
 
 // ESTRUCTURAS NO RECONOCIDAS
 typedef struct NodoErrorSintactico {
@@ -170,7 +178,7 @@ char* copiarCadena(const char *str);
      // Para manejar errores de tipo
 } Type;
 
-// Declara la función check_type para usar en el control de tipos
+// Declara la funcion check_type para usar en el control de tipos
 Type check_type(char *left, char *right, const int linea, const int columna);
 
 //estructura para saber tipo de dato en cada token
@@ -192,7 +200,7 @@ typedef enum {
      // Para manejar errores de tipo
 } Type;
 
-// Declara la función check_type para usar en el control de tipos
+// Declara la funcion check_type para usar en el control de tipos
 Type check_type(char *left, char *right, const int linea, const int columna);
 
 //estructura para saber tipo de dato en cada token
@@ -216,5 +224,10 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
 int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
 NodoSimbolo *buscar_simbolo(char *nombre);
 void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna);
+
+void agregarParametro(Parametro **listaDeParametros, char *tipo, char *identificador);
+void llenarNodoGenericoFuncion(NodoFuncion *nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros);
+
+
 #endif
 

@@ -42,7 +42,7 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tabla
         // Crear el nuevo nodo
         NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(variableDeclarada, tipoDato, linea, columna, sufijo);
 
-        // Si la lista está vacía, el nuevo nodo es el primer nodo
+        // Si la lista esta vacia, el nuevo nodo es el primer nodo
         if (*lista == NULL) {
             *lista = nuevoNodo;
             return;
@@ -60,7 +60,7 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tabla
         // Crear el nuevo NodoSimbolo
         NodoSimbolo *nuevoNodoSimbolo = crearNodoSimbolo(variableDeclarada, VARIABLE, nuevoNodo);
 
-        // Si la lista está vacía, el nuevo NodoSimbolo es el primer NodoSimbolo
+        // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
         if (*tablaSimbolos == NULL) {
             *tablaSimbolos = nuevoNodoSimbolo;
             return;
@@ -123,24 +123,24 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
 }
 
 // FUNCIONES
-NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica){
+NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno, const char *funcion, int linea, const char* tipogramatica) {
     NodoFuncion *nuevo = (NodoFuncion *)malloc(sizeof(NodoFuncion));
     
     nuevo->funcion = copiarCadena(funcion);
-    nuevo->linea = linea;
-    nuevo->parametro = copiarCadena(listaParametros);
-    listaParametros = NULL;
     nuevo->retorno = copiarCadena(retorno);
     nuevo->tipogramatica = copiarCadena(tipogramatica);
+    nuevo->linea = linea;
+    nuevo->listaDeParametros = listaDeParametros;
     nuevo->siguiente = NULL;
 
     return nuevo;
 }
 
-char* unirParametros(const char* param1, const char* param2) {
-    // Aquí asumimos que ambos parámetros son no nulos
 
-    // Calculamos las longitudes de los parámetros
+char* unirParametros(const char* param1, const char* param2) {
+    // Aqui asumimos que ambos parametros son no nulos
+
+    // Calculamos las longitudes de los parametros
     size_t longitud1 = strlen(param1);
     size_t longitud2 = strlen(param2);
 
@@ -151,19 +151,19 @@ char* unirParametros(const char* param1, const char* param2) {
         exit(EXIT_FAILURE);
     }
 
-    // Copiamos el primer parámetro
+    // Copiamos el primer parametro
     strcpy(resultado, param1);
 
     // Agregamos un espacio
     strcat(resultado, " ");
 
-    // Concatenamos el segundo parámetro
+    // Concatenamos el segundo parametro
     strcat(resultado, param2);
 
     return resultado; // Retornamos la cadena resultante
 }
 
-void agregarParametro(char** lista, char* parametro) { //enum
+/*void agregarParametro(char** lista, char* parametro) { //enum
     if (*lista == NULL) {
         *lista = copiarCadena(parametro);
     } else {
@@ -181,49 +181,62 @@ void agregarParametro(char** lista, char* parametro) { //enum
         free(*lista);
         *lista = nuevaLista;
     }
-}
+}*/
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, char *funcion, const int linea, const char* tipogramatica, const int columna){
-    if (buscar_simbolo(funcion) == NULL){
-    // Crear el nuevo nodo
-    NodoFuncion *nuevoNodo = crearNodoFuncion(retorno, funcion, linea, tipogramatica);
-    // Si la lista está vacía, el nuevo nodo es el primer nodo
-    if (*lista == NULL) {
-        *lista = nuevoNodo;
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion *nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna){
+    /*if (nodoGenericoFuncion == NULL) {
+        printf("Error: nodoGenericoFuncion es NULL.\n");
         return;
     }
 
-    // Si la lista no está vacía, recorrer hasta el final
-    NodoFuncion *actual = *lista;
-    while (actual->siguiente != NULL) {
-        actual = actual->siguiente;
-    }
-
-    // Enlazar el nuevo nodo al final de la lista
-    actual->siguiente = nuevoNodo;
-
-    // Crear el nuevo NodoSimbolo
-    NodoSimbolo *nuevoNodoSimbolo = crearNodoSimbolo(funcion, FUNCION, nuevoNodo);
-
-    // Si la lista está vacía, el nuevo NodoSimbolo es el primer NodoSimbolo
-    if (*tablaSimbolos == NULL) {
-        *tablaSimbolos = nuevoNodoSimbolo;
-        return;
-    }
-
-    // Si la lista no esta vacia, recorrer hasta el final
-    NodoSimbolo *actual_simbolo = *tablaSimbolos;
-    while (actual_simbolo->siguiente != NULL) {
-        actual_simbolo = actual_simbolo->siguiente;
-    }
+    printf("hola\n");
+    //printf("Funcion: %s\n", nodoGenericoFuncion->funcion);
+    printf("Funcion: %s\n", nodoGenericoFuncion->listaDeParametros->tipo);  // Acceso correcto
+    printf("Retorno: %s\n", retorno);
+    printf("Linea: %d\n", linea);
+    printf("Tipogramatica: %s\n", tipogramatica);
     
-    // Enlazar el nuevo nodo al final de la lista
-    actual_simbolo->siguiente = nuevoNodoSimbolo;
-   }
+   /* if (buscar_simbolo(nodoGenericoFuncion->funcion) == NULL){
+        // Crear el nuevo nodo
+       NodoFuncion *nuevoNodo = crearNodoFuncion(nodoGenericoFuncion->listaDeParametros, retorno, nodoGenericoFuncion->funcion, linea, tipogramatica);
+        // Si la lista esta vacia, el nuevo nodo es el primer nodo
+        if (*lista == NULL) {
+            *lista = nuevoNodo;
+            return;
+        }
+
+        // Si la lista no esta vacia, recorrer hasta el final
+        NodoFuncion *actual = *lista;
+        while (actual->siguiente != NULL) {
+            actual = actual->siguiente;
+        }
+
+        // Enlazar el nuevo nodo al final de la lista
+        actual->siguiente = nuevoNodo;
+
+        // Crear el nuevo NodoSimbolo
+        NodoSimbolo *nuevoNodoSimbolo = crearNodoSimbolo(nuevoNodo->funcion, FUNCION, nuevoNodo);
+
+        // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
+        if (*tablaSimbolos == NULL) {
+            *tablaSimbolos = nuevoNodoSimbolo;
+            return;
+        }
+
+        // Si la lista no esta vacia, recorrer hasta el final
+        NodoSimbolo *actual_simbolo = *tablaSimbolos;
+        while (actual_simbolo->siguiente != NULL) {
+            actual_simbolo = actual_simbolo->siguiente;
+        }
+        
+        // Enlazar el nuevo nodo al final de la lista
+        actual_simbolo->siguiente = nuevoNodoSimbolo;
+   }*/
     //else{
      //   agregarErrorSemantico("%d:%d Funcion '%s' sin declarar", linea, columna, funcion);
-   // }
+   // }*/
 }
+
 
 void imprimirFunciones(NodoFuncion *lista) {
     NodoFuncion *actual = lista;
@@ -235,10 +248,33 @@ void imprimirFunciones(NodoFuncion *lista) {
     }
 
     while (actual != NULL) {
-        printf("%s: %s, input: %s, retorna: %s, linea %d\n", actual->funcion, actual->tipogramatica, actual->parametro, actual->retorno, actual->linea);
+        printf("%s: %s, input: ", actual->funcion, actual->tipogramatica);
+
+        Parametro *paramActual = actual->listaDeParametros;
+        if (paramActual == NULL) {
+            printf(" ");
+        } else {
+            while (paramActual != NULL) {
+                if(paramActual->tipo == NULL){
+                    printf("%s", paramActual->tipo);
+                }
+                if(paramActual->tipo == NULL && paramActual->identificador == NULL){
+                    printf(" %s", paramActual->identificador);
+                } else if (paramActual->identificador == NULL){
+                    printf("%s", paramActual->identificador);
+                }
+                paramActual = paramActual->siguiente;
+                if (paramActual != NULL) {
+                    printf(", ");
+                }
+            }
+        }
+
+        printf(", retorna: %s, linea %d\n", actual->retorno, actual->linea);
         actual = actual->siguiente;
     }
 }
+
 
 void liberarFunciones(NodoFuncion *lista){
     NodoFuncion *actual = lista;
@@ -262,7 +298,7 @@ NodoErrorSintactico* crearNodoErrorSintactico(const char *errorSintactico, const
 }
 
 void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoErrorSintactico **listaSecuenciasLeidas) {
-    if (*listaSecuenciasLeidas == NULL) return; // No hay nada en la lista de secuencias leídas
+    if (*listaSecuenciasLeidas == NULL) return; // No hay nada en la lista de secuencias leidas
 
     NodoErrorSintactico *nodoError = NULL;
     NodoErrorSintactico *actual = *listaSecuenciasLeidas;
@@ -278,19 +314,19 @@ void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoE
         }
         // Ahora `actual` es el anteultimo nodo
         eliminarEspacios(actual->errorSintactico);
-        nodoError = crearNodoErrorSintactico(actual->errorSintactico, actual->linea); // Copiar el anteúltimo nodo
+        nodoError = crearNodoErrorSintactico(actual->errorSintactico, actual->linea); // Copiar el anteultimo nodo
     }
 
-    // Agregar el nodo seleccionado a la lista de errores sintácticos
+    // Agregar el nodo seleccionado a la lista de errores sintacticos
     nodoError->siguiente = *listaErroresSintacticos;
     *listaErroresSintacticos = nodoError;
 }
 
 void eliminarEspacios(char *cadena) {
     char *src = cadena; // Puntero para recorrer la cadena
-    char *dst = cadena; // Puntero para la posición de escritura
+    char *dst = cadena; // Puntero para la posicion de escritura
 
-    // Mover el puntero src hasta el primer carácter no espacio
+    // Mover el puntero src hasta el primer caracter no espacio
     while (*src == ' ') {
         src++;
     }
@@ -409,15 +445,15 @@ NodoErroresSemanticos* crearNodoErroresSemanticos(const char *mensaje, const int
 NodoSimbolo* buscarSimbolo(const char *nombre) {
     NodoSimbolo *actual = tablaSimbolos; // Empezar desde el inicio de la tabla
 
-    // Recorrer la lista de símbolos
+    // Recorrer la lista de simbolos
     while (actual != NULL) {
         // Comparar el nombre actual con el nombre buscado
         if (strcmp(actual->nombre, nombre) == 0) {
-            return actual; // Símbolo encontrado
+            return actual; // Simbolo encontrado
         }
         actual = actual->siguiente; // Avanzar al siguiente nodo
     }
-    return NULL; // No se encontró el símbolo
+    return NULL; // No se encontro el simbolo
 }
 
 void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, const int linea, const int columna){
@@ -425,17 +461,17 @@ void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, c
     NodoErroresSemanticos *nuevoNodo = crearNodoErroresSemanticos(mensaje, linea, columna);
     
     if (nuevoNodo == NULL) {
-        fprintf(stderr, "Error al crear el nodo de error semántico.\n");
+        fprintf(stderr, "Error al crear el nodo de error semantico.\n");
         return; // Manejo de error
     }
 
-    // Si la lista está vacía, el nuevo nodo es el primer nodo
+    // Si la lista esta vacia, el nuevo nodo es el primer nodo
     if (*lista == NULL) {
         *lista = nuevoNodo;
         return;
     }
 
-    // Si la lista no está vacía, recorrer hasta el final
+    // Si la lista no esta vacia, recorrer hasta el final
     NodoErroresSemanticos *actual = *lista;
     while (actual->siguiente != NULL) {
         actual = actual->siguiente;
@@ -488,7 +524,7 @@ char* copiarCadena(const char *str) {
 //Validacion de tipos 
 // Implementa check_type para manejar los tokens
 /*Type check_type(char *token1, char *token2, const int linea, const int columna) {
-    // Define las reglas de tipo para multiplicación (int * int = int, float * float = float, etc.)
+    // Define las reglas de tipo para multiplicacion (int * int = int, float * float = float, etc.)
     if (strcmp(token1, "IDENTIFICADOR") == 0 || strcmp(token2, "IDENTIFICADOR") == 0) {
         const char *mensaje = "Operandos invalidos del operador binario * (identificador)";
         agregarErrorSemantico(&listaErrorSemantico, mensaje,linea,columna);
@@ -502,23 +538,23 @@ char* copiarCadena(const char *str) {
     } else if (strcmp(token1, "LITERAL_CADENA") == 0 || strcmp(token2, "LITERAL_CADENA") == 0) {
         const char *mensaje = "Operandos invalidos del operador binario * (literal_cadena)";
         agregarErrorSemantico(&listaErrorSemantico, mensaje, linea,columna);
-        return TIPO_ERROR;  // Multiplicación no soporta strings
+        return TIPO_ERROR;  // Multiplicacion no soporta strings
     }
     return TIPO_ERROR;  // Devuelve error si no coincide con las reglas
 }*/
 
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea) {
-    // Si es un carácter de corte, crea un nuevo nodo y lo agrega al final de la lista
+    // Si es un caracter de corte, crea un nuevo nodo y lo agrega al final de la lista
     if (strcmp(yytext, ";") == 0 || strcmp(yytext, "\n") == 0) {
         if (*listaSecuenciasLeidas == NULL) {
-            // Si la lista está vacía, crea el primer nodo
+            // Si la lista esta vacia, crea el primer nodo
             *listaSecuenciasLeidas = crearNodoErrorSintactico("", linea);
         } else {
             // Si hay nodos, busca el final de la lista
             NodoErrorSintactico *nuevoNodo = crearNodoErrorSintactico("", linea);
             NodoErrorSintactico *actual = *listaSecuenciasLeidas;
             
-            // Recorrer hasta el último nodo
+            // Recorrer hasta el ultimo nodo
             while (actual->siguiente != NULL) {
                 actual = actual->siguiente;
             }
@@ -526,14 +562,14 @@ void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yy
             actual->siguiente = nuevoNodo;
         }
     } else {
-        // Si la lista está vacía, crea el primer nodo
+        // Si la lista esta vacia, crea el primer nodo
         if (*listaSecuenciasLeidas == NULL) {
             *listaSecuenciasLeidas = crearNodoErrorSintactico(yytext, linea);
         } else {
-            // Encuentra el último nodo en la lista y concatena yytext a su errorSintactico
+            // Encuentra el ultimo nodo en la lista y concatena yytext a su errorSintactico
             NodoErrorSintactico *actual = *listaSecuenciasLeidas;
             
-            // Recorrer hasta el último nodo
+            // Recorrer hasta el ultimo nodo
             while (actual->siguiente != NULL) {
                 actual = actual->siguiente;
             }
@@ -549,20 +585,20 @@ void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yy
             actual->errorSintactico = nuevaCadena;
             strcat(actual->errorSintactico, yytext);
 
-            // Actualiza la línea en caso de que el nodo se haya iniciado antes de esta línea
+            // Actualiza la linea en caso de que el nodo se haya iniciado antes de esta linea
             actual->linea = linea;
         }
     }
 }
 
-// Inserción de símbolo en la tabla
+// Insercion de simbolo en la tabla
 int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) {
     NodoSimbolo *simbolo_existente = buscar_simbolo(nombre);
     if (simbolo_existente) {
-        // Ya existe un símbolo con ese nombre
+        // Ya existe un simbolo con ese nombre
         return -1;
     }
-    // Inserta un nuevo símbolo
+    // Inserta un nuevo simbolo
     NodoSimbolo *nuevo_simbolo = malloc(sizeof(NodoSimbolo));
     nuevo_simbolo->nombre = strdup(nombre);
     nuevo_simbolo->tipo = tipo;
@@ -583,10 +619,10 @@ NodoSimbolo *buscar_simbolo(char *nombre) {
     return NULL; // Retornar NULL si no se encuentra el nodo
 }
 
-// Validación de operaciones específicas
+// Validacion de operaciones especificas
 int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador) {
     if (!simbolo1 || !simbolo2) {
-        printf("Error: Uno o ambos operandos no están declarados.\n");
+        printf("Error: Uno o ambos operandos no estan declarados.\n");
         return -1;
     }
 
@@ -595,41 +631,41 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
             if (simbolo1->tipo == VARIABLE && simbolo2->tipo == VARIABLE) {
                 // Verifica si ambos son del tipo correcto (int, float, etc.)
                 // Por ejemplo, supongamos que nodo contiene el tipo real de la variable
-                // Typecasting y verificación de tipos específicos (a ajustar según implementación)
+                // Typecasting y verificacion de tipos especificos (a ajustar segun implementacion)
                 if ((int)simbolo1->nodo != TIPO_INT || (int)simbolo2->nodo != TIPO_INT) {
-                    printf("Error: Operandos inválidos para '*'\n");
+                    printf("Error: Operandos invalidos para '*'\n");
                     return -1;
                 }
             }
             break;
-        // Otros operadores pueden agregarse aquí
+        // Otros operadores pueden agregarse aqui
     }
     return 0;
 }
 
-// Validación de invocación de función
-int validar_invocacion_funcion(NodoSimbolo *simbolo, int num_args) { //Esta función no la entiendo, hice validarInvocacionAFuncion() que anda bien, pero no borro esta por las dudas
+// Validacion de invocacion de funcion
+int validar_invocacion_funcion(NodoSimbolo *simbolo, int num_args) { //Esta funcion no la entiendo, hice validarInvocacionAFuncion() que anda bien, pero no borro esta por las dudas
     if (!simbolo || simbolo->tipo != FUNCION) {
-        printf("Error: '%s' no es una función declarada.\n", simbolo->nombre);
+        printf("Error: '%s' no es una funcion declarada.\n", simbolo->nombre);
         return -1;
     }
-    // Validación específica para funciones con respecto a los argumentos
-    // Tipo de datos de cada argumento a verificar en nodo de la función
+    // Validacion especifica para funciones con respecto a los argumentos
+    // Tipo de datos de cada argumento a verificar en nodo de la funcion
     return 0;
 }
 
-// Validación de asignación
+// Validacion de asignacion
 int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der) {
     if (!simbolo_lado_izq || !simbolo_lado_der) {
-        printf("Error: Variable no declarada en la asignación.\n");
+        printf("Error: Variable no declarada en la asignacion.\n");
         return -1;
     }
     if (simbolo_lado_izq->tipo != VARIABLE || simbolo_lado_der->tipo != VARIABLE) {
-        printf("Error: Asignación solo permitida entre variables.\n");
+        printf("Error: Asignacion solo permitida entre variables.\n");
         return -1;
     }
     if (simbolo_lado_izq->nodo != simbolo_lado_der->nodo) {
-        printf("Error: Tipos incompatibles en la asignación.\n");
+        printf("Error: Tipos incompatibles en la asignacion.\n");
         return -1;
     }
     return 0;
@@ -692,7 +728,7 @@ int contarArgumentos(char *listaDeArgumentos) {
 
 
 
-//Definición de la función getsym
+//Definicion de la funcion getsym
 
 NodoSimbolo *obtenerSimboloTS (char const *nombreSimbolo)
 {
@@ -703,3 +739,41 @@ NodoSimbolo *obtenerSimboloTS (char const *nombreSimbolo)
       return ptr;
   return 0;
 }*/
+
+void agregarParametro(Parametro **listaDeParametros, char *tipo, char *identificador) {
+    // Crear nuevo nodo
+    Parametro *nuevo = (Parametro *)malloc(sizeof(Parametro));
+    nuevo->tipo = tipo;
+    nuevo->identificador = identificador;
+    nuevo->siguiente = NULL;
+
+    // Si la lista esta vacia, asignar el nuevo nodo como el primer nodo
+    if (*listaDeParametros == NULL) {
+        *listaDeParametros = nuevo;
+    } else {
+        // Si la lista ya tiene nodos, recorrer hasta el ultimo nodo
+        Parametro *actual = *listaDeParametros;
+        while (actual->siguiente != NULL) {
+            actual = actual->siguiente;
+        }
+        // Asignar el nuevo nodo al final de la lista
+        actual->siguiente = nuevo;
+    }
+}
+
+void llenarNodoGenericoFuncion(NodoFuncion *nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros) {
+    printf("nodogenericofuncion\n");
+    printf("funcion: %s\n", identificador);
+    
+    nodoGenericoFuncion->funcion = identificador;
+    nodoGenericoFuncion->listaDeParametros = *listaDeParametros; 
+
+    // Verificacion para evitar un acceso invalido si listaDeParametros es NULL
+    if (*listaDeParametros != NULL) {
+        printf("tipo de dato primer parametro: %s\n", (*listaDeParametros)->tipo);
+        printf("identificador primer parametro: %s\n", (*listaDeParametros)->identificador);
+    }
+
+    *listaDeParametros = NULL;  
+}
+
