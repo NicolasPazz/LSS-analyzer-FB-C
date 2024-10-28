@@ -1,90 +1,98 @@
-
-/* Inicio de la sección de definiciones. Aquí: */
-    /* 1. Cualquier texto sangrado o encerrado entre '%{' y '%}' (estos últimos dos sin sangrar en líneas ocupadas únicamente por ellos) se copia íntegramente al archivo de salida del analizador léxico (scanner) generado (*.lex.yy.c) */
-        /* De esas formas podemos poner declaraciones y definiciones de C y directivas del preprocesador */
-    /* 2. Los comentarios (sólo hay de múltiples líneas) sin sangría también se copian tal cual al archivo de salida del analizador léxico (scanner) generado (*.lex.yy.c) */
-
 %{
-
+#include <string.h>
+#include <stdlib.h>
 #include "general.h"
-
-/* Es indispensable que incluyamos el archivo de cabecera con las definiciones de YACC (*.tab.h) que se genera a partir del archivo fuente de YACC (*.y) */
 #include "parser.tab.h"
-
+extern char* copiarCadena(const char *str);
 %}
 
-    /* La siguiente línea define explícitamente a yytext como un puntero a un caracter ( char* yytext; ). Ésta es la opción por defecto si no se pone nada. */
 %pointer
-    /* Con la siguiente opción la función de análisis int yylex(void); se comporta como si en la sección de usuario existiera la función int yywrap(void) return 1; la cual devuelve verdadero (no-cero), haciendo que una vez que la función de análisis int yylex(void) reciba una indicación de EOF desde YY_INPUT, asuma que no hay nada más para analizar de yyin y finalice (haciendo un return 0;) */
 %option noyywrap
-
-    /* Condiciones de arranque inclusivas */
-/* %s */
-    /* Condiciones de arranque exclusivas */
 %x tokenNoReconocido
 
-    /* Declaraciones con cada nombre y su definición; se utilizan para simplificar las reglas */
-digito [0-9]
-
-/* Fin de la sección de definiciones */
-
-/* Inicio de la sección de reglas. Aquí: */
-    /* 1. Cualquier texto sangrado o encerrado entre '%{' y '%}' (estos últimos dos sin sangrar en líneas ocupadas únicamente por ellos) se copia íntegramente al archivo de salida del analizador léxico (scanner) generado (*.lex.yy.c) */
-        /* Esto podría utilizarse para declarar variables que son locales a la rutina de análisis léxico y (después de las declaraciones) al código que debe ejecutarse siempre que se entra a la rutina de análisis léxico */
-    /* 2. NO pueden hacerse comentarios sin sangría, ya que estos no se copian literalmente al archivo de salida del analizador léxico (scanner) generado (*.lex.yy.c) */
 %%
+    /*Operadores*/
+"("                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return '(';}
+")"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ')';}
+"{"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return '{';}
+"}"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return '}';}
+";"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ';';}
+","                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ',';}
+":"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ':';}
+"="|"*="|"/="|"+="|"-="                                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_ASIGNACION;}
+"<"|">"|"<="|">="                                                           {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_RELACIONAL;}
+"&&"                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return OP_AND;}
+"||"                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return OP_OR;}
+"++"|"--"                                                                   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_INCREMENTO_DECREMENTO;}
+[*/]                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_MULTIPLICATIVO;}
+[+-]                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return OP_ADITIVO;}
+"=="|"!="                                                                   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
-    reinicializarUbicacion();
+    /*Tipos de datos*/
+char|double|enum|float|int|long|short|struct|union                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return TIPODEDATO;}
+void                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return VOID;}
 
-{digito}+ {
-        yylloc.last_column += yyleng;
-        yylval.unsigned_long_type = strtoul(yytext, NULL, 0);
-        return NUM;
-    }
+    /*Estructuras de control*/
+break                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return BREAK;}
+case                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return CASE;}
+continue                                                                    {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return CONTINUE;}
+default                                                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return DEFAULT;}
+do                                                                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return DO;}
+else                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ELSE;}
+for                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return FOR;}
+goto                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return GOTO;}
+if                                                                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return IF;}
+return                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return RETURN;}
+switch                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return SWITCH;}
+while                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return WHILE;}
 
-"+" { yylloc.last_column += yyleng; return '+'; }
+    /*Otros*/
+auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return SUFIJO;}
 
-"-" { yylloc.last_column += yyleng; return '-'; }
+    /*Constantes enteras*/
+0[0-7]*[uU]?[lL]{0,2}                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.entero = strtol(yytext, NULL, 8); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
+0[xX][0-9a-fA-F]+[uU]?[lL]{0,2}                                             {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.entero = strtol(yytext, NULL, 16); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
+[1-9][0-9]*[uU]?[lL]{0,2}                                                   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.entero = strtol(yytext, NULL, 10); yylloc.last_column += yyleng; return CONSTANTE_ENTERA;}
 
-"*" { yylloc.last_column += yyleng; return '*'; }
+    /*Constantes reales*/
+[0-9]+\.[0-9]*([eE][+-]?[0-9]+)?[fFlL]?                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
+[0-9]+([eE][+-]?[0-9]+)[fFlL]?                                              {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.real = strtof(yytext, NULL); yylloc.last_column += yyleng; return CONSTANTE_REAL;}
 
-"/" { yylloc.last_column += yyleng; return '/'; }
+    /*Constantes de caracter*/
+\'([^\\\']|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)\'              {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = strdup(yytext); yylloc.last_column += yyleng; return CONSTANTE_CARACTER;}
 
-"^" { yylloc.last_column += yyleng; return '^'; }
+    /*Literal cadena*/
+\"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
 
-[ \t]+ { yylloc.first_column = yylloc.last_column += yyleng; }
+    /*Identificadores*/
+[a-zA-Z_][a-zA-Z0-9_]*                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
 
-\n {
-        yylloc.first_line = yylloc.last_line += yyleng;
-        yylloc.first_column = yylloc.last_column = INICIO_CONTEO_COLUMNA;
-        return '\n';
-    }
+    /*Espacio y tabulacion*/
+[\t]                                                                      {yylloc.first_column += yyleng;}
+[ ]                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.first_column += yyleng;}
 
-[^ \t\n] { yylloc.last_column += yyleng; fprintf(stderr, "Flex: %d:%d: Error lexico: token no reconocido: %s", yylloc.first_line, yylloc.first_column, yytext); BEGIN(tokenNoReconocido); }
+    /*Salto de linea*/
+\n                                                                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n'; printf("\n\n"); yylloc.last_line += 1;*/}
+
+[^ \t\n]                                                                    {unput(yytext[0]); BEGIN(tokenNoReconocido);}
+
 <tokenNoReconocido>{
-    " "|\t|\n {
-        yyless(0);
-        fprintf(stderr, "\n");
-        BEGIN(INITIAL);
-    }
-    [^ \t\n]+ {
-        yylloc.last_column += yyleng;
-        fprintf(stderr, "%s\n", yytext);
-        BEGIN(INITIAL);
-    }
+    <<EOF>>     {
+                    BEGIN(INITIAL);
+                }
+    " "|\t|\n   {
+                    yyless(0);
+                    BEGIN(INITIAL);
+                }   
+    [^ \t\n]+   {
+                    concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); 
+                    yylval.cadena = copiarCadena(yytext);
+                    agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.first_column); 
+                    yylloc.last_column += yyleng;
+                    BEGIN(INITIAL); 
+                    //return NO_RECONOCIDO;
+                }
 }
-
-    /* Reglas por defecto de Flex: */
-        /* <*>.|\n { ECHO; } */
-            /* (ECHO; escribe yytext en la salida del escáner: FILE* yyout (variable global a la cual por defecto se le asigna stdout)) */
-        /* <<EOF>> { yyterminate(); } */
-            /* (yyterminate(); hace que la función yylex finalice retornando un 0, indicando un fin-de-entrada (EOF)) */
-
+    /*Fin de archivo*/
+<<EOF>> {return EOF;}
 %%
-/* Fin de la sección de reglas */ 
-
-/* Inicio de la sección de código de usuario, la cual: */
-	/* 1. Se utiliza para rutinas de complemento que llaman al analizador léxico o son llamadas por este; la presencia de esta sección es opcional */
-    /* 2. Toda esta sección simplemente se copia íntegramente al archivo de salida del analizador léxico (scanner) generado (*.lex.yy.c) */
-
-/* Fin de la sección de código de usuario */
