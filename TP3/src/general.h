@@ -18,18 +18,40 @@ void inicializarUbicacion(void);
 void reinicializarUbicacion(void);
 
 
+// Tabla de símbolos
+ typedef enum tipoSimbolo
+  {
+    VARIABLE,
+    FUNCION
+  } tipoSimbolo;
+
+typedef struct NodoSimbolo
+{
+  char *nombre;
+  enum tipoSimbolo tipo;
+  void* nodo;
+  struct NodoSimbolo *siguiente; //Puntero al siguiente nodo de la lista
+} NodoSimbolo;
+
+extern NodoSimbolo* tablaSimbolos;
+
+//TODO:: hago un switch para saber si es variable o funcion typecast
+
+NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo);
+
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
     char *variableDeclarada;
     char *tipoDato;
     int linea;
+    int columna;
     char *sufijo;
     struct NodoVariableDeclarada *siguiente;
 } NodoVariableDeclarada;
 
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo);
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, const char *variableDeclarada, const char *tipoDato, const int linea, const char *sufijo);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
@@ -42,15 +64,19 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 typedef struct NodoFuncion {
     char *funcion;
     char *retorno;
-    char *sufijo;
+    char *parametro;
     char *tipogramatica;
     int linea;
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
-NodoFuncion* crearNodoFuncion(const char *sufijo, const char *retorno, const char *funcion, const int linea, const char *tipogramatica);
+NodoFuncion* crearNodoFuncion(const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, const char *sufijo, const char *retorno, const char *funcion, const int linea, const char *tipogramatica);
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, const char *funcion, const int linea, const char* tipogramatica);
+
+void agregarParametro(char** lista, char* parametro);
+
+char* unirParametros(const char* param1, const char* param2);
 
 void imprimirFunciones(NodoFuncion *lista);
 
@@ -58,6 +84,9 @@ void liberarFunciones(NodoFuncion *lista);
 
 extern NodoFuncion* listaFunciones;
 
+extern char* listaParametros;
+
+extern char* parametro;
 
 // SENTENCIAS
 typedef struct NodoSentencia {
@@ -80,22 +109,25 @@ extern NodoSentencia* listaSentencias;
 
 
 // ESTRUCTURAS NO RECONOCIDAS
-typedef struct NodoEstructuraNoReconocida {
-    char *estructuraNoReconocida;
+typedef struct NodoErrorSintactico {
+    char *errorSintactico;
     int linea;
-    struct NodoEstructuraNoReconocida *siguiente;
-} NodoEstructuraNoReconocida;
+    struct NodoErrorSintactico *siguiente;
+} NodoErrorSintactico;
 
-NodoEstructuraNoReconocida* crearNodoEstructuraNoReconocida(const char *estructuraNoReconocida, int linea);
+NodoErrorSintactico* crearNodoErrorSintactico(const char *errorSintactico, const int linea);
 
-void agregarEstructuraNoReconocida(NodoEstructuraNoReconocida **lista, const char *estructuraNoReconocida, int linea);
+void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoErrorSintactico **listaSecuenciasLeidas);
 
-void imprimirEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
+void eliminarEspacios(char *cadena);
 
-void liberarEstructurasNoReconocidas(NodoEstructuraNoReconocida *lista);
+void imprimirErrorSintactico(NodoErrorSintactico *lista);
 
-extern NodoEstructuraNoReconocida* listaEstructurasNoReconocidas;
+void liberarErrorSintactico(NodoErrorSintactico *lista);
 
+extern NodoErrorSintactico* listaErrorSintactico;
+
+extern NodoErrorSintactico* listaSecuenciasLeidas;
 
 // CADENAS NO RECONOCIDAS
 typedef struct NodoCadenaNoReconocida {
@@ -114,10 +146,76 @@ void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
 extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
+void reiniciarListaParametros(char **listaParametros);
+
+//ERRORES SEMANTICOS 
+typedef struct NodoErrorSemantico {
+    char *mensaje;
+    int linea;
+    int columna;
+    struct NodoSentencia *siguiente;
+} NodoErrorSemantico;
+
+NodoErrorSemantico* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna);
+
+void agregarErrorSemantico(NodoErrorSemantico **lista, const char *mensaje, const int linea, const int columna);
+//void agregarSentencia(listaSentencias, sentencia, tipoSentencia, linea, columna);
+
+void imprimirErrorSemantico(NodoErrorSemantico *lista);
+
+void liberarErrorSemantico(NodoErrorSemantico *lista);
+
+extern NodoErrorSemantico* listaErrorSemantico;
 
 
 // FUNCIONES
 
 char* copiarCadena(const char *str);
+
+//Rutinas
+
+// Define los tipos de datos posibles
+/*typedef enum {
+    TIPO_INT,
+    TIPO_FLOAT,
+    TIPO_ERROR
+     // Para manejar errores de tipo
+} Type;
+
+// Declara la función check_type para usar en el control de tipos
+Type check_type(char *left, char *right, const int linea, const int columna);
+
+//estructura para saber tipo de dato en cada token
+typedef struct{
+    char tipo[20];
+    union{
+        int numero;
+        char cadena[100];
+    } valor;
+}TokenInfo;*/
+
+//Rutinas
+
+// Define los tipos de datos posibles
+typedef enum {
+    TIPO_INT,
+    TIPO_FLOAT,
+    TIPO_ERROR
+     // Para manejar errores de tipo
+} Type;
+
+// Declara la función check_type para usar en el control de tipos
+Type check_type(char *left, char *right, const int linea, const int columna);
+
+//estructura para saber tipo de dato en cada token
+typedef struct{
+    char tipo[20];
+    union{
+        int numero;
+        char cadena[100];
+    } valor;
+}TokenInfo;
+
+void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
 
 #endif

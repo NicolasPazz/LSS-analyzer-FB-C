@@ -1,49 +1,68 @@
-float potencia(float base, long exp){
+void imprimir(void) {
+    printf("Log: %s \n", "");
+    return;
+}
+
+void imprimir(void);
+int imprimir = 2, compartida = -5;
+float potencia(float base, unsigned long);
+int incremento(int y);
+long incremento(long y);
+
+int main(void) {
+    unsigned int a = 06, b = "Hola mundo! \n", c = 0xA, c, d = c * "";
+    const float e = potencia(1.0 * 2.0, 2 * 3) * (1.0 * 1), a, f = imprimir;
+    if (a <= 6 && c != 'A') {
+        int i;
+        f(x);
+        while (i > 0) {
+            c = incremento(c);
+            --i;
+        }
+    }
+
+    switch (c) {
+        case 10:
+            c = a
+            break;
+        default:
+            1 = 1;
+            e @double = 0;
+            return imprimir;
+    }
+
+    incremento();
+    potencia(a * 1.0, a * c, 3 * imprimir);
+    potencia(c * 3, e * 1.0);
+    potencia(3.0 * f, e * f);
+    potencia("++", incremento);
+    a = imprimir();
+    return "Terminado";
+}
+
+int incremento(int x) {
+    return ++x;
+}
+
+int incremento(int x) {
+    do {
+        x+=1;
+        continue;
+    } while (x < 5);
+
+    if (x > 5)
+        if (x == 6 || x >= 10)
+            return ++x;
+        else {
+            x += 2;
+        }
+    return x;
+}
+
+double potencia(double base, unsigned int exp) {
     float acumulador = 1.0;
     for (; exp > 0; exp--) {
         acumulador *= base;
     }
     return acumulador;
-}
-
-void rutina(int x);
-
-int main(void) {
-    unsigned int i, j = 0xA, a = 06;
-    if (a > 5 && j == 10) {
-        int b = a;
-        while (b != 0) {
-            printf("El valor de b es %d\n", b);
-            b--;
-            ++j;
-            continue;
-        }
-    }
-
-    switch(potencia(j, 2)) {
-        case 2:
-            j = a;
-            break;
-        case 4:
-            @double = 0;
-            return b-j;
-        default:
-            return 1+j+b;
-    }
-
-    rutina(5);
-    return 0;
-}
-
-void rutina(int x) {
-    do {
-        printf("El valor de x es %d \n", x);
-        x+=1;
-    } while (x < 5);
-
-    if (x == 5 || x > 10) {
-        printf("x es 5 o mayor que 10 \n");
-    } else {
-        printf("x tiene un valor entre 6 y 9 inclusive \n");
-    }
 }
