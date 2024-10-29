@@ -25,7 +25,7 @@ void inicializarUbicacion(void);
 void reinicializarUbicacion(void);
 
 
-// Tabla de símbolos
+// Tabla de simbolos
  typedef enum tipoSimbolo{
     VARIABLE,
     FUNCION
@@ -75,6 +75,7 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 
 
 typedef struct Parametro {
+    char *sufijo;
     char *tipo;
     char *identificador;
     struct Parametro *siguiente;
@@ -94,7 +95,7 @@ NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno,
 
 void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion *nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna);
 
-//void agregarParametro(char** lista, char* parametro);
+void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador);
 
 char* unirParametros(const char* param1, const char* param2);
 
@@ -224,8 +225,8 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
 int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
 NodoSimbolo *buscar_simbolo(char *nombre);
 void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna);
-
-void agregarParametro(Parametro **listaDeParametros, char *tipo, char *identificador);
+Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador);
+void agregarParametro(Parametro **listaDeParametros, char* sufijo, char *tipo, char *identificador);
 void llenarNodoGenericoFuncion(NodoFuncion *nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros);
 
 

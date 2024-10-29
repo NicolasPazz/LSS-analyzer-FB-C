@@ -184,19 +184,12 @@ char* unirParametros(const char* param1, const char* param2) {
 }*/
 
 void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion *nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna){
-    /*if (nodoGenericoFuncion == NULL) {
+    if (nodoGenericoFuncion == NULL) {
         printf("Error: nodoGenericoFuncion es NULL.\n");
         return;
     }
-
-    printf("hola\n");
-    //printf("Funcion: %s\n", nodoGenericoFuncion->funcion);
-    printf("Funcion: %s\n", nodoGenericoFuncion->listaDeParametros->tipo);  // Acceso correcto
-    printf("Retorno: %s\n", retorno);
-    printf("Linea: %d\n", linea);
-    printf("Tipogramatica: %s\n", tipogramatica);
     
-   /* if (buscar_simbolo(nodoGenericoFuncion->funcion) == NULL){
+    if (buscar_simbolo(nodoGenericoFuncion->funcion) == NULL){
         // Crear el nuevo nodo
        NodoFuncion *nuevoNodo = crearNodoFuncion(nodoGenericoFuncion->listaDeParametros, retorno, nodoGenericoFuncion->funcion, linea, tipogramatica);
         // Si la lista esta vacia, el nuevo nodo es el primer nodo
@@ -231,10 +224,10 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char
         
         // Enlazar el nuevo nodo al final de la lista
         actual_simbolo->siguiente = nuevoNodoSimbolo;
-   }*/
+   }
     //else{
      //   agregarErrorSemantico("%d:%d Funcion '%s' sin declarar", linea, columna, funcion);
-   // }*/
+   //
 }
 
 
@@ -255,25 +248,31 @@ void imprimirFunciones(NodoFuncion *lista) {
             printf(" ");
         } else {
             while (paramActual != NULL) {
-                if(paramActual->tipo == NULL){
-                    printf("%s", paramActual->tipo);
-                }
-                if(paramActual->tipo == NULL && paramActual->identificador == NULL){
-                    printf(" %s", paramActual->identificador);
-                } else if (paramActual->identificador == NULL){
-                    printf("%s", paramActual->identificador);
+                    if(paramActual->tipo != NULL && paramActual->sufijo != NULL){
+                        printf("%s ", paramActual->sufijo);
+                    } else if (paramActual->sufijo != NULL){
+                        printf("%s", paramActual->sufijo);
+                    }
+                    if(paramActual->identificador != NULL && paramActual->tipo != NULL){
+                        printf("%s ", paramActual->tipo);
+                    } else if (paramActual->tipo != NULL){
+                        printf("%s", paramActual->tipo);
+                    }
+                    if(paramActual->identificador != NULL){
+                        printf("%s", paramActual->identificador);
+                    }
+                if (paramActual->siguiente != NULL) {
+                printf(", ");
                 }
                 paramActual = paramActual->siguiente;
-                if (paramActual != NULL) {
-                    printf(", ");
-                }
             }
+            
         }
-
         printf(", retorna: %s, linea %d\n", actual->retorno, actual->linea);
         actual = actual->siguiente;
     }
 }
+
 
 
 void liberarFunciones(NodoFuncion *lista){
@@ -740,40 +739,48 @@ NodoSimbolo *obtenerSimboloTS (char const *nombreSimbolo)
   return 0;
 }*/
 
-void agregarParametro(Parametro **listaDeParametros, char *tipo, char *identificador) {
-    // Crear nuevo nodo
+Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador) {
+    // Crear nuevo nodo y asignar memoria
     Parametro *nuevo = (Parametro *)malloc(sizeof(Parametro));
+    if (nuevo == NULL) {
+        printf("Error: no se pudo asignar memoria para el nuevo parámetro.\n");
+        return NULL;
+    }
+
+    // Asignar valores a los campos del nodo
+    nuevo->sufijo = sufijo;
     nuevo->tipo = tipo;
     nuevo->identificador = identificador;
     nuevo->siguiente = NULL;
 
-    // Si la lista esta vacia, asignar el nuevo nodo como el primer nodo
+    return nuevo;
+}
+
+void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador) {
+    // Crear el nodo usando la funcion de creacion
+    Parametro *nuevo = crearNodoParametro(sufijo, tipo, identificador);
+
+    if (nuevo == NULL) {
+        printf("Error: no se pudo crear el nuevo nodo de parámetro.\n");
+        return; // En caso de error en la creacion del nodo
+    }
+
+    // Agregar el nodo a la lista
     if (*listaDeParametros == NULL) {
         *listaDeParametros = nuevo;
     } else {
-        // Si la lista ya tiene nodos, recorrer hasta el ultimo nodo
         Parametro *actual = *listaDeParametros;
         while (actual->siguiente != NULL) {
             actual = actual->siguiente;
         }
-        // Asignar el nuevo nodo al final de la lista
         actual->siguiente = nuevo;
     }
 }
 
+
 void llenarNodoGenericoFuncion(NodoFuncion *nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros) {
-    printf("nodogenericofuncion\n");
-    printf("funcion: %s\n", identificador);
-    
     nodoGenericoFuncion->funcion = identificador;
     nodoGenericoFuncion->listaDeParametros = *listaDeParametros; 
 
-    // Verificacion para evitar un acceso invalido si listaDeParametros es NULL
-    if (*listaDeParametros != NULL) {
-        printf("tipo de dato primer parametro: %s\n", (*listaDeParametros)->tipo);
-        printf("identificador primer parametro: %s\n", (*listaDeParametros)->identificador);
-    }
-
     *listaDeParametros = NULL;  
 }
-

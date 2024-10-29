@@ -241,10 +241,10 @@ return:
 declaracion:
       sufijo TIPODEDATO lista_declaradores_variable ';'   { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, $2, yylloc.last_line, @1.first_column, $1); }
     | TIPODEDATO lista_declaradores_variable ';'          { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $2, $1, yylloc.last_line, @1.first_column, NULL); }
-    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, $3, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 1 %s %s %s\n", $1, $2, $3);}
-    | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, $3, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 2 %s %s %s\n", $1, $2, $3);}
-    | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); }
-    | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 4 %s %s\n", $1, $2);}
+    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 1 %s %s %s\n", $1, $2, $3);}
+    | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 2 %s %s %s\n", $1, $2, $3);}
+    | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); }
+    | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 4 %s %s\n", $1, $2);}
     ;
 
 lista_declaradores_variable:
@@ -274,13 +274,13 @@ lista_argumentos_prototipo:
 
        
 argumento_prototipo
-    : /*VACIO*/                                     { agregarParametro(&listaDeParametros, "", NULL); DBG_PRINT("argumento_prototipo_final_vacio \n"); }
-    | IDENTIFICADOR                                 { agregarParametro(&listaDeParametros, NULL, $1); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
-    | TIPODEDATO IDENTIFICADOR                      { agregarParametro(&listaDeParametros, $1, $2); DBG_PRINT("argumento_prototipo_final_3 %s\n", parametro); }
-    | TIPODEDATO                                    { agregarParametro(&listaDeParametros, $1, NULL); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
-    | sufijo TIPODEDATO                             { agregarParametro(&listaDeParametros, $2, NULL); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
-    | sufijo TIPODEDATO IDENTIFICADOR               { agregarParametro(&listaDeParametros, $2, $3); DBG_PRINT("argumento_prototipo_final %s\n", parametro); }
-    | VOID                                          { agregarParametro(&listaDeParametros, $1, NULL); DBG_PRINT("argumento_prototipo_final %s\n", $1); }
+    : /*VACIO*/                                     { agregarParametro(&listaDeParametros, NULL, NULL, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
+    | IDENTIFICADOR                                 { agregarParametro(&listaDeParametros, NULL, NULL, $1); DBG_PRINT("argumento_prototipo_final\n"); }
+    | TIPODEDATO IDENTIFICADOR                      { agregarParametro(&listaDeParametros, NULL, $1, $2); DBG_PRINT("argumento_prototipo_final\n"); }
+    | TIPODEDATO                                    { agregarParametro(&listaDeParametros, NULL, $1, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
+    | sufijo TIPODEDATO                             { agregarParametro(&listaDeParametros, $1, $2, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
+    | sufijo TIPODEDATO IDENTIFICADOR               { agregarParametro(&listaDeParametros, $1, $2, $3); DBG_PRINT("argumento_prototipo_final\n"); }
+    | VOID                                          { agregarParametro(&listaDeParametros, NULL, $1, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
     ;
 lista_declaradores_variable_prototipo:
       declarador_variable_prototipo                                               { DBG_PRINT("lista_declaradores_variable\n"); }
@@ -304,8 +304,8 @@ definiciones_externas:
     ;
 
 definicion_funcion: 
-      TIPODEDATO declarador_funcion sentencia_compuesta   { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
-    | VOID declarador_funcion sentencia_compuesta         { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, $2, yylloc.last_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
+      TIPODEDATO declarador_funcion sentencia_compuesta   { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
+    | VOID declarador_funcion sentencia_compuesta         { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
     ; 
 %%
 
