@@ -146,7 +146,6 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char
     if (buscar_simbolo((*nodoGenericoFuncion)->funcion) == NULL){
         // Crear el nuevo nodo
        NodoFuncion *nuevoNodo = crearNodoFuncion((*nodoGenericoFuncion)->listaDeParametros, retorno, (*nodoGenericoFuncion)->funcion, linea, tipogramatica);
-       NodoFuncion *nuevoNodo = crearNodoFuncion((*nodoGenericoFuncion)->listaDeParametros, retorno, (*nodoGenericoFuncion)->funcion, linea, tipogramatica);
         // Si la lista esta vacia, el nuevo nodo es el primer nodo
         if (*lista == NULL) {
             *lista = nuevoNodo;
