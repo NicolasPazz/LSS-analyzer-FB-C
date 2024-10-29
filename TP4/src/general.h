@@ -100,7 +100,7 @@ void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, c
 char* unirParametros(const char* param1, const char* param2);
 
 void imprimirFunciones(NodoFuncion *lista);
-
+char* imprimirParametros(Parametro *listaDeParametros);
 void liberarFunciones(NodoFuncion *lista);
 
 extern NodoFuncion* listaFunciones;
@@ -167,7 +167,7 @@ extern NodoErroresSemanticos* listaErroresSemanticos;
 
 // FUNCIONES
 
-char* copiarCadena(const char *str);
+extern char* copiarCadena(const char *str);
 
 //Rutinas
 

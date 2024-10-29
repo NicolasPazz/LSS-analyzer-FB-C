@@ -239,8 +239,8 @@ return:
 
 
 declaracion:
-      sufijo TIPODEDATO lista_declaradores_variable ';'   { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, $2, yylloc.last_line, @1.first_column, $1); }
-    | TIPODEDATO lista_declaradores_variable ';'          { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $2, $1, yylloc.last_line, @1.first_column, NULL); }
+      sufijo TIPODEDATO lista_declaradores_variable ';'   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, $2, @1.first_line, yylloc.first_column, $1); */}
+    | TIPODEDATO lista_declaradores_variable ';'          { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $2, $1,  @1.first_line, yylloc.first_column, NULL); */}
     | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 1 %s %s %s\n", $1, $2, $3);}
     | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 2 %s %s %s\n", $1, $2, $3);}
     | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); }
@@ -252,7 +252,7 @@ lista_declaradores_variable:
     | lista_declaradores_variable ',' declarador_variable  { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
-    IDENTIFICADOR inicializacion_variable { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.tipoDeDato, yylloc.last_line, @1.first_column, yyval.sufijo);*/ DBG_PRINT("declarador_variable \n"); }
+    IDENTIFICADOR inicializacion_variable { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.tipoDeDato,  @1.first_line, @1.first_column, yyval.sufijo); DBG_PRINT("declarador_variable \n"); }
     ;
 inicializacion_variable
     : /*VACIO*/

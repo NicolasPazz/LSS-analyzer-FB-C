@@ -80,16 +80,66 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tabla
         if (nodoPrevio->tipo == VARIABLE){
             NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodoPrevio->nodo;
             char mensaje[256];
-            snprintf(mensaje, sizeof(mensaje), "%d:%d '%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", linea, columna, variableDeclarada, variableDeclarada, elemento->tipoDato, elemento->linea, elemento->columna);
+            snprintf(mensaje, sizeof(mensaje), "'%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", variableDeclarada, variableDeclarada, elemento->tipoDato, elemento->linea, elemento->columna);
             agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         }
-        else if (nodoPrevio->tipo == FUNCION){
+        else if (nodoPrevio->tipo == FUNCION) {
             NodoFuncion* elemento = nodoPrevio->nodo;
-            char mensaje[256];
-            snprintf(mensaje, sizeof(mensaje), "%d:%d '%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", linea, columna, variableDeclarada, variableDeclarada, elemento->retorno, elemento->linea, elemento->columna);
+            char mensaje[512];  // Aumentamos el tamaño del buffer si es necesario
+            snprintf(mensaje, sizeof(mensaje), "'%s' redeclarado como un tipo diferente de simbolo\nNota: la declaracion previa de '%s' es de tipo '%s(", 
+                    variableDeclarada, variableDeclarada, elemento->retorno);
+            
+            char *parametros = imprimirParametros(elemento->listaDeParametros);
+            if (parametros != NULL) {
+                // Añadir los parámetros al mensaje
+                snprintf(mensaje + strlen(mensaje), sizeof(mensaje) - strlen(mensaje), "%s)': %d:%d", 
+                        parametros, elemento->linea, elemento->columna);
+                free(parametros);  // Liberamos la memoria asignada
+            } else {
+                // Manejo de error en caso de que no se pueda imprimir parámetros
+                snprintf(mensaje + strlen(mensaje), sizeof(mensaje) - strlen(mensaje), "Error al obtener parámetros'): %d:%d", 
+                        elemento->linea, elemento->columna);
+            }
+            
             agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         }        
     }
+}
+char* imprimirParametros(Parametro *listaDeParametros) {
+    // Inicializamos un buffer suficientemente grande para los parámetros
+    char *parametros = (char *)malloc(256);
+    if (parametros == NULL) {
+        printf("Error: No se pudo asignar memoria para los parámetros\n");
+        return NULL;
+    }
+    
+    // Limpiamos el buffer
+    strcpy(parametros, "");
+    
+    Parametro *paramActual = listaDeParametros;
+    while (paramActual != NULL) {
+        if (paramActual->tipo != NULL && paramActual->sufijo != NULL) {
+            strcat(parametros, paramActual->sufijo);
+            strcat(parametros, " ");
+        } else if (paramActual->sufijo != NULL) {
+            strcat(parametros, paramActual->sufijo);
+        }
+        if(paramActual->identificador != NULL && paramActual->tipo != NULL){
+            strcat(parametros, paramActual->tipo);
+            strcat(parametros, " ");
+        } else if (paramActual->tipo != NULL){
+            strcat(parametros, paramActual->tipo);
+        }
+        if (paramActual->identificador != NULL) {
+            strcat(parametros, paramActual->identificador);
+        }
+        if (paramActual->siguiente != NULL) {
+            strcat(parametros, ", ");
+        }
+        paramActual = paramActual->siguiente;
+    }
+    
+    return parametros;  // Devolvemos el string con los parámetros concatenados
 }
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
@@ -188,7 +238,7 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char
 
 void imprimirFunciones(NodoFuncion *lista) {
     NodoFuncion *actual = lista;
-    printf("* Listado de funciones declaradas o definidas:\n");
+    printf("* Listado de funciones declaradas y definidas:\n");
 
     if (actual == NULL) {
         printf("-\n");
@@ -198,35 +248,20 @@ void imprimirFunciones(NodoFuncion *lista) {
     while (actual != NULL) {
         printf("%s: %s, input: ", actual->funcion, actual->tipogramatica);
 
-        Parametro *paramActual = actual->listaDeParametros;
-        if (paramActual == NULL) {
-            printf(" ");
+        // Invocar la función para obtener los parámetros
+        char *parametros = imprimirParametros(actual->listaDeParametros);
+        if (parametros != NULL) {
+            printf("%s", parametros);
+            free(parametros);  // Liberar memoria después de usar
         } else {
-            while (paramActual != NULL) {
-                    if(paramActual->tipo != NULL && paramActual->sufijo != NULL){
-                        printf("%s ", paramActual->sufijo);
-                    } else if (paramActual->sufijo != NULL){
-                        printf("%s", paramActual->sufijo);
-                    }
-                    if(paramActual->identificador != NULL && paramActual->tipo != NULL){
-                        printf("%s ", paramActual->tipo);
-                    } else if (paramActual->tipo != NULL){
-                        printf("%s", paramActual->tipo);
-                    }
-                    if(paramActual->identificador != NULL){
-                        printf("%s", paramActual->identificador);
-                    }
-                if (paramActual->siguiente != NULL) {
-                printf(", ");
-                }
-                paramActual = paramActual->siguiente;
-            }
-            
+            printf("Error al obtener los parámetros");
         }
+
         printf(", retorna: %s, linea %d\n", actual->retorno, actual->linea);
         actual = actual->siguiente;
     }
 }
+
 
 void liberarFunciones(NodoFuncion *lista){
     NodoFuncion *actual = lista;
@@ -632,7 +667,7 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
     NodoSimbolo *nodoPrevio = buscar_simbolo(identificador);
     if (nodoPrevio == NULL){
         char mensaje[256];
-        snprintf(mensaje, sizeof(mensaje), " Funcion %s sin declarar", identificador);
+        snprintf(mensaje, sizeof(mensaje), " Funcion '%s' sin declarar", identificador);
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
     }
     else if (nodoPrevio->tipo != FUNCION){
@@ -679,7 +714,6 @@ Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador) {
 void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador) {
     // Crear el nodo usando la funcion de creacion
     Parametro *nuevo = crearNodoParametro(sufijo, tipo, identificador);
-    printf("Nuevo Sufijo: %s\n", nuevo->sufijo);
 
     if (nuevo == NULL) {
         printf("Error: no se pudo crear el nuevo nodo de parámetro.\n");

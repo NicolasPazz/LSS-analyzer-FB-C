@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "general.h"
 #include "parser.tab.h"
-extern char* copiarCadena(const char *str);
+
 %}
 
 %pointer
@@ -68,11 +68,11 @@ auto|const|extern|register|signed|sizeof|static|typedef|unsigned|volatile   {con
 [a-zA-Z_][a-zA-Z0-9_]*                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
 
     /*Espacio y tabulacion*/
-[\t]                                                                      {yylloc.first_column += yyleng;}
-[ ]                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.first_column += yyleng;}
+[\t]                                                                      {yylloc.first_column = yylloc.last_column += yyleng;}
+[ ]                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.first_column = yylloc.last_column += yyleng;}
 
     /*Salto de linea*/
-\n                                                                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = 1; /*return '\n'; printf("\n\n"); yylloc.last_line += 1;*/}
+\n                                                                          {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.first_line = yylloc.last_line += yyleng; yylloc.first_column = yylloc.last_column = INICIO_CONTEO_COLUMNA;}
 
 [^ \t\n]                                                                    {unput(yytext[0]); BEGIN(tokenNoReconocido);}
 
