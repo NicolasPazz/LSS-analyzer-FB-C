@@ -93,7 +93,7 @@ expresion_primaria:
     | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");}
     ;
 expresion_postfija:
-      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); validarInvocacionAFuncion(&listaErroresSemanticos, $1, $3, yylloc.last_line, @1.first_column)}
+      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); validarInvocacionAFuncion(&listaErroresSemanticos, $1, $3, yylloc.last_line, @1.first_column); }
     | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); }
     ;
 expresion_unaria:
@@ -166,26 +166,26 @@ declaraciones
     | declaraciones declaracion
     ;
 sentencia_if_else:
-      IF '(' expresion ')' sentencia_compuesta                                      { /*agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");*/}
-    | IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta             { /*agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");*/}
-    | IF '(' expresion ')' sentencia_compuesta_sin_llaves                          { /*agregarSentencia(&listaSentencias, "if", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if\n");*/}
-    | IF '(' expresion ')' sentencia_compuesta_sin_llaves ELSE sentencia_compuesta  { /*agregarSentencia(&listaSentencias, "if/else", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_if_else\n");*/}
+      IF '(' expresion ')' sentencia_compuesta                                      
+    | IF '(' expresion ')' sentencia_compuesta ELSE sentencia_compuesta             
+    | IF '(' expresion ')' sentencia_compuesta_sin_llaves                          
+    | IF '(' expresion ')' sentencia_compuesta_sin_llaves ELSE sentencia_compuesta  
     ;
 sentencia_switch:
-    SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    { /*agregarSentencia(&listaSentencias, "switch", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_switch\n");*/}
+    SWITCH '(' expresion ')' '{' sentencia_etiquetada '}'    
 sentencia_etiquetada:
     cases default
     ;
 case:
-      CASE expresion ':' sentencias_compuestas_sin_llaves   { /*agregarSentencia(&listaSentencias, "case", @1.first_line, @1.first_column);*/}
+      CASE expresion ':' sentencias_compuestas_sin_llaves   
     | CASE expresion ':' sentencias_compuestas_sin_llaves 
-      BREAK                                                 { /*agregarSentencia(&listaSentencias, "case/break", @1.first_line, @1.first_column);*/}
+      BREAK                                                 
     ;
 default
     : /*VACIO*/
-    | DEFAULT ':' sentencias    { /*agregarSentencia(&listaSentencias, "default", @1.first_line, @1.first_column); */}
+    | DEFAULT ':' sentencias
     | DEFAULT ':' sentencias 
-      BREAK                     { /*agregarSentencia(&listaSentencias, "default/break", @1.first_line, @1.first_column);*/}
+      BREAK
     ;
 cases
     : /*VACIO*/
@@ -194,12 +194,12 @@ cases
     ;
 
 sentencia_do_while:
-      WHILE '(' expresion ')' sentencia_compuesta           { /*agregarSentencia(&listaSentencias, "while", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_while\n");*/}
-    | DO sentencia_compuesta WHILE '(' expresion ')' ';'    { /*agregarSentencia(&listaSentencias, "do/while", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_do_while\n");*/}
+      WHILE '(' expresion ')' sentencia_compuesta
+    | DO sentencia_compuesta WHILE '(' expresion ')' ';'
     ;
 sentencia_for:
     FOR '(' primera_parte_for ';' expresion_op ';' expresion_op ')' 
-    sentencia_compuesta     { /*agregarSentencia(&listaSentencias, "for", @1.first_line, @1.first_column) ; DBG_PRINT("sentencia_for\n");*/}
+    sentencia_compuesta
     ;
 expresion_op
     : /*VACIO*/
