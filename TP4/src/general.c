@@ -138,12 +138,14 @@ NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno,
 
 void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion **nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna){
     if (nodoGenericoFuncion == NULL) {
+        
         printf("Error: nodoGenericoFuncion es NULL.\n");
         return;
     }
     
     if (buscar_simbolo((*nodoGenericoFuncion)->funcion) == NULL){
         // Crear el nuevo nodo
+       NodoFuncion *nuevoNodo = crearNodoFuncion((*nodoGenericoFuncion)->listaDeParametros, retorno, (*nodoGenericoFuncion)->funcion, linea, tipogramatica);
        NodoFuncion *nuevoNodo = crearNodoFuncion((*nodoGenericoFuncion)->listaDeParametros, retorno, (*nodoGenericoFuncion)->funcion, linea, tipogramatica);
         // Si la lista esta vacia, el nuevo nodo es el primer nodo
         if (*lista == NULL) {
@@ -472,7 +474,7 @@ char* copiarCadena(const char *str) {
     if (copiado != NULL) {
         strcpy(copiado, str);  // Copia el contenido de la cadena de entrada a la nueva cadena
     }
-    return copiado;  // Devuelve el puntero a la nueva cadena copiada
+    return copiado;  // Devuelve la nueva cadena
 }
 
 
@@ -594,7 +596,7 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
                 }
             }
             break;
-        // Otros operadores pueden agregarse aqui
+        /// Oregarse aqui
     }
     return 0;
 }
@@ -678,6 +680,7 @@ Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador) {
 void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador) {
     // Crear el nodo usando la funcion de creacion
     Parametro *nuevo = crearNodoParametro(sufijo, tipo, identificador);
+    printf("Nuevo Sufijo: %s\n", nuevo->sufijo);
 
     if (nuevo == NULL) {
         printf("Error: no se pudo crear el nuevo nodo de parámetro.\n");
