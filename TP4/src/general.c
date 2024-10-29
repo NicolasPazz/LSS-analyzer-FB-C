@@ -31,7 +31,7 @@ NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada,
     nuevo->tipoDato = copiarCadena(tipoDato);
     nuevo->linea = linea;
     nuevo->columna = columna;
-    nuevo->sufijo = sufijo;
+    nuevo->sufijo = copiarCadena(sufijo);
     nuevo->siguiente = NULL;
     return nuevo;
 }
@@ -136,62 +136,15 @@ NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno,
     return nuevo;
 }
 
-
-char* unirParametros(const char* param1, const char* param2) {
-    // Aqui asumimos que ambos parametros son no nulos
-
-    // Calculamos las longitudes de los parametros
-    size_t longitud1 = strlen(param1);
-    size_t longitud2 = strlen(param2);
-
-    // Asignamos memoria para la cadena resultante
-    char* resultado = (char*)malloc(longitud1 + longitud2 + 2); // +2 para espacio y terminador nulo
-    if (resultado == NULL) {
-        perror("malloc");
-        exit(EXIT_FAILURE);
-    }
-
-    // Copiamos el primer parametro
-    strcpy(resultado, param1);
-
-    // Agregamos un espacio
-    strcat(resultado, " ");
-
-    // Concatenamos el segundo parametro
-    strcat(resultado, param2);
-
-    return resultado; // Retornamos la cadena resultante
-}
-
-/*void agregarParametro(char** lista, char* parametro) { //enum
-    if (*lista == NULL) {
-        *lista = copiarCadena(parametro);
-    } else {
-        size_t newLength = strlen(*lista) + strlen(parametro) + 3;
-        char* nuevaLista = (char*)malloc(newLength);
-        if (nuevaLista == NULL) {
-            perror("malloc");
-            exit(EXIT_FAILURE);
-        }
-
-        strcpy(nuevaLista, *lista);
-        strcat(nuevaLista, ", ");
-        strcat(nuevaLista, parametro);
-
-        free(*lista);
-        *lista = nuevaLista;
-    }
-}*/
-
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion *nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna){
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion **nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna){
     if (nodoGenericoFuncion == NULL) {
         printf("Error: nodoGenericoFuncion es NULL.\n");
         return;
     }
     
-    if (buscar_simbolo(nodoGenericoFuncion->funcion) == NULL){
+    if (buscar_simbolo((*nodoGenericoFuncion)->funcion) == NULL){
         // Crear el nuevo nodo
-       NodoFuncion *nuevoNodo = crearNodoFuncion(nodoGenericoFuncion->listaDeParametros, retorno, nodoGenericoFuncion->funcion, linea, tipogramatica);
+       NodoFuncion *nuevoNodo = crearNodoFuncion((*nodoGenericoFuncion)->listaDeParametros, retorno, (*nodoGenericoFuncion)->funcion, linea, tipogramatica);
         // Si la lista esta vacia, el nuevo nodo es el primer nodo
         if (*lista == NULL) {
             *lista = nuevoNodo;
@@ -224,10 +177,11 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char
         
         // Enlazar el nuevo nodo al final de la lista
         actual_simbolo->siguiente = nuevoNodoSimbolo;
-   }
-    //else{
-     //   agregarErrorSemantico("%d:%d Funcion '%s' sin declarar", linea, columna, funcion);
-   //
+    } else {
+        //agregarErrorSemantico("%d:%d Funcion '%s' sin declarar", linea, columna, (*nodoGenericoFuncion)->funcion); // SEGMENTATION FAULT
+    }
+    free(*nodoGenericoFuncion);
+    (*nodoGenericoFuncion) = NULL;
 }
 
 
@@ -272,8 +226,6 @@ void imprimirFunciones(NodoFuncion *lista) {
         actual = actual->siguiente;
     }
 }
-
-
 
 void liberarFunciones(NodoFuncion *lista){
     NodoFuncion *actual = lista;
@@ -511,6 +463,10 @@ void liberarErrorSemantico(NodoErroresSemanticos *lista){
 
 // Funciones de Utilidad
 char* copiarCadena(const char *str) {
+    if (str == NULL) {  // Verifica si la cadena es NULL
+        return NULL;    // Devuelve NULL si la cadena de entrada es NULL
+    }
+
     size_t len = strlen(str);  // Obtiene la longitud de la cadena de entrada
     char *copiado = (char *)malloc(len + 1);  // Asigna memoria para la nueva cadena
     if (copiado != NULL) {
@@ -518,6 +474,7 @@ char* copiarCadena(const char *str) {
     }
     return copiado;  // Devuelve el puntero a la nueva cadena copiada
 }
+
 
 //Rutinas semanticas
 //Validacion de tipos 
@@ -631,7 +588,7 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
                 // Verifica si ambos son del tipo correcto (int, float, etc.)
                 // Por ejemplo, supongamos que nodo contiene el tipo real de la variable
                 // Typecasting y verificacion de tipos especificos (a ajustar segun implementacion)
-                if ((int)simbolo1->nodo != TIPO_INT || (int)simbolo2->nodo != TIPO_INT) {
+                if (*(int*)simbolo1->nodo != TIPO_INT || *(int*)simbolo2->nodo != TIPO_INT) {
                     printf("Error: Operandos invalidos para '*'\n");
                     return -1;
                 }
@@ -701,44 +658,6 @@ int contarArgumentos(char *listaDeArgumentos) {
     return contador;
 }
 
-/*NodoSimbolo *agregarSimboloTS (char const *sym_name, int sym_type){
-  NodoSimbolo *ptr = (NodoSimbolo *) malloc (sizeof (NodoSimbolo));
-  ptr->nombre = (char *) malloc (strlen (sym_name) + 1);
-  strcpy (ptr->nombre,sym_name);
-  ptr->tipo = sym_type;
-  ptr->nodo.variable = 0;
-
-    switch (sym_type)
-        {
-    case FUNCION:
-      ptr->nodo.funcion = (NodoFuncion *) 0;
-      break;
-
-    case VARIABLE:
-        ptr->nodo.variable = (NodoVariableDeclarada *) 0;
-        break;
-
-       }
-
-  ptr->siguiente = (struct NodoSimbolo *)tablaSimbolos;
-  tablaSimbolos = ptr;
-  return ptr;
-}
-
-
-
-//Definicion de la funcion getsym
-
-NodoSimbolo *obtenerSimboloTS (char const *nombreSimbolo)
-{
-  NodoSimbolo *ptr;
-  for (ptr = tablaSimbolos; ptr != (NodoSimbolo *) 0;
-       ptr = (NodoSimbolo *)ptr->siguiente)
-    if (strcmp (ptr->nombre, nombreSimbolo) == 0)
-      return ptr;
-  return 0;
-}*/
-
 Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador) {
     // Crear nuevo nodo y asignar memoria
     Parametro *nuevo = (Parametro *)malloc(sizeof(Parametro));
@@ -748,9 +667,9 @@ Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador) {
     }
 
     // Asignar valores a los campos del nodo
-    nuevo->sufijo = sufijo;
-    nuevo->tipo = tipo;
-    nuevo->identificador = identificador;
+    nuevo->sufijo = copiarCadena(sufijo);
+    nuevo->tipo = copiarCadena(tipo);
+    nuevo->identificador = copiarCadena(identificador);
     nuevo->siguiente = NULL;
 
     return nuevo;
@@ -778,9 +697,46 @@ void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, c
 }
 
 
-void llenarNodoGenericoFuncion(NodoFuncion *nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros) {
-    nodoGenericoFuncion->funcion = identificador;
-    nodoGenericoFuncion->listaDeParametros = *listaDeParametros; 
+void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros) {
+    (*nodoGenericoFuncion) = (NodoFuncion *)malloc(sizeof(NodoFuncion));
+    (*nodoGenericoFuncion)->funcion = copiarCadena(identificador);
+    (*nodoGenericoFuncion)->listaDeParametros = *listaDeParametros; 
 
     *listaDeParametros = NULL;  
 }
+
+/*NodoSimbolo *agregarSimboloTS (char const *sym_name, int sym_type){
+  NodoSimbolo *ptr = (NodoSimbolo *) malloc (sizeof (NodoSimbolo));
+  ptr->nombre = (char *) malloc (strlen (sym_name) + 1);
+  strcpy (ptr->nombre,sym_name);
+  ptr->tipo = sym_type;
+  ptr->nodo.variable = 0;
+
+    switch (sym_type)
+        {
+    case FUNCION:
+      ptr->nodo.funcion = (NodoFuncion *) 0;
+      break;
+
+    case VARIABLE:
+        ptr->nodo.variable = (NodoVariableDeclarada *) 0;
+        break;
+
+       }
+
+  ptr->siguiente = (struct NodoSimbolo *)tablaSimbolos;
+  tablaSimbolos = ptr;
+  return ptr;
+}
+
+//Definicion de la funcion getsym
+
+NodoSimbolo *obtenerSimboloTS (char const *nombreSimbolo)
+{
+  NodoSimbolo *ptr;
+  for (ptr = tablaSimbolos; ptr != (NodoSimbolo *) 0;
+       ptr = (NodoSimbolo *)ptr->siguiente)
+    if (strcmp (ptr->nombre, nombreSimbolo) == 0)
+      return ptr;
+  return 0;
+}*/

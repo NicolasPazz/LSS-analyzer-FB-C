@@ -14,7 +14,7 @@ typedef struct NodoErroresSemanticos {
     char *mensaje;
     int linea;
     int columna;
-    struct NodoSentencia *siguiente;
+    struct NodoErroresSemanticos *siguiente;
 } NodoErroresSemanticos;
 
 #define INICIO_CONTEO_LINEA 1
@@ -93,7 +93,7 @@ typedef struct NodoFuncion {
 
 NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno, const char *funcion, int linea, const char* tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion *nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna);
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion **nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna);
 
 void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador);
 
@@ -227,7 +227,7 @@ NodoSimbolo *buscar_simbolo(char *nombre);
 void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna);
 Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador);
 void agregarParametro(Parametro **listaDeParametros, char* sufijo, char *tipo, char *identificador);
-void llenarNodoGenericoFuncion(NodoFuncion *nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros);
+void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros);
 
 
 #endif
