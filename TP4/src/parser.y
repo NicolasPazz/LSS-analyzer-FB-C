@@ -304,8 +304,8 @@ definiciones_externas:
     ;
 
 definicion_funcion: 
-      TIPODEDATO declarador_funcion sentencia_compuesta   { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
-    | VOID declarador_funcion sentencia_compuesta         { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
+      TIPODEDATO declarador_funcion sentencia_compuesta   { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
+    | VOID declarador_funcion sentencia_compuesta         { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
     ; 
 %%
 
