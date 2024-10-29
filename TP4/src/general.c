@@ -31,7 +31,7 @@ NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada,
     nuevo->tipoDato = copiarCadena(tipoDato);
     nuevo->linea = linea;
     nuevo->columna = columna;
-    nuevo->sufijo = sufijo;
+    nuevo->sufijo = (char *)sufijo;
     nuevo->siguiente = NULL;
     return nuevo;
 }
@@ -183,15 +183,20 @@ char* unirParametros(const char* param1, const char* param2) {
     }
 }*/
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion *nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna){
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion **nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna){
     if (nodoGenericoFuncion == NULL) {
+        
         printf("Error: nodoGenericoFuncion es NULL.\n");
         return;
     }
+
+    printf ("Nodo generico funcion %s\n", (*nodoGenericoFuncion)->funcion);
+    printf ("Nodo generico funcion %s\n", (*nodoGenericoFuncion)->listaDeParametros->sufijo);
+    printf ("Nodo generico funcion %s\n", (*nodoGenericoFuncion)->listaDeParametros->tipo);
     
-    if (buscar_simbolo(nodoGenericoFuncion->funcion) == NULL){
+    if (buscar_simbolo((*nodoGenericoFuncion)->funcion) == NULL){
         // Crear el nuevo nodo
-       NodoFuncion *nuevoNodo = crearNodoFuncion(nodoGenericoFuncion->listaDeParametros, retorno, nodoGenericoFuncion->funcion, linea, tipogramatica);
+       NodoFuncion *nuevoNodo = crearNodoFuncion((*nodoGenericoFuncion)->listaDeParametros, retorno, (*nodoGenericoFuncion)->funcion, linea, tipogramatica);
         // Si la lista esta vacia, el nuevo nodo es el primer nodo
         if (*lista == NULL) {
             *lista = nuevoNodo;
@@ -228,6 +233,8 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char
     //else{
      //   agregarErrorSemantico("%d:%d Funcion '%s' sin declarar", linea, columna, funcion);
    //
+   free(*nodoGenericoFuncion);
+   (*nodoGenericoFuncion) = NULL;
 }
 
 
@@ -511,13 +518,18 @@ void liberarErrorSemantico(NodoErroresSemanticos *lista){
 
 // Funciones de Utilidad
 char* copiarCadena(const char *str) {
+    if (str == NULL) {  // Verifica si la cadena es NULL
+        return NULL;    // Devuelve NULL si la cadena de entrada es NULL
+    }
+
     size_t len = strlen(str);  // Obtiene la longitud de la cadena de entrada
     char *copiado = (char *)malloc(len + 1);  // Asigna memoria para la nueva cadena
     if (copiado != NULL) {
         strcpy(copiado, str);  // Copia el contenido de la cadena de entrada a la nueva cadena
     }
-    return copiado;  // Devuelve el puntero a la nueva cadena copiada
+    return copiado;  // Devuelve la nueva cadena
 }
+
 
 //Rutinas semanticas
 //Validacion de tipos 
@@ -631,13 +643,13 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
                 // Verifica si ambos son del tipo correcto (int, float, etc.)
                 // Por ejemplo, supongamos que nodo contiene el tipo real de la variable
                 // Typecasting y verificacion de tipos especificos (a ajustar segun implementacion)
-                if ((int)simbolo1->nodo != TIPO_INT || (int)simbolo2->nodo != TIPO_INT) {
+                if (*(int*)simbolo1->nodo != TIPO_INT || *(int*)simbolo2->nodo != TIPO_INT) {
                     printf("Error: Operandos invalidos para '*'\n");
                     return -1;
                 }
             }
             break;
-        // Otros operadores pueden agregarse aqui
+        /// Oregarse aqui
     }
     return 0;
 }
@@ -748,9 +760,10 @@ Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador) {
     }
 
     // Asignar valores a los campos del nodo
-    nuevo->sufijo = sufijo;
-    nuevo->tipo = tipo;
-    nuevo->identificador = identificador;
+    nuevo->sufijo = copiarCadena(sufijo);
+    printf("sufijo: %s\n", nuevo->sufijo);
+    nuevo->tipo = copiarCadena(tipo);
+    nuevo->identificador = copiarCadena(identificador);
     nuevo->siguiente = NULL;
 
     return nuevo;
@@ -759,6 +772,7 @@ Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador) {
 void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador) {
     // Crear el nodo usando la funcion de creacion
     Parametro *nuevo = crearNodoParametro(sufijo, tipo, identificador);
+    printf("Nuevo Sufijo: %s\n", nuevo->sufijo);
 
     if (nuevo == NULL) {
         printf("Error: no se pudo crear el nuevo nodo de parámetro.\n");
@@ -778,9 +792,13 @@ void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, c
 }
 
 
-void llenarNodoGenericoFuncion(NodoFuncion *nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros) {
-    nodoGenericoFuncion->funcion = identificador;
-    nodoGenericoFuncion->listaDeParametros = *listaDeParametros; 
+void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros) {
+    (*nodoGenericoFuncion) = (NodoFuncion *)malloc(sizeof(NodoFuncion));
 
+    (*nodoGenericoFuncion)->funcion = copiarCadena(identificador);
+
+    (*nodoGenericoFuncion)->listaDeParametros = *listaDeParametros; 
+    printf("Lista de parametros: %s\n", (*nodoGenericoFuncion)->listaDeParametros->sufijo);
+    printf("Lista de sufijo: %s\n", (*nodoGenericoFuncion)->listaDeParametros->tipo);
     *listaDeParametros = NULL;  
 }
