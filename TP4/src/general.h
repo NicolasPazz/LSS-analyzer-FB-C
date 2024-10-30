@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #ifndef GENERAL_H
 #define GENERAL_H
 #define YYLTYPE YYLTYPE
@@ -94,7 +95,7 @@ typedef struct NodoFuncion {
 NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno, const char *funcion, int linea, const char* tipogramatica);
 
 void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion **nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna);
-
+bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoFuncion *nodoGenericoFuncion);
 void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador);
 
 char* unirParametros(const char* param1, const char* param2);
@@ -228,7 +229,7 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
 Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador);
 void agregarParametro(Parametro **listaDeParametros, char* sufijo, char *tipo, char *identificador);
 void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros);
-
+void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos);
 
 #endif
 
