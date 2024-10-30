@@ -1,10 +1,4 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
-#include <math.h>
-#include <stdbool.h>
 #include "general.h"
 
 extern FILE *yyin;

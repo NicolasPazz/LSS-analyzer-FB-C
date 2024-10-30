@@ -1,8 +1,12 @@
+#include <stddef.h>
+#include <math.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #ifndef GENERAL_H
 #define GENERAL_H
 #define YYLTYPE YYLTYPE
-
 typedef struct YYLTYPE
 {
   int first_line;
