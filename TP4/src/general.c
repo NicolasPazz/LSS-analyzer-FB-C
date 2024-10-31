@@ -226,13 +226,13 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char
     //if (nodoEncontrado != NULL){printf("tipogramatica encontrada: %s\n", ((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica);}
     //if (nodoGenericoFuncion != NULL){printf("tipogramatica generico: %s\n", (*nodoGenericoFuncion)->tipogramatica);}
     if (//El identificador no fue usado antes
-        nodoEncontrado == NULL ||  // o
+        nodoEncontrado == NULL ||  /// o
         //El identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes
-        (nodoEncontrado != NULL &&
+        ((nodoEncontrado != NULL &&
         nodoEncontrado->tipo == FUNCION &&
         strcmp(((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica, "declaracion") == 0 &&
         strcmp((*nodoGenericoFuncion)->tipogramatica, "definicion") == 0) &&
-        noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion)) {
+        noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion))) {
 
         //Si el identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes. Validar que los parametros que se pretenden usar en la definicion, sean compatibles con los de la declaracion
         if(nodoEncontrado != NULL &&
