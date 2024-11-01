@@ -8,7 +8,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/bin/tp4",
-      "args": ["/home/utnso/Desktop/24-051-04/TP4/src/archivo.i"],
+      "args": ["/home/utnso/Documents/24-051-04/TP4/src/archivo.i"],
       "stopAtEntry": true,
       "cwd": "${workspaceFolder}/bin",
       "environment": [],

@@ -502,8 +502,7 @@ void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *caden
     actual->siguiente = nuevoNodo;
 }
 
-void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista)
-{
+void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista){
     NodoCadenaNoReconocida *actual = lista;
     printf("* Listado de errores lexicos:\n");
 
@@ -934,38 +933,61 @@ void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos)
     }
 }
 
-/*NodoSimbolo *agregarSimboloTS (char const *sym_name, int sym_type){
-  NodoSimbolo *ptr = (NodoSimbolo *) malloc (sizeof (NodoSimbolo));
-  ptr->nombre = (char *) malloc (strlen (sym_name) + 1);
-  strcpy (ptr->nombre,sym_name);
-  ptr->tipo = sym_type;
-  ptr->nodo.variable = 0;
 
-    switch (sym_type)
-        {
-    case FUNCION:
-      ptr->nodo.funcion = (NodoFuncion *) 0;
-      break;
 
-    case VARIABLE:
-        ptr->nodo.variable = (NodoVariableDeclarada *) 0;
-        break;
-
-       }
-
-  ptr->siguiente = (struct NodoSimbolo *)tablaSimbolos;
-  tablaSimbolos = ptr;
-  return ptr;
+void inicializarTipoRetorno(const char *tipo) {
+    //printf("Ingreso a inicializarTipoRetorno\n");
+    //captura el tipo de retorno esperado de la FUNCION que se esta analizando
+    tipoReturnEsperado = copiarCadena(tipo);
+    //printf("tipo: %s \n", tipoReturnEsperado);
 }
 
-//Definicion de la funcion getsym
+void registrarReturn(const char *tipo, int linea, int columna) {
+    if (tipoReturnEncontrado == NULL) {
+        tipoReturnEncontrado = (TipoRetorno *)malloc(sizeof(TipoRetorno));
+    }
+    //printf("registrarReturn pasado\n");
+    tipoReturnEncontrado->tipoDato = copiarCadena(tipo);
+    tipoReturnEncontrado->linea = linea;
+    tipoReturnEncontrado->columna = columna+1;
+    tipoReturnEncontrado->siguiente = NULL;
+    //printf("tipo: %s\n", tipoReturnEncontrado->tipoDato);
+    
 
-NodoSimbolo *obtenerSimboloTS (char const *nombreSimbolo)
-{
-  NodoSimbolo *ptr;
-  for (ptr = tablaSimbolos; ptr != (NodoSimbolo *) 0;
-       ptr = (NodoSimbolo *)ptr->siguiente)
-    if (strcmp (ptr->nombre, nombreSimbolo) == 0)
-      return ptr;
-  return 0;
-}*/
+}
+
+void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos) {
+    //printf("entra a validarTipoReturn\n");
+    if (tipoReturnEsperado != NULL && tipoReturnEncontrado->tipoDato != NULL) {
+        //printf("entre al if\n");
+
+        if (strcmp(tipoReturnEsperado, tipoReturnEncontrado->tipoDato) != 0) {
+            char mensaje[256];
+            snprintf(mensaje, sizeof(mensaje), "Incompatibilidad de tipos al retornar el tipo '%s' pero se esperaba '%s'", tipoReturnEncontrado->tipoDato, tipoReturnEsperado);
+            agregarErrorSemantico(listaErroresSemanticos, mensaje, tipoReturnEncontrado->linea, tipoReturnEncontrado->columna);
+        }
+        //printf("realizo comparacion de tipos\n");
+
+    }
+    //printf("tipoFueraDelEntorno: %s \n", tipoReturnEsperado);
+
+    // Reinicia los valores después de validar
+    free(tipoReturnEncontrado->tipoDato);
+    tipoReturnEncontrado->tipoDato = NULL;
+}
+
+
+char* obtenerTipoIdentificador(const char *identificador) {
+    NodoSimbolo *simbolo = buscarSimbolo(identificador);
+    if (simbolo) {
+        if (simbolo->tipo == FUNCION) {
+            NodoFuncion *func = (NodoFuncion *)simbolo->nodo;
+            return func->retorno;  // Retorna el tipo de retorno de la función, como "void (*)(void)"
+        } else if (simbolo->tipo == VARIABLE) {
+            NodoVariableDeclarada *var = (NodoVariableDeclarada *)simbolo->nodo;
+            return var->tipoDato;  // Retorna el tipo de dato de la variable
+        }
+    }
+    return NULL;
+}
+

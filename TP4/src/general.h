@@ -218,6 +218,19 @@ typedef struct{
     } valor;
 }TokenInfo;
 
+typedef struct {
+    char *tipoDato; // Tipo de dato de la expresión return
+    int linea;
+    int columna;
+   struct TipoRetorno *siguiente;
+} TipoRetorno;
+
+// Variable global para almacenar el tipo de retorno esperado de la función
+extern char *tipoReturnEsperado;
+extern TipoRetorno *tipoReturnEncontrado;
+
+
+
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
 
 
@@ -235,5 +248,10 @@ void agregarParametro(Parametro **listaDeParametros, char* sufijo, char *tipo, c
 void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros);
 void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos);
 
+void inicializarTipoRetorno(const char *tipo) ;
+void registrarReturn(const char *tipo, int linea, int columna);
+void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos);
+
+char* obtenerTipoIdentificador(const char *identificador) ;
 #endif
 
