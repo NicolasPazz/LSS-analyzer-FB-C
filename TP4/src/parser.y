@@ -176,15 +176,15 @@ sentencia_etiquetada:
     cases default
     ;
 case:
-      case expresion ':' sentencias_compuestas_sin_llaves   
-    | case expresion ':' sentencias_compuestas_sin_llaves 
-      break                                                 
+      CASE expresion ':' sentencias_compuestas_sin_llaves   
+    | CASE expresion ':' sentencias_compuestas_sin_llaves 
+      BREAK                                                 
     ;
 default
     : /*VACIO*/
-    | default ':' sentencias
-    | default ':' sentencias 
-      sentencia_de_salto
+    | DEFAULT ':' sentencias
+    | DEFAULT ':' sentencias 
+      BREAK
     ;
 cases
     : /*VACIO*/
