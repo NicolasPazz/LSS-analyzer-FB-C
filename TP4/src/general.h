@@ -46,7 +46,11 @@ typedef struct NodoSimbolo{
 extern NodoSimbolo* tablaSimbolos;
 
 NodoSimbolo* buscarSimbolo(const char *nombre);
- typedef enum tipoDato{
+ 
+
+
+ // Declaracion de enum para armar un arbol de identificacion de tipos de datos. Sirve para la comparativa del return con la funcion.
+ /*typedef enum tipoDato{
     INT,
     DOUBLE,
     FLOAT,
@@ -74,13 +78,10 @@ NodoSimbolo* buscarSimbolo(const char *nombre);
     CADENA      
  }expresionPrimaria;
 
- extern expresionPrimaria tipoResultanteEvExpresion;
+ extern expresionPrimaria tipoResultanteEvExpresion;*/
 
  //desarrolamos ya identificamos que es tipo IDENTIFICADOR
  //con ese IDENTIFICADOR Vamos a la tabla de simbolos
-
-
-
 
 //NodoSimbolo *agregarSimboloTS (char const *, int);
 //NodoSimbolo *obtenerSimboloTS (char const *);

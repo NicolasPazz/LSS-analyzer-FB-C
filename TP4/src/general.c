@@ -936,49 +936,38 @@ void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos)
 
 
 
-
+// Se recibe el tipo de dato de la funcion y se llama a la funcion copiarCadena
 void inicializarTipoRetorno(const char *tipo) {
-    //printf("Ingreso a inicializarTipoRetorno\n");
-    //captura el tipo de retorno esperado de la FUNCION que se esta analizando
     tipoReturnEsperado = copiarCadena(tipo);
-    //printf("tipo: %s \n", tipoReturnEsperado);
 }
 
+// Se recibe el tipo de dato del return encontrado junto con su fila y columna
+// fila y columna funcionan ok
+// No se esta recibiendo el tipo de dato del return, si no que se recibe un char* con la cadena del return. Ya sea identificador, literal cadena o constante. 
 void registrarReturn(const char *tipo, int linea, int columna) {
     if (tipoReturnEncontrado == NULL) {
         tipoReturnEncontrado = (TipoRetorno *)malloc(sizeof(TipoRetorno));
     }
-    //printf("registrarReturn pasado\n");
     tipoReturnEncontrado->tipoDato = copiarCadena(tipo);
     tipoReturnEncontrado->linea = linea;
     tipoReturnEncontrado->columna = columna+1;
     tipoReturnEncontrado->siguiente = NULL;
-    //printf("tipo: %s\n", tipoReturnEncontrado->tipoDato);
-    
-
 }
 
+// Se valida si el tipo de dato del return y de la funcion son el mismo y se genera accion dependiendo el caso.
+// Al ser un strcmp, se esta comparando dos cadenas char*, no segun su valor semantico. 
 void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos) {
-    //printf("entra a validarTipoReturn\n");
     if (tipoReturnEsperado != NULL && tipoReturnEncontrado->tipoDato != NULL) {
-        //printf("entre al if\n");
-
         if (strcmp(tipoReturnEsperado, tipoReturnEncontrado->tipoDato) != 0) {
             char mensaje[256];
             snprintf(mensaje, sizeof(mensaje), "Incompatibilidad de tipos al retornar el tipo '%s' pero se esperaba '%s'", tipoReturnEncontrado->tipoDato, tipoReturnEsperado);
             agregarErrorSemantico(listaErroresSemanticos, mensaje, tipoReturnEncontrado->linea, tipoReturnEncontrado->columna);
         }
-        //printf("realizo comparacion de tipos\n");
 
     }
-    //printf("tipoFueraDelEntorno: %s \n", tipoReturnEsperado);
-
-    // Reinicia los valores después de validar
     free(tipoReturnEncontrado->tipoDato);
     tipoReturnEncontrado->tipoDato = NULL;
 }
-
-
 
 
 char* obtenerTipoIdentificador(const char *identificador) {
@@ -995,3 +984,10 @@ char* obtenerTipoIdentificador(const char *identificador) {
     return NULL;
 }
 
+/*int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
+    if (tipoReturn == tipoFuncion) {
+        return 1;  
+    } else {
+        return 0;
+    }
+}*/ // puede ir algo por acá la validacion de tipos. En vez de return 1 o 0, se puede generar acción. 
