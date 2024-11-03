@@ -935,6 +935,8 @@ void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos)
 
 
 
+
+
 void inicializarTipoRetorno(const char *tipo) {
     //printf("Ingreso a inicializarTipoRetorno\n");
     //captura el tipo de retorno esperado de la FUNCION que se esta analizando
@@ -975,6 +977,8 @@ void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos) {
     free(tipoReturnEncontrado->tipoDato);
     tipoReturnEncontrado->tipoDato = NULL;
 }
+
+
 
 
 char* obtenerTipoIdentificador(const char *identificador) {

@@ -236,9 +236,6 @@ return:
     | RETURN ';'               { registrarReturn(NULL, @1.first_line,@1.last_column); }
     ;
 
-   
-
-
 declaracion:
       sufijo TIPODEDATO lista_declaradores_variable ';'   { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, $2, @1.first_line, @1.first_column, $1); }
     | TIPODEDATO lista_declaradores_variable ';'          { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $2, $1,  @1.first_line, @1.first_column, NULL); }

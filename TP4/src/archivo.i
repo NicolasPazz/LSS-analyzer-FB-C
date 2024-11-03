@@ -44,6 +44,7 @@ int incremento(int x) {
     return ++x;
 }
 
+
 int incremento(int x) {
     do {
         x+=1;

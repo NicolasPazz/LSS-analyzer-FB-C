@@ -46,14 +46,45 @@ typedef struct NodoSimbolo{
 extern NodoSimbolo* tablaSimbolos;
 
 NodoSimbolo* buscarSimbolo(const char *nombre);
+ typedef enum tipoDato{
+    INT,
+    DOUBLE,
+    FLOAT,
+    CHAR,
+    VOID
+  }tipoDato;
+
+   typedef enum especificadorAlmacenamiento{
+    AUTO,
+    REGISTER,
+    STATIC,
+    EXTERN,
+    TYPEDEF
+  }especificadorAlmacenamiento;
+
+ typedef enum calificadorTipo{
+    CONST,
+    VOLATILE
+ }calificadorTipo;
+
+ typedef enum expresionPrimaria{
+    IDENTIFICADOR,
+    CONSTANTE,
+    VACIA, //NULL EL return
+    CADENA      
+ }expresionPrimaria;
+
+ extern expresionPrimaria tipoResultanteEvExpresion;
+
+ //desarrolamos ya identificamos que es tipo IDENTIFICADOR
+ //con ese IDENTIFICADOR Vamos a la tabla de simbolos
+
+
+
 
 //NodoSimbolo *agregarSimboloTS (char const *, int);
 //NodoSimbolo *obtenerSimboloTS (char const *);
-
-
-
 //TODO:: hago un switch para saber si es variable o funcion typecast
-
 
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
@@ -228,7 +259,6 @@ typedef struct {
 // Variable global para almacenar el tipo de retorno esperado de la función
 extern char *tipoReturnEsperado;
 extern TipoRetorno *tipoReturnEncontrado;
-
 
 
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
