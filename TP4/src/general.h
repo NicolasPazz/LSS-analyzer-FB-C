@@ -35,8 +35,9 @@ void reinicializarUbicacion(void);
     INT_TIPODATO,
     DOUBLE_TIPODATO,
     FLOAT_TIPODATO,
-    CHA_TIPODATO,
-    VOID_TIPODATO
+    CHAR_TIPODATO,
+    VOID_TIPODATO,
+    VACIO_TIPODATO
   }tipoDato;
 
    typedef enum especificadorAlmacenamiento{
@@ -45,11 +46,13 @@ void reinicializarUbicacion(void);
     STATIC_ESPALMAC,
     EXTERN_ESPALMAC,
     TYPEDEF_ESPALMAC
+    VACIO_ESPALMAC
   }especificadorAlmacenamiento;
 
  typedef enum calificadorTipo{
     CONST_CALIFICADORTIPO,
     VOLATILE_CALIFICADORTIPO
+    VACIO_CALIFICADORTIPO
  }calificadorTipo;
 
  typedef enum expresionPrimaria{
@@ -72,23 +75,17 @@ void reinicializarUbicacion(void);
 
 typedef struct NodoSimbolo{
   char *nombre;
-  enum tipoSimbolo tipo;
-  enum tipoDato tipoDeDato;
   void* nodo;
   struct NodoSimbolo *siguiente; //Puntero al siguiente nodo de la lista
 }NodoSimbolo;
 
 extern NodoSimbolo* tablaSimbolos;
 
-NodoSimbolo* buscarSimbolo(const char *nombre);
- 
-
- 
 
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
     char *variableDeclarada;
-    char *tipoDato;
+    enum tipoDato tipoDato;
     int linea;
     int columna;
     char *sufijo;
@@ -117,7 +114,7 @@ typedef struct Parametro {
 } Parametro;
 typedef struct NodoFuncion {
     char *funcion;
-    char *retorno;
+    enum  tipoDato retorno;
     Parametro *listaDeParametros;
     char *tipogramatica;
     int linea;

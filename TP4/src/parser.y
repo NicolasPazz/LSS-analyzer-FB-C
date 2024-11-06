@@ -50,7 +50,6 @@ TipoRetorno* tipoReturnEncontrado =NULL;
 
 
 %left OP_AND OP_OR
-//%left tipo_de_dato
 %left '+' '-'
 %left '*' '/'
 %left '^'

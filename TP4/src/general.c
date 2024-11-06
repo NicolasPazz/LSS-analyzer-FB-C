@@ -551,21 +551,6 @@ NodoErroresSemanticos *crearNodoErroresSemanticos(const char *mensaje, const int
     return nuevo;
 }
 
-NodoSimbolo *buscarSimbolo(const char *nombre)
-{
-    NodoSimbolo *actual = tablaSimbolos; // Empezar desde el inicio de la tabla
-
-    // Recorrer la lista de simbolos
-    while (actual != NULL){
-        // Comparar el nombre actual con el nombre buscado
-        if (strcmp(actual->nombre, nombre) == 0)
-        {
-            return actual; // Simbolo encontrado
-        }
-        actual = actual->siguiente; // Avanzar al siguiente nodo
-    }
-    return NULL; // No se encontro el simbolo
-}
 
 void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, const int linea, const int columna)
 {
@@ -971,7 +956,7 @@ void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos) {
 
 
 char* obtenerTipoIdentificador(const char *identificador) {
-    NodoSimbolo *simbolo = buscarSimbolo(identificador);
+    NodoSimbolo *simbolo = buscar_simbolo(identificador);
     if (simbolo) {
         if (simbolo->tipo == FUNCION) {
             NodoFuncion *func = (NodoFuncion *)simbolo->nodo;
@@ -983,10 +968,6 @@ char* obtenerTipoIdentificador(const char *identificador) {
     }
     return NULL;
 }
-
-
-
-
 
 
 
