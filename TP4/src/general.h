@@ -45,13 +45,13 @@ void reinicializarUbicacion(void);
     REGISTER_ESPALMAC,
     STATIC_ESPALMAC,
     EXTERN_ESPALMAC,
-    TYPEDEF_ESPALMAC
+    TYPEDEF_ESPALMAC,
     VACIO_ESPALMAC
   }especificadorAlmacenamiento;
 
  typedef enum calificadorTipo{
     CONST_CALIFICADORTIPO,
-    VOLATILE_CALIFICADORTIPO
+    VOLATILE_CALIFICADORTIPO,
     VACIO_CALIFICADORTIPO
  }calificadorTipo;
 
