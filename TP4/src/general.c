@@ -984,10 +984,16 @@ char* obtenerTipoIdentificador(const char *identificador) {
     return NULL;
 }
 
-/*int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
+
+
+
+
+
+
+int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
     if (tipoReturn == tipoFuncion) {
         return 1;  
     } else {
         return 0;
     }
-}*/ // puede ir algo por acá la validacion de tipos. En vez de return 1 o 0, se puede generar acción. 
+} // puede ir algo por acá la validacion de tipos. En vez de return 1 o 0, se puede generar acción. 

@@ -42,16 +42,15 @@ TipoRetorno* tipoReturnEncontrado =NULL;
     char* sufijo;  
 }
 
-%token <cadena> IDENTIFICADOR SUFIJO TIPODEDATO LITERAL_CADENA OP_ASIGNACION OP_RELACIONAL OP_INCREMENTO_DECREMENTO OP_MULTIPLICATIVO OP_ADITIVO OP_IGUALDAD NO_RECONOCIDO OP_AND OP_OR BREAK CASE CONTINUE DEFAULT DO ELSE FOR IF RETURN SWITCH WHILE GOTO VOID CONSTANTE_CARACTER
+%token <cadena> IDENTIFICADOR SUFIJO LITERAL_CADENA OP_ASIGNACION OP_RELACIONAL OP_INCREMENTO_DECREMENTO OP_MULTIPLICATIVO OP_ADITIVO OP_IGUALDAD NO_RECONOCIDO OP_AND OP_OR BREAK CASE CONTINUE DEFAULT DO ELSE FOR IF RETURN SWITCH WHILE GOTO VOID CONSTANTE_CARACTER CHAR DOUBLE ENUM FLOAT INT LONG SHORT STRUCT UNION AUTO CONST EXTERN REGISTER SIGNED SIZEOF STATIC TYPEDEF UNSIGNED VOLATILE
 %token <entero> CONSTANTE_ENTERA
 %token <real> CONSTANTE_REAL
 
-
-%type <cadena> lista_declaradores_funcion  sufijo lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_primaria expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion
+%type <cadena> lista_declaradores_funcion  sufijo lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_primaria expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion tipo_de_dato
 
 
 %left OP_AND OP_OR
-%left TIPODEDATO
+//%left tipo_de_dato
 %left '+' '-'
 %left '*' '/'
 %left '^'
@@ -84,12 +83,12 @@ expresion:
     | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); }
     ;
 expresion_primaria: 
-      IDENTIFICADOR                             { $$=obtenerTipoIdentificador($1)  ;DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
-    | CONSTANTE_ENTERA                          { $$ ="int";DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1); }
-    | CONSTANTE_REAL                            { $$ ="float";DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1); }
-    | CONSTANTE_CARACTER                        { $$ ="char";DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", $1); }
-    | LITERAL_CADENA                            { $$= "char *";DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1); }
-    | '(' expresion ')'                         { ;DBG_PRINT("expresion_primaria - (EXP)\n");}
+      IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
+    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1); }
+    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1); }
+    | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %s\n", $1); }
+    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1); }
+    | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");}
     ;
 expresion_postfija:
       IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); validarInvocacionAFuncion(&listaErroresSemanticos, $1, $3, @1.last_line, @1.first_column); }
@@ -125,7 +124,40 @@ lista_argumentos_invocacion
     | expresion                                   { DBG_PRINT("ARGUMENTO\n"); } 
     | lista_argumentos_invocacion ',' expresion   { DBG_PRINT("ARGUMENTO\n"); } 
     ;
-
+tipo_de_dato
+    : CHAR
+    | DOUBLE
+    | ENUM 
+    | FLOAT
+    | INT  
+    | LONG 
+    | SHORT  
+    | STRUCT
+    | UNION
+    | VOID
+    ;
+especificador_almacenamiento
+    : AUTO 
+    | CONST 
+    | VOLATILE
+    | EXTERN 
+    | REGISTER 
+    | SIGNED 
+    | SIZEOF 
+    | STATIC 
+    | TYPEDEF 
+    | UNSIGNED
+    ;
+calificador_tipo
+    : CONST
+    | VOLATILE
+    ;
+sufijo
+    : calificador_tipo
+    | especificador_almacenamiento
+    | calificador_tipo especificador_almacenamiento
+    ;
+    
 sentencia:
       sentencia_de_expresion 
     | sentencia_compuesta 
@@ -206,8 +238,8 @@ expresion_op
     ;
 primera_parte_for
     : /*VACIO*/
-    | sufijo TIPODEDATO lista_declaradores_variable_for { DBG_PRINT("primera_parte_for\n");}
-    | IDENTIFICADOR                                     { DBG_PRINT("primera_parte_for\n");}
+    | sufijo tipo_de_dato lista_declaradores_variable_for { DBG_PRINT("primera_parte_for\n");}
+    | IDENTIFICADOR                                       { DBG_PRINT("primera_parte_for\n");}
     ;
 lista_declaradores_variable_for:
       declarador_variable_for                                       { DBG_PRINT("lista_declaradores_variable\n"); }
@@ -229,19 +261,19 @@ continue:
     CONTINUE ';'    { /*agregarSentencia(&listaSentencias, "continue", @1.first_line, @1.first_column);*/ }
     ;
 break:
-    BREAK ';'   { /*agregarSentencia(&listaSentencias, "break", @1.first_line, @1.first_column);*/ }
+    BREAK ';'       { /*agregarSentencia(&listaSentencias, "break", @1.first_line, @1.first_column);*/ }
     ;
 return:
-      RETURN expresion_op ';'  { registrarReturn($2, @1.first_line, @1.last_column); }
+      RETURN expresion ';'     { registrarReturn($2, @1.first_line, @1.last_column); }
     | RETURN ';'               { registrarReturn(NULL, @1.first_line,@1.last_column); }
     ;
 
 declaracion:
-      sufijo TIPODEDATO lista_declaradores_variable ';'   { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, $2, @1.first_line, @1.first_column, $1); }
-    | TIPODEDATO lista_declaradores_variable ';'          { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $2, $1,  @1.first_line, @1.first_column, NULL); }
-    | sufijo TIPODEDATO lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 1 %s %s %s\n", $1, $2, $3);}
+      sufijo tipo_de_dato lista_declaradores_variable ';'   { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, $2, @1.first_line, @1.first_column, $1); }
+    | tipo_de_dato lista_declaradores_variable ';'          { agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $2, $1,  @1.first_line, @1.first_column, NULL); }
+    | sufijo tipo_de_dato lista_declaradores_funcion ';'    { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 1 %s %s %s\n", $1, $2, $3);}
     | sufijo VOID lista_declaradores_funcion ';'          { agregarFuncion(&listaFunciones, &tablaSimbolos, $2, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 2 %s %s %s\n", $1, $2, $3);}
-    | TIPODEDATO lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); }
+    | tipo_de_dato lista_declaradores_funcion ';'           { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); }
     | VOID lista_declaradores_funcion ';'                 { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "declaracion", @1.first_column); DBG_PRINT("declaracion de funcion 4 %s %s\n", $1, $2);}
     ;
 
@@ -274,10 +306,10 @@ lista_argumentos_prototipo:
 argumento_prototipo
     : /*VACIO*/                                     { agregarParametro(&listaDeParametros, NULL, NULL, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
     | IDENTIFICADOR                                 { agregarParametro(&listaDeParametros, NULL, NULL, $1); DBG_PRINT("argumento_prototipo_final\n"); }
-    | TIPODEDATO IDENTIFICADOR                      { agregarParametro(&listaDeParametros, NULL, $1, $2); DBG_PRINT("argumento_prototipo_final\n"); }
-    | TIPODEDATO                                    { agregarParametro(&listaDeParametros, NULL, $1, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
-    | sufijo TIPODEDATO                             { agregarParametro(&listaDeParametros, $1, $2, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
-    | sufijo TIPODEDATO IDENTIFICADOR               { agregarParametro(&listaDeParametros, $1, $2, $3); DBG_PRINT("argumento_prototipo_final\n"); }
+    | tipo_de_dato IDENTIFICADOR                      { agregarParametro(&listaDeParametros, NULL, $1, $2); DBG_PRINT("argumento_prototipo_final\n"); }
+    | tipo_de_dato                                    { agregarParametro(&listaDeParametros, NULL, $1, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
+    | sufijo tipo_de_dato                             { agregarParametro(&listaDeParametros, $1, $2, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
+    | sufijo tipo_de_dato IDENTIFICADOR               { agregarParametro(&listaDeParametros, $1, $2, $3); DBG_PRINT("argumento_prototipo_final\n"); }
     | VOID                                          { agregarParametro(&listaDeParametros, NULL, $1, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
     ;
 lista_declaradores_variable_prototipo:
@@ -302,7 +334,7 @@ definiciones_externas:
     ;
 
 definicion_funcion: 
-      TIPODEDATO declarador_funcion sentencia_compuesta   {inicializarTipoRetorno($1) ; validarTipoReturn(&listaErroresSemanticos); agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
+      tipo_de_dato declarador_funcion sentencia_compuesta   {inicializarTipoRetorno($1) ; validarTipoReturn(&listaErroresSemanticos); agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); }
     | VOID declarador_funcion sentencia_compuesta         {inicializarTipoRetorno("VOID"); validarTipoReturn(&listaErroresSemanticos); agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, "definicion", @1.first_column); DBG_PRINT("definiciones_externas: definicion de funcion VOID\n"); }
     ; 
 

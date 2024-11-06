@@ -30,6 +30,40 @@ void inicializarUbicacion(void);
 void reinicializarUbicacion(void);
 
 
+// Declaracion de enum para armar un arbol de identificacion de tipos de datos. Sirve para la comparativa del return con la funcion.
+ typedef enum tipoDato{
+    INT_TIPODATO,
+    DOUBLE_TIPODATO,
+    FLOAT_TIPODATO,
+    CHA_TIPODATO,
+    VOID_TIPODATO
+  }tipoDato;
+
+   typedef enum especificadorAlmacenamiento{
+    AUTO_ESPALMAC ,
+    REGISTER_ESPALMAC,
+    STATIC_ESPALMAC,
+    EXTERN_ESPALMAC,
+    TYPEDEF_ESPALMAC
+  }especificadorAlmacenamiento;
+
+ typedef enum calificadorTipo{
+    CONST_CALIFICADORTIPO,
+    VOLATILE_CALIFICADORTIPO
+ }calificadorTipo;
+
+ typedef enum expresionPrimaria{
+    IDENTIFICADOR_EXPRESIONPRIMARIA,
+    CONSTANTE_EXPRESIONPRIMARIA,
+    VACIA_EXPRESIONPRIMARIA, //NULL EL return
+    CADENA_EXPRESIONPRIMARIA      
+ }expresionPrimaria;
+
+ extern expresionPrimaria tipoResultanteEvExpresion;
+ 
+ //desarrolamos ya identificamos que es tipo IDENTIFICADOR
+ //con ese IDENTIFICADOR Vamos a la tabla de simbolos
+
 // Tabla de simbolos
  typedef enum tipoSimbolo{
     VARIABLE,
@@ -39,6 +73,7 @@ void reinicializarUbicacion(void);
 typedef struct NodoSimbolo{
   char *nombre;
   enum tipoSimbolo tipo;
+  enum tipoDato tipoDeDato;
   void* nodo;
   struct NodoSimbolo *siguiente; //Puntero al siguiente nodo de la lista
 }NodoSimbolo;
@@ -48,44 +83,7 @@ extern NodoSimbolo* tablaSimbolos;
 NodoSimbolo* buscarSimbolo(const char *nombre);
  
 
-
- // Declaracion de enum para armar un arbol de identificacion de tipos de datos. Sirve para la comparativa del return con la funcion.
- /*typedef enum tipoDato{
-    INT,
-    DOUBLE,
-    FLOAT,
-    CHAR,
-    VOID
-  }tipoDato;
-
-   typedef enum especificadorAlmacenamiento{
-    AUTO,
-    REGISTER,
-    STATIC,
-    EXTERN,
-    TYPEDEF
-  }especificadorAlmacenamiento;
-
- typedef enum calificadorTipo{
-    CONST,
-    VOLATILE
- }calificadorTipo;
-
- typedef enum expresionPrimaria{
-    IDENTIFICADOR,
-    CONSTANTE,
-    VACIA, //NULL EL return
-    CADENA      
- }expresionPrimaria;
-
- extern expresionPrimaria tipoResultanteEvExpresion;*/
-
- //desarrolamos ya identificamos que es tipo IDENTIFICADOR
- //con ese IDENTIFICADOR Vamos a la tabla de simbolos
-
-//NodoSimbolo *agregarSimboloTS (char const *, int);
-//NodoSimbolo *obtenerSimboloTS (char const *);
-//TODO:: hago un switch para saber si es variable o funcion typecast
+ 
 
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
