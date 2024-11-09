@@ -103,7 +103,8 @@ extern NodoSimbolo* tablaSimbolos;
 
 typedef enum tipoFuncion{
     DEFINICION_FUNCION,
-    DECLARACION_FUNCION
+    DECLARACION_FUNCION,
+    OTRO
 }tipoFuncion;
 
 
@@ -122,7 +123,7 @@ void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista);
 
-extern NodoVariableDeclarada* listaVariablesDeclaradas;
+extern NodoSimbolo* listaVariablesDeclaradas;
 
 
 // FUNCIONES
@@ -139,10 +140,9 @@ typedef struct NodoFuncion {
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
-NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno, const char *funcion, int linea, const char* tipogramatica);
-
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoFuncion **nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna);
-bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoFuncion *nodoGenericoFuncion);
+NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos retorno, tipoFuncion tipogramatica);
+void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo**nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna);
+bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFuncion);
 void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador);
 
 char* unirParametros(const char* param1, const char* param2);
@@ -151,11 +151,11 @@ void imprimirFunciones(NodoFuncion *lista);
 char* imprimirParametros(Parametro *listaDeParametros);
 void liberarFunciones(NodoFuncion *lista);
 
-extern NodoFuncion* listaFunciones;
+extern NodoSimbolo* listaFunciones;
 
 extern Parametro* listaDeParametros;
 
-extern NodoFuncion* nodoGenericoFuncion;
+extern NodoSimbolo* nodoGenericoFuncion;
 
 // ESTRUCTURAS NO RECONOCIDAS
 typedef struct NodoErrorSintactico {
@@ -288,7 +288,7 @@ int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
 NodoSimbolo *buscar_simbolo(char *nombre);
 void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna);
 Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador);
-void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros);
+void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *identificador, Parametro **listaDeParametros);
 void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos);
 
 void inicializarTipoRetorno(const char *tipo) ;

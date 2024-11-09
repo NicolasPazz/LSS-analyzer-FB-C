@@ -9,14 +9,14 @@ void yyerror(const char *s);
 
 // Declaramos listas e inicializamos en null
 NodoSimbolo* tablaSimbolos = NULL;
-NodoVariableDeclarada* listaVariablesDeclaradas = NULL;
-NodoFuncion* listaFunciones = NULL;
+NodoSimbolo* listaVariablesDeclaradas = NULL;
+NodoSimbolo* listaFunciones = NULL;
 NodoErroresSemanticos* listaErroresSemanticos = NULL;
 NodoErrorSintactico* listaErrorSintactico = NULL;
 NodoErrorSintactico* listaSecuenciasLeidas = NULL;
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 Parametro* listaDeParametros = NULL;
-NodoFuncion* nodoGenericoFuncion = NULL;
+NodoSimbolo* nodoGenericoFuncion = NULL;
 // Variables globales definidas
 //char *tipoReturnEsperado = NULL;
 //TipoRetorno* tipoReturnEncontrado =NULL;
@@ -284,7 +284,7 @@ return:
 
 declaracion
     : especificador_declaracion lista_declaradores_variable ';'             { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, tipoRetorno, @1.first_line, @1.first_column, $1);*/ }
-    | especificador_declaracion lista_declaradores_funcion ';'              {/* agregarFuncion(&listaFunciones, &tablaSimbolos, tipoRetorno, &nodoGenericoFuncion, @1.first_line, DECLARACION_FUNCION, @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2);*/ };
+    | especificador_declaracion lista_declaradores_funcion ';'              { agregarFuncion(&listaFunciones, &tablaSimbolos, tipoRetorno, &nodoGenericoFuncion, @1.first_line, DECLARACION_FUNCION, @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); };
     ;
 
 lista_declaradores_variable:
@@ -305,8 +305,8 @@ lista_declaradores_funcion:
     | lista_declaradores_funcion ',' declarador_funcion    { DBG_PRINT("lista_declaradores_funcion\n"); }
     ;
 declarador_funcion:
-      IDENTIFICADOR '(' ')'                                 { /*llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros);*/ DBG_PRINT("declarador_funcion %s\n", $1);}
-    | IDENTIFICADOR '(' lista_argumentos_prototipo ')'      { /*llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros);*/ DBG_PRINT("declarador_funcion %s\n", $1);}
+      IDENTIFICADOR '(' ')'                                 { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1);}
+    | IDENTIFICADOR '(' lista_argumentos_prototipo ')'      { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1);}
     ;
 lista_argumentos_prototipo:
       argumento_prototipo                                   { DBG_PRINT("argumento_prototipo\n"); }

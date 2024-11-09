@@ -171,27 +171,36 @@ void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
         actual = siguiente;
     }
 }
-
+*/
 // FUNCIONES
-NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, const char *retorno, const char *funcion, int linea, const char *tipogramatica){
+NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos retorno, tipoFuncion tipogramatica) {
+    // Asignar memoria para un nuevo nodo de tipo NodoFuncion
     NodoFuncion *nuevo = (NodoFuncion *)malloc(sizeof(NodoFuncion));
+    if (nuevo == NULL) {
+        printf("Error: no se pudo asignar memoria para el nuevo nodo de función.\n");
+        return NULL;
+    }
 
-    nuevo->funcion = copiarCadena(funcion);
-    nuevo->retorno = copiarCadena(retorno);
-    nuevo->tipogramatica = copiarCadena(tipogramatica);
-    nuevo->linea = linea;
-    nuevo->listaDeParametros = listaDeParametros;
-    nuevo->siguiente = NULL;
+    // Asignar los valores a los campos del NodoFuncion
+    nuevo->retorno = retorno;  // Copiar el especificador de retorno
+    nuevo->tipogramatica = tipogramatica;  // Asignar el tipo de función (DEFINICION_FUNCION o DECLARACION_FUNCION)
+    nuevo->listaDeParametros = listaDeParametros;  // Asignar la lista de parámetros
+    nuevo->siguiente = NULL;  // Inicializamos el siguiente puntero a NULL
 
     return nuevo;
 }
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoFuncion **nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna){
+void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo**nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna){
     if (nodoGenericoFuncion == NULL){
         printf("Error: nodoGenericoFuncion es NULL.\n");
         return;
     }
-    (*nodoGenericoFuncion)->tipogramatica = copiarCadena(tipogramatica);
+    NodoFuncion *nuevaFuncion = (NodoFuncion*)((*nodoGenericoFuncion)->nodo);
+    nuevaFuncion->tipogramatica = tipogramatica;
+    nuevaFuncion->retorno = retorno;
+
+    (*nodoGenericoFuncion)->linea = linea;
+    (*nodoGenericoFuncion)->columna = columna;
 
     //imprimirTablaSimbolos(*tablaSimbolos);
     // si esta declarado y quiero definir, puedo
@@ -199,7 +208,7 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, Especifica
     //
     //printf("\n\n(*nodoGenericoFuncion)->funcion): %s\n", (*nodoGenericoFuncion)->funcion);
     //printf("(*nodoGenericoFuncion)->tipogramatica: %s\n", (*nodoGenericoFuncion)->tipogramatica);
-    NodoSimbolo *nodoEncontrado = buscar_simbolo((*nodoGenericoFuncion)->funcion);
+    NodoSimbolo *nodoEncontrado = buscar_simbolo((*nodoGenericoFuncion)->nombre);
     //if (nodoEncontrado != NULL){printf("tipogramatica encontrada: %s\n", ((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica);}
     //if (nodoGenericoFuncion != NULL){printf("tipogramatica generico: %s\n", (*nodoGenericoFuncion)->tipogramatica);}
     if (//El identificador no fue usado antes
@@ -207,66 +216,53 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, Especifica
         //El identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes
         ((nodoEncontrado != NULL &&
         nodoEncontrado->tipo == FUNCION &&
-        strcmp(((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica, "declaracion") == 0 &&
-        strcmp((*nodoGenericoFuncion)->tipogramatica, "definicion") == 0) &&
-        noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion))) {
+        ((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica == DECLARACION_FUNCION &&
+        nuevaFuncion->tipogramatica == DEFINICION_FUNCION &&
+        noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion)))) {
 
         //Si el identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes. Validar que los parametros que se pretenden usar en la definicion, sean compatibles con los de la declaracion
         if(nodoEncontrado != NULL &&
         nodoEncontrado->tipo == FUNCION &&
-        strcmp(((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica, "declaracion") == 0 &&
-        strcmp((*nodoGenericoFuncion)->tipogramatica, "definicion") == 0 &&
+        ((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica == DECLARACION_FUNCION &&
+        nuevaFuncion->tipogramatica == DEFINICION_FUNCION &&
         noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion)){
             Parametro *paramDeclaracion = ((NodoFuncion*)nodoEncontrado->nodo)->listaDeParametros;
-            Parametro *paramDefinicion = (*nodoGenericoFuncion)->listaDeParametros;
+            Parametro *paramDefinicion = nuevaFuncion->listaDeParametros;
 
             while (paramDeclaracion != NULL && paramDefinicion != NULL) {
                 // Comprobar solo si ambos sufijos no son NULL
-                if (paramDeclaracion->sufijo != NULL && paramDefinicion->sufijo != NULL){
-                    if (strcmp(paramDeclaracion->sufijo, paramDefinicion->sufijo) != 0){
+                if (paramDeclaracion->especificadorDeclaracion.esTipoDato != NULL && paramDefinicion->especificadorDeclaracion.esTipoDato != NULL){
+                    if (paramDeclaracion->especificadorDeclaracion.esTipoDato != paramDefinicion->especificadorDeclaracion.esTipoDato){
                         //printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
                         return;
                     }
                 }
-                
-                // Comprobar solo si ambos tipos no son NULL
-                if (paramDeclaracion->tipo != NULL && paramDefinicion->tipo != NULL) {
-                    if (strcmp(paramDeclaracion->tipo, paramDefinicion->tipo) != 0) {
-                        //printf("Error: Incompatibilidad de tipos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
+                if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != NULL && paramDefinicion->especificadorDeclaracion.esAlmacenamiento != NULL){
+                    if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != paramDefinicion->especificadorDeclaracion.esAlmacenamiento){
+                        //printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
                         return;
                     }
                 }
-                
+                if (paramDeclaracion->especificadorDeclaracion.esCalificador != NULL && paramDefinicion->especificadorDeclaracion.esCalificador != NULL){
+                    if (paramDeclaracion->especificadorDeclaracion.esCalificador != paramDefinicion->especificadorDeclaracion.esCalificador){
+                        //printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
+                        return;
+                    }
+                }          
                 paramDeclaracion = paramDeclaracion->siguiente;
                 paramDefinicion = paramDefinicion->siguiente;
             }
     
             if (paramDeclaracion != NULL || paramDefinicion != NULL) {
-                printf("Error: La cantidad de parametros entre declaracion y definicion no coincide para la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
+                printf("Error: La cantidad de parametros entre declaracion y definicion no coincide para la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
                 return;
             }
         }
 
-        // Crear el nuevo nodo
-        NodoFuncion *nuevoNodo = crearNodoFuncion((*nodoGenericoFuncion)->listaDeParametros, retorno, (*nodoGenericoFuncion)->funcion, linea, tipogramatica);
-        // Si la lista esta vacia, el nuevo nodo es el primer nodo
-        if (*lista == NULL){
-            *lista = nuevoNodo;
-        }
-        else{ // Si la lista no esta vacia, recorrer hasta el final
-            NodoFuncion *actual = *lista;
-            while (actual->siguiente != NULL){
-                actual = actual->siguiente;
-            }
-            // Enlazar el nuevo nodo al final de la lista
-            actual->siguiente = nuevoNodo;
-        }
-
-        // Crear el nuevo NodoSimbolo
-        NodoSimbolo *nuevoNodoSimbolo = crearNodoSimbolo(nuevoNodo->funcion, FUNCION, nuevoNodo);
+        
         // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
         if (*tablaSimbolos == NULL){
-            *tablaSimbolos = nuevoNodoSimbolo;
+            *tablaSimbolos = nodoGenericoFuncion;
         }
         else{ // Si la lista no esta vacia, recorrer hasta el final
             NodoSimbolo *actual_simbolo = *tablaSimbolos;
@@ -274,16 +270,16 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, Especifica
                 actual_simbolo = actual_simbolo->siguiente;
             }
             // Enlazar el nuevo nodo al final de la lista
-            actual_simbolo->siguiente = nuevoNodoSimbolo;
+            actual_simbolo->siguiente = nodoGenericoFuncion;
         }
     } 
     else if (nodoEncontrado->tipo == FUNCION &&
-        strcmp(((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica, "definicion") == 0 &&
-        strcmp((*nodoGenericoFuncion)->tipogramatica, "declaracion") == 0) {
+        ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DEFINICION_FUNCION &&
+        nuevaFuncion->tipogramatica == DECLARACION_FUNCION) {
     // definicion ya existente, y se intenta declarar (sin efecto)
     } 
     else if (nodoEncontrado->tipo == FUNCION &&
-        strcmp(((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica, (*nodoGenericoFuncion)->tipogramatica) == 0) {
+        ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == nuevaFuncion->tipogramatica) {
     // redeclaracion o redefinicion de funcion
     }  
     else
@@ -294,7 +290,7 @@ void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, Especifica
     (*nodoGenericoFuncion) = NULL;
 }
 
-bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoFuncion *nodoGenericoFuncion) {
+bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFuncion) {
     NodoSimbolo *nodoActual = tablaSimbolos;
 
     while (nodoActual != NULL) {
@@ -302,8 +298,8 @@ bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoFuncion *nodoGenericoFun
             NodoFuncion *nodoFuncion = (NodoFuncion *)(nodoActual->nodo);
 
             // Comparar nombre de la funcion y verificar que no haya sido definida antes
-            if (strcmp(nodoFuncion->funcion, nodoGenericoFuncion->funcion) == 0 &&
-                strcmp(nodoFuncion->tipogramatica, "definicion") == 0) {
+            if (nodoActual->nombre == nodoGenericoFuncion->nombre &&
+                nodoFuncion->tipogramatica == DEFINICION_FUNCION) {
                 return false;  // Ya fue definida antes
             }
         }
@@ -312,7 +308,7 @@ bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoFuncion *nodoGenericoFun
 
     return true;  // No fue definida antes
 }
-
+/*
 void imprimirFunciones(NodoFuncion *lista){
     NodoFuncion *actual = lista;
     printf("* Listado de funciones declaradas y definidas:\n");
@@ -488,16 +484,25 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista){
         actual = siguiente;
     }
 }
-/*
-NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void *nodo){
+
+NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void *nodo) {
+    // Asignar memoria para el nuevo nodo de tipo NodoSimbolo
     NodoSimbolo *nuevo = (NodoSimbolo *)malloc(sizeof(NodoSimbolo));
-    nuevo->nombre = copiarCadena(nombre);
-    nuevo->tipo = tipo;
-    nuevo->nodo = nodo;
-    nuevo->siguiente = NULL;
-    return nuevo;
+    if (nuevo == NULL) {
+        printf("Error: no se pudo asignar memoria para el nuevo nodo de símbolo.\n");
+        return NULL;
+    }
+
+    // Asignar los valores a los campos del NodoSimbolo
+    nuevo->nombre = copiarCadena(nombre);  // Copiar el nombre del símbolo
+    nuevo->tipo = tipo;  // Asignar el tipo del símbolo (VARIABLE o FUNCION)
+    nuevo->nodo = nodo;  // Asignar el nodo asociado (de tipo void*)
+    nuevo->siguiente = NULL;  // Inicializar el siguiente puntero a NULL
+
+    return nuevo;  // Retornar el nuevo nodo
 }
 
+/*
 // ERRORES SEMANTICOS
 NodoErroresSemanticos *crearNodoErroresSemanticos(const char *mensaje, const int linea, const int columna){
     NodoErroresSemanticos *nuevo = (NodoErroresSemanticos *)malloc(sizeof(NodoErroresSemanticos));
@@ -665,7 +670,7 @@ int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo){
     tablaSimbolos = nuevo_simbolo;
     return 0;
 }
-
+*/
 NodoSimbolo *buscar_simbolo(char *nombre){
     NodoSimbolo *nodo_actual = tablaSimbolos;
     while (nodo_actual != NULL){
@@ -676,7 +681,7 @@ NodoSimbolo *buscar_simbolo(char *nombre){
     }
     return NULL; // Retornar NULL si no se encuentra el nodo
 }
-
+/*
 // Validacion de operaciones especificas
 int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador){
     if (!simbolo1 || !simbolo2){
@@ -798,16 +803,26 @@ void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especifi
     }
 }
 
+void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *identificador, Parametro **listaDeParametros){
+    EspecificadorTipos especificadorVacio = {.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
 
+    // Crear el nodo de tipo NodoFuncion utilizando la función crearNodoFuncion
+    NodoFuncion *nuevaFuncion = crearNodoFuncion(*listaDeParametros, especificadorVacio, OTRO);
+    
+    if (nuevaFuncion == NULL) {
+        printf("Error al crear la función\n");
+        return;
+    }
 
+    // Crear el nodo de tipo NodoSimbolo para almacenar la función
+    *nodoGenericoFuncion = crearNodoSimbolo(identificador, FUNCION, nuevaFuncion);
 
-/*void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros){
-    (*nodoGenericoFuncion) = (NodoFuncion *)malloc(sizeof(NodoFuncion));
-    //(*nodoGenericoFuncion)->funcion = copiarCadena(identificador);
-    (*nodoGenericoFuncion)->listaDeParametros = *listaDeParametros;
-
+    // Limpiar la lista de parámetros
     *listaDeParametros = NULL;
-}*/
+}
+
+
+
 /*
 void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
     NodoSimbolo *nodoActual = tablaSimbolos;
