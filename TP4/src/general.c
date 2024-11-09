@@ -202,12 +202,12 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
     (*nodoGenericoFuncion)->linea = linea;
     (*nodoGenericoFuncion)->columna = columna;
 
-    //imprimirTablaSimbolos(*tablaSimbolos);
+    imprimirTablaSimbolos(*tablaSimbolos);
     // si esta declarado y quiero definir, puedo
     // si esta definido y quiero declararar, no tiene efecto (no lo imprime en el reporte como funcion y no es error semantico)
     //
     //printf("\n\n(*nodoGenericoFuncion)->funcion): %s\n", (*nodoGenericoFuncion)->funcion);
-    //printf("(*nodoGenericoFuncion)->tipogramatica: %s\n", (*nodoGenericoFuncion)->tipogramatica);
+    printf("(*nodoGenericoFuncion)->nombre %s\n", (*nodoGenericoFuncion)->nombre);
     NodoSimbolo *nodoEncontrado = buscar_simbolo((*nodoGenericoFuncion)->nombre);
     //if (nodoEncontrado != NULL){printf("tipogramatica encontrada: %s\n", ((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica);}
     //if (nodoGenericoFuncion != NULL){printf("tipogramatica generico: %s\n", (*nodoGenericoFuncion)->tipogramatica);}
@@ -669,11 +669,16 @@ int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo){
     nuevo_simbolo->siguiente = tablaSimbolos;
     tablaSimbolos = nuevo_simbolo;
     return 0;
-}
-*/
+}*/
+
 NodoSimbolo *buscar_simbolo(char *nombre){
+    printf("entro a la funcion\n");
     NodoSimbolo *nodo_actual = tablaSimbolos;
-    while (nodo_actual != NULL){
+    printf("buscar_simbolo 1: nombre: %s\n", nombre);
+    
+    while (nodo_actual != NULL){ 
+        printf("Entro al while\n");
+        printf("buscar_simbolo 2: nombre: %s\n", nodo_actual->nombre); // No imprime este
         if (strcmp(nodo_actual->nombre, nombre) == 0){
             return nodo_actual; // Retornar el nodo encontrado
         }
@@ -823,7 +828,7 @@ void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *id
 
 
 
-/*
+
 void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
     NodoSimbolo *nodoActual = tablaSimbolos;
 
@@ -834,22 +839,18 @@ void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
     while (nodoActual != NULL){
         printf("Nombre: %s\n", nodoActual->nombre);
         printf("Tipo: %s\n", nodoActual->tipo == VARIABLE ? "VARIABLE" : "FUNCION");
+        printf("Linea: %d\n", nodoActual->linea);
+        printf("Columna: %d\n", nodoActual->columna);
 
         if (nodoActual->tipo == VARIABLE){
             NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodoActual->nodo;
-            printf("  Variable Declarada: %s\n", var->variableDeclarada);
-            printf("  Tipo de Dato: %s\n", var->tipoDato);
-            printf("  Linea: %d\n", var->linea);
-            printf("  Columna: %d\n", var->columna);
-            printf("  Sufijo: %s\n", var->sufijo);
+            printf("Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[var->tipoDato.esTipoDato], especificadorAlmacenamientoString[var->tipoDato.esAlmacenamiento], calificadorTipoString[var->tipoDato.esCalificador])
         }
         else if (nodoActual->tipo == FUNCION){
             NodoFuncion *func = (NodoFuncion *)nodoActual->nodo;
-            printf("  Identificador: %s\n", func->funcion);
-            printf("  Retorno: %s\n", func->retorno);
-            printf("  Tipo de gramatica: %s\n", func->tipogramatica);
-            printf("  Linea: %d\n", func->linea);
-            printf("  Columna: %d\n", func->columna);
+            printf("Identificador: %s\n", func->funcion);
+            printf("Retorno: %s\n", func->retorno);
+            printf("Tipo de gramatica: %s\n", func->tipogramatica);
 
             // Imprimir parametros usando tu funcion
             char *parametros = imprimirParametros(func->listaDeParametros);
@@ -862,7 +863,7 @@ void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
 }
 
 
-
+/*
 
 // Se recibe el tipo de dato de la funcion y se llama a la funcion copiarCadena
 void inicializarTipoRetorno(const char *tipo) {
@@ -941,6 +942,32 @@ EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, Especificado
 
     return inicial;
 }
+const char* especificadorTiposString[] = {
+    [VACIO_TIPODATO] = "vacio",
+    [CHAR_TIPODATO] = "char",
+    [VOID_TIPODATO] = "void",
+    [DOUBLE_TIPODATO] = "double",
+    [FLOAT_TIPODATO] = "float",
+    [INT_TIPODATO] = "int",
+    [UNSIGNED_INT_TIPODATO] = "unsigned int",
+    [LONG_TIPODATO] = "long",
+    [UNSIGNED_LONG_TIPODATO] = "unsigned long",
+    [SHORT_TIPODATO] = "short",
+    [UNSIGNED_SHORT_TIPODATO] = "unsigned short"
+};
+const char* especificadorAlmacenamientoString[] = {
+    [AUTO_ESPALMAC] = "auto",
+    [REGISTER_ESPALMAC] = "register",
+    [STATIC_ESPALMAC] = "static",
+    [EXTERN_ESPALMAC] = "extern",
+    [TYPEDEF_ESPALMAC] = "typedef",
+    [VACIO_ESPALMAC] = "vacio"
+};
+const char* calificadorTipoString[] = {
+    [CONST_CALIFICADORTIPO] = "const",
+    [VOLATILE_CALIFICADORTIPO] = "volatile",
+    [VACIO_CALIFICADORTIPO] = "vacio"
+};
 
 const char* especificadorTiposToString(EspecificadorTipos *especificador) {
     // Asigna memoria para el buffer dinámico

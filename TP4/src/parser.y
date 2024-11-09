@@ -24,7 +24,7 @@ EspecificadorTipos especificadorVacio = {.esTipoDato = VACIO_TIPODATO, .esAlmace
 
 EspecificadorTipos tipoRetorno;
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG
     #define DBG_PRINT(...) fprintf(stderr, __VA_ARGS__)
@@ -134,8 +134,7 @@ lista_argumentos_invocacion
     ;
 
 tipo_de_dato
-    : /*VACIO*/         { $$ = VACIO_TIPODATO; }
-    | CHAR              { $$ = CHAR_TIPODATO; }
+    : CHAR              { $$ = CHAR_TIPODATO; }
     | VOID              { $$ = VOID_TIPODATO; }
     | DOUBLE            { $$ = DOUBLE_TIPODATO; }
     | FLOAT             { $$ = FLOAT_TIPODATO; }
@@ -162,14 +161,14 @@ calificador_tipo
     ;
 
 sufijo
-    : tipo_de_dato                  { $$ = (struct EspecificadorTipos){.esTipoDato = $1, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO}; }
-    | especificador_almacenamiento  { $$ = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = $1, .esCalificador = VACIO_CALIFICADORTIPO}; }
-    | calificador_tipo              { $$ = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = $1}; }
+    : tipo_de_dato                  { $$ = (struct EspecificadorTipos){.esTipoDato = $1, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO}; DBG_PRINT("Tipo de dato: %s\n", especificadorTiposString[$$.esTipoDato]);}
+    | especificador_almacenamiento  { $$ = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = $1, .esCalificador = VACIO_CALIFICADORTIPO}; DBG_PRINT("Almacenamiento: %s\n", especificadorAlmacenamientoString[$$.esAlmacenamiento]);}
+    | calificador_tipo              { $$ = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = $1}; DBG_PRINT("Calificador: %s\n", calificadorTipoString[$$.esCalificador]);}
     ;
 
 especificador_declaracion
-    : sufijo                           { $$ = $1; const char* uno = especificadorTiposToString(&$$); DBG_PRINT("ESPECIFICADOR DECLARACION 1: %s\n", uno);}
-    | especificador_declaracion sufijo { /*$$ = (combinarEspecificadorTipos($1, $2)); const char* uno = especificadorTiposToString(&$$); DBG_PRINT("ESPECIFICADOR DECLARACION 2: %s\n", uno);*/ }
+    : sufijo                            { $$ = $1; DBG_PRINT("ESPECIFICADOR DECLARACION 1: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[$$.esTipoDato], especificadorAlmacenamientoString[$$.esAlmacenamiento], calificadorTipoString[$$.esCalificador]);}
+    | especificador_declaracion sufijo  { $$ = (combinarEspecificadorTipos($1, $2)); DBG_PRINT("ESPECIFICADOR DECLARACION 2: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[$$.esTipoDato], especificadorAlmacenamientoString[$$.esAlmacenamiento], calificadorTipoString[$$.esCalificador]); }
     ;
 
 sentencia:
@@ -192,7 +191,7 @@ sentencia_compuesta:
     ;
 sentencia_compuesta_sin_llaves:
       declaracion
-    | sentencia                     {DBG_PRINT("sentencia_compuesta_sin_llaves\n");}
+    | sentencia                     { DBG_PRINT("sentencia_compuesta_sin_llaves\n"); }
     | error ';'                     { agregarErrorSintactico(&listaErrorSintactico, &listaSecuenciasLeidas); yyclearin; yyerrok; DBG_PRINT("error sintactico\n"); }
     ;
 sentencias_compuestas_sin_llaves
@@ -284,7 +283,7 @@ return:
 
 declaracion
     : especificador_declaracion lista_declaradores_variable ';'             { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, tipoRetorno, @1.first_line, @1.first_column, $1);*/ }
-    | especificador_declaracion lista_declaradores_funcion ';'              { agregarFuncion(&listaFunciones, &tablaSimbolos, tipoRetorno, &nodoGenericoFuncion, @1.first_line, DECLARACION_FUNCION, @1.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); };
+    | especificador_declaracion lista_declaradores_funcion ';'              { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DECLARACION_FUNCION, @1.first_column); /*DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); */};
     ;
 
 lista_declaradores_variable:
@@ -292,7 +291,7 @@ lista_declaradores_variable:
     | lista_declaradores_variable ',' declarador_variable  { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
-    IDENTIFICADOR inicializacion_variable { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.especificadorTipos,  @1.first_line, @1.first_column, yyval.sufijo); */DBG_PRINT("declarador_variable \n"); }
+    IDENTIFICADOR inicializacion_variable   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.especificadorTipos,  @1.first_line, @1.first_column, yyval.sufijo); */DBG_PRINT("declarador_variable \n"); }
     ;
 inicializacion_variable
     : /*VACIO*/
@@ -305,8 +304,7 @@ lista_declaradores_funcion:
     | lista_declaradores_funcion ',' declarador_funcion    { DBG_PRINT("lista_declaradores_funcion\n"); }
     ;
 declarador_funcion:
-      IDENTIFICADOR '(' ')'                                 { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1);}
-    | IDENTIFICADOR '(' lista_argumentos_prototipo ')'      { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1);}
+    IDENTIFICADOR '(' lista_argumentos_prototipo ')'      { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1);}
     ;
 lista_argumentos_prototipo:
       argumento_prototipo                                   { DBG_PRINT("argumento_prototipo\n"); }
@@ -316,8 +314,8 @@ lista_argumentos_prototipo:
 argumento_prototipo
     : /*VACIO*/                                     { agregarParametro(&listaDeParametros, especificadorVacio, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
     | IDENTIFICADOR                                 { agregarParametro(&listaDeParametros, especificadorVacio, $1); DBG_PRINT("argumento_prototipo_final\n"); }
-    | especificador_declaracion IDENTIFICADOR       { agregarParametro(&listaDeParametros, $1, $2); DBG_PRINT("argumento_prototipo_final\n"); }
     | especificador_declaracion                     { agregarParametro(&listaDeParametros, $1, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
+    | especificador_declaracion IDENTIFICADOR       { agregarParametro(&listaDeParametros, $1, $2); DBG_PRINT("argumento_prototipo_final\n"); }
     ;
 lista_declaradores_variable_prototipo:
       declarador_variable_prototipo                                               { DBG_PRINT("lista_declaradores_variable\n"); }

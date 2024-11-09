@@ -92,7 +92,7 @@ void reinicializarUbicacion(void);
 
 typedef struct NodoSimbolo{
   char *nombre;
-  void* nodo;
+  void *nodo;
   tipoSimbolo tipo;
   int linea;
   int columna;
@@ -299,6 +299,9 @@ EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, Especificado
 
 char* obtenerTipoIdentificador(const char *identificador) ;
 
-const char* especificadorTiposToString(EspecificadorTipos *especificador);
+extern const char* especificadorTiposString[];
+extern const char* especificadorAlmacenamientoString[];
+extern const char* calificadorTipoString[];
+
 
 #endif
