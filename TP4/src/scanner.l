@@ -26,16 +26,16 @@
 "=="|"!="                                                                   {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return OP_IGUALDAD;}
 
     /*Tipos de datos*/
-char                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return CHAR;}
-double                                                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return DOUBLE;}
-enum                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return ENUM;}
-float                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return FLOAT;}
-int                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return INT;}
-long                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return LONG;}
-short                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return SHORT;}
-struct                                                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return STRUCT;}
-union                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.tipoDeDato = copiarCadena(yytext); yylloc.last_column += yyleng; return UNION;}
-void                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return VOID;}
+char                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return CHAR;}
+double                                                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return DOUBLE;}
+enum                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ENUM;}
+float                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return FLOAT;}
+int                                                                        {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return INT;}
+long                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return LONG;}
+short                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return SHORT;}
+struct                                                                     {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return STRUCT;}
+union                                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return UNION;}
+void                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return VOID;}
 
     /*Estructuras de control*/
 break                                                                       {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return BREAK;}

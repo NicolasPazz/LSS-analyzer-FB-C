@@ -7,8 +7,7 @@
 #ifndef GENERAL_H
 #define GENERAL_H
 #define YYLTYPE YYLTYPE
-typedef struct YYLTYPE
-{
+typedef struct YYLTYPE{
   int first_line;
   int first_column;
   int last_line;
@@ -31,17 +30,30 @@ void reinicializarUbicacion(void);
 
 
 // Declaracion de enum para armar un arbol de identificacion de tipos de datos. Sirve para la comparativa del return con la funcion.
+ 
+ //desarrolamos ya identificamos que es tipo IDENTIFICADOR
+ //con ese IDENTIFICADOR Vamos a la tabla de simbolos
+
  typedef enum tipoDato{
-    INT_TIPODATO,
-    DOUBLE_TIPODATO,
-    FLOAT_TIPODATO,
+    VACIO_TIPODATO,
+
     CHAR_TIPODATO,
     VOID_TIPODATO,
-    VACIO_TIPODATO
-  }tipoDato;
+    DOUBLE_TIPODATO,
+    FLOAT_TIPODATO,
+
+    INT_TIPODATO,
+    UNSIGNED_INT_TIPODATO,
+    
+    LONG_TIPODATO,             
+    UNSIGNED_LONG_TIPODATO,    
+
+    SHORT_TIPODATO,             
+    UNSIGNED_SHORT_TIPODATO   
+}tipoDato;
 
    typedef enum especificadorAlmacenamiento{
-    AUTO_ESPALMAC ,
+    AUTO_ESPALMAC,
     REGISTER_ESPALMAC,
     STATIC_ESPALMAC,
     EXTERN_ESPALMAC,
@@ -64,8 +76,13 @@ void reinicializarUbicacion(void);
 
  extern expresionPrimaria tipoResultanteEvExpresion;
  
- //desarrolamos ya identificamos que es tipo IDENTIFICADOR
- //con ese IDENTIFICADOR Vamos a la tabla de simbolos
+
+ typedef struct EspecificadorTipos{
+    tipoDato esTipoDato;
+    especificadorAlmacenamiento esAlmacenamiento;
+    calificadorTipo esCalificador;
+ }EspecificadorTipos;
+
 
 // Tabla de simbolos
  typedef enum tipoSimbolo{
@@ -76,25 +93,30 @@ void reinicializarUbicacion(void);
 typedef struct NodoSimbolo{
   char *nombre;
   void* nodo;
-  struct NodoSimbolo *siguiente; //Puntero al siguiente nodo de la lista
+  tipoSimbolo tipo;
+  int linea;
+  int columna;
+  struct NodoSimbolo *siguiente; 
 }NodoSimbolo;
 
 extern NodoSimbolo* tablaSimbolos;
 
+typedef enum tipoFuncion{
+    DEFINICION_FUNCION,
+    DECLARACION_FUNCION
+}tipoFuncion;
+
 
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
-    char *variableDeclarada;
-    enum tipoDato tipoDato;
-    int linea;
-    int columna;
-    char *sufijo;
-    struct NodoVariableDeclarada *siguiente;
+ 
+  EspecificadorTipos  tipoDato;    
+
 } NodoVariableDeclarada;
 
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
+NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada,  tipoDato tipoDato, const int linea, const int columna);
 
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *variableDeclarada, const char *tipoDato, const int linea, const int columna, const char *sufijo);
+void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *variableDeclarada, EspecificadorTipos tipoDato, const int linea, const int columna, const char *sufijo);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
@@ -104,8 +126,6 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 
 
 // FUNCIONES
-
-
 typedef struct Parametro {
     char *sufijo;
     char *tipo;
@@ -113,19 +133,15 @@ typedef struct Parametro {
     struct Parametro *siguiente;
 } Parametro;
 typedef struct NodoFuncion {
-    char *funcion;
-    enum  tipoDato retorno;
+    EspecificadorTipos retorno;
     Parametro *listaDeParametros;
-    char *tipogramatica;
-    int linea;
-    int columna;
+    tipoFuncion tipogramatica;
     struct NodoFuncion *siguiente;
 } NodoFuncion;
 
-
 NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno, const char *funcion, int linea, const char* tipogramatica);
 
-void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, const char *retorno, NodoFuncion **nodoGenericoFuncion, const int linea, const char* tipogramatica, const int columna);
+void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoFuncion **nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna);
 bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoFuncion *nodoGenericoFuncion);
 void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador);
 
@@ -245,6 +261,7 @@ typedef struct{
     } valor;
 }TokenInfo;
 
+/*
 typedef struct {
     char *tipoDato; // Tipo de dato de la expresión return
     int linea;
@@ -252,9 +269,10 @@ typedef struct {
    struct TipoRetorno *siguiente;
 } TipoRetorno;
 
+
+*/
 // Variable global para almacenar el tipo de retorno esperado de la función
-extern char *tipoReturnEsperado;
-extern TipoRetorno *tipoReturnEncontrado;
+extern EspecificadorTipos tipoRetorno;
 
 
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
@@ -277,6 +295,8 @@ void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos);
 void inicializarTipoRetorno(const char *tipo) ;
 void registrarReturn(const char *tipo, int linea, int columna);
 void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos);
+
+EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b) ;
 
 char* obtenerTipoIdentificador(const char *identificador) ;
 #endif
