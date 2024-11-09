@@ -760,27 +760,25 @@ int contarArgumentos(char *listaDeArgumentos){
     }
     return contador;
 }
-
-Parametro *crearNodoParametro(char *sufijo, char *tipo, char *identificador){
+*/
+Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador) {
     // Crear nuevo nodo y asignar memoria
     Parametro *nuevo = (Parametro *)malloc(sizeof(Parametro));
-    if (nuevo == NULL){
-        printf("Error: no se pudo asignar memoria para el nuevo parametro.\n");
+    if (nuevo == NULL) {
+        fprintf(stderr, "Error: no se pudo asignar memoria para el nuevo parámetro.\n");
         return NULL;
     }
-
-    // Asignar valores a los campos del nodo
-    nuevo->sufijo = copiarCadena(sufijo);
-    nuevo->tipo = copiarCadena(tipo);
+    
+    nuevo->especificadorDeclaracion = especificadorDeclaracion;
     nuevo->identificador = copiarCadena(identificador);
     nuevo->siguiente = NULL;
-
+    
     return nuevo;
 }
 
-void agregarParametro(Parametro **listaDeParametros, char *sufijo, char *tipo, char *identificador){
+void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador){
     // Crear el nodo usando la funcion de creacion
-    Parametro *nuevo = crearNodoParametro(sufijo, tipo, identificador);
+    Parametro *nuevo = crearNodoParametro(especificadorDeclaracion, identificador);
 
     if (nuevo == NULL){
         printf("Error: no se pudo crear el nuevo nodo de parametro.\n");
@@ -799,7 +797,10 @@ void agregarParametro(Parametro **listaDeParametros, char *sufijo, char *tipo, c
         actual->siguiente = nuevo;
     }
 }
-*/
+
+
+
+
 /*void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros){
     (*nodoGenericoFuncion) = (NodoFuncion *)malloc(sizeof(NodoFuncion));
     //(*nodoGenericoFuncion)->funcion = copiarCadena(identificador);
@@ -916,7 +917,6 @@ EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, Especificado
     if(a.esCalificador != VACIO_CALIFICADORTIPO)
         inicial.esCalificador = a.esCalificador;
 
-    // FALTA TAMBIÉN PARA b
     if(b.esTipoDato != VACIO_TIPODATO)
         inicial.esTipoDato = b.esTipoDato;
     if(b.esAlmacenamiento != VACIO_ESPALMAC)
@@ -925,4 +925,55 @@ EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, Especificado
         inicial.esCalificador = b.esCalificador;
 
     return inicial;
+}
+
+const char* especificadorTiposToString(EspecificadorTipos *especificador) {
+    // Asigna memoria para el buffer dinámico
+    char *buffer = (char *)malloc(150 * sizeof(char));
+    if (buffer == NULL) {
+        fprintf(stderr, "Error: No se pudo asignar memoria para el buffer.\n");
+        return NULL;
+    }
+
+    const char *tipoStr, *almacenamientoStr, *calificadorStr;
+
+    // Convertir esTipoDato
+    switch (especificador->esTipoDato) {
+        case VACIO_TIPODATO: tipoStr = "vacio"; break;
+        case CHAR_TIPODATO: tipoStr = "char"; break;
+        case VOID_TIPODATO: tipoStr = "void"; break;
+        case DOUBLE_TIPODATO: tipoStr = "double"; break;
+        case FLOAT_TIPODATO: tipoStr = "float"; break;
+        case INT_TIPODATO: tipoStr = "int"; break;
+        case UNSIGNED_INT_TIPODATO: tipoStr = "unsigned int"; break;
+        case LONG_TIPODATO: tipoStr = "long"; break;
+        case UNSIGNED_LONG_TIPODATO: tipoStr = "unsigned long"; break;
+        case SHORT_TIPODATO: tipoStr = "short"; break;
+        case UNSIGNED_SHORT_TIPODATO: tipoStr = "unsigned short"; break;
+        default: tipoStr = "desconocido"; break;
+    }
+
+    // Convertir esAlmacenamiento
+    switch (especificador->esAlmacenamiento) {
+        case AUTO_ESPALMAC: almacenamientoStr = "auto"; break;
+        case REGISTER_ESPALMAC: almacenamientoStr = "register"; break;
+        case STATIC_ESPALMAC: almacenamientoStr = "static"; break;
+        case EXTERN_ESPALMAC: almacenamientoStr = "extern"; break;
+        case TYPEDEF_ESPALMAC: almacenamientoStr = "typedef"; break;
+        case VACIO_ESPALMAC: almacenamientoStr = "vacio"; break;
+        default: almacenamientoStr = "desconocido"; break;
+    }
+
+    // Convertir esCalificador
+    switch (especificador->esCalificador) {
+        case CONST_CALIFICADORTIPO: calificadorStr = "const"; break;
+        case VOLATILE_CALIFICADORTIPO: calificadorStr = "volatile"; break;
+        case VACIO_CALIFICADORTIPO: calificadorStr = "vacio"; break;
+        default: calificadorStr = "desconocido"; break;
+    }
+
+    // Formatear el resultado en el buffer dinámico
+    snprintf(buffer, 150, "Tipo de dato: %s, Almacenamiento: %s, Calificador: %s", tipoStr, almacenamientoStr, calificadorStr);
+
+    return buffer;
 }

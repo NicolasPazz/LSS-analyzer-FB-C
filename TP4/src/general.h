@@ -127,11 +127,11 @@ extern NodoVariableDeclarada* listaVariablesDeclaradas;
 
 // FUNCIONES
 typedef struct Parametro {
-    char *sufijo;
-    char *tipo;
+    EspecificadorTipos especificadorDeclaracion;
     char *identificador;
     struct Parametro *siguiente;
 } Parametro;
+
 typedef struct NodoFuncion {
     EspecificadorTipos retorno;
     Parametro *listaDeParametros;
@@ -143,7 +143,7 @@ NodoFuncion* crearNodoFuncion(Parametro* listaDeParametros, const char *retorno,
 
 void agregarFuncion(NodoFuncion **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoFuncion **nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna);
 bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoFuncion *nodoGenericoFuncion);
-void agregarParametro(Parametro **listaDeParametros, char* sufijo, char* tipo, char* identificador);
+void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador);
 
 char* unirParametros(const char* param1, const char* param2);
 
@@ -287,8 +287,7 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
 int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
 NodoSimbolo *buscar_simbolo(char *nombre);
 void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna);
-Parametro* crearNodoParametro(char* sufijo, char* tipo, char* identificador);
-void agregarParametro(Parametro **listaDeParametros, char* sufijo, char *tipo, char *identificador);
+Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador);
 void llenarNodoGenericoFuncion(NodoFuncion **nodoGenericoFuncion, char *identificador, Parametro **listaDeParametros);
 void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos);
 
@@ -299,5 +298,7 @@ void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos);
 EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b) ;
 
 char* obtenerTipoIdentificador(const char *identificador) ;
-#endif
 
+const char* especificadorTiposToString(EspecificadorTipos *especificador);
+
+#endif
