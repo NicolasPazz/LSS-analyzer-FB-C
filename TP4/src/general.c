@@ -825,7 +825,7 @@ void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *
         if (nodoPrevio == NULL && strcmp(contextoActual,"main")==0){
             char mensaje[256];
             snprintf(mensaje, sizeof(mensaje), "'%s' sin declarar", identificador);
-            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna+2);
+            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         }
     }
 }
@@ -927,21 +927,22 @@ NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos r
     return nuevo;
 }
 
-bool fueDefinidaAntes(NodoSimbolo *tablaSimbolos, char* nombre){
+NodoSimbolo* fueDefinidaAntes(NodoSimbolo *tablaSimbolos, char* nombre) {
     NodoSimbolo *nodoActual = tablaSimbolos;
 
-    while (nodoActual != NULL){
-        if (nodoActual->tipo == FUNCION){
+    while (nodoActual != NULL) {
+        // Verificar si es una función y si coincide el nombre
+        if (nodoActual->tipo == FUNCION) {
             NodoFuncion *nodoFuncion = (NodoFuncion *)(nodoActual->nodo);
 
-            // Comparar nombre de la funcion y verificar que no haya sido definida antes
-            if (strcmp(nodoActual->nombre,nombre) == 0 && nodoFuncion->tipogramatica == DEFINICION_FUNCION){
-                return true; 
+            // Comparar el nombre de la función y verificar si ya fue definida
+            if (strcmp(nodoActual->nombre, nombre) == 0 && nodoFuncion->tipogramatica == DEFINICION_FUNCION) {
+                return nodoActual; // Retornar el nodo si ya está definida
             }
         }
-        nodoActual = nodoActual->siguiente; 
+        nodoActual = nodoActual->siguiente; // Avanzar al siguiente nodo
     }
-    return false;
+    return NULL; // Retornar NULL si no se encuentra ninguna definición previa
 }
 
 void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo **nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna){   
@@ -986,8 +987,17 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
             agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
             return;
         }
-        if (fueDefinidaAntes(*tablaSimbolos, (*nodoGenericoFuncion)->nombre)){
-            //SI LA FUNCION YA FUE DEFINIDA ANTES, NO ES UN ERROR SEMANTICO PERO TAMPOCO SE AGREGA A LA TABLA
+        NodoSimbolo* definicionAnterior = fueDefinidaAntes(*tablaSimbolos, (*nodoGenericoFuncion)->nombre);
+        if (definicionAnterior != NULL && tipogramatica == DEFINICION_FUNCION){
+            //47:5: Redefinicion de 'incremento'
+            //Nota: la definicion previa de 'incremento' es de tipo 'int(int)': 43:5
+            //SI LA FUNCION YA FUE DEFINIDA ANTES Y SE QUIERE DEFINIR
+            char mensaje[256];
+            snprintf(mensaje, sizeof(mensaje), "Redefinicion de '%s'\nNota: la definicion previa de '%s' es de tipo '%s(%s)': %d:%d", (*nodoGenericoFuncion)->nombre, (*nodoGenericoFuncion)->nombre, especificadorTiposString[funcionEncontrada->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDeclaracion), definicionAnterior->linea, definicionAnterior->columna);
+            agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
+            return;
+        } else if (definicionAnterior != NULL){
+            //SI LA FUNCION YA FUE DEFINIDA ANTES Y SE QUIERE DECLARAR, NO ES UN ERROR SEMANTICO PERO TAMPOCO SE AGREGA A LA TABLA
             return;
         }
     }
