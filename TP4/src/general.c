@@ -913,7 +913,7 @@ void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos
     }
 }
 
-void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, int contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores)
+void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores)
 {
     bool estaSiendoDeclarada = false;
     IdentificadorTemporal* actual = listaTemporalIdentificadores;

@@ -314,7 +314,7 @@ NodoVariableDeclarada *crearNodoVariableDeclarada(EspecificadorTipos tipoDato);
 void agregarIdentificadorTemporal(IdentificadorTemporal **listaTemporalIdentificadores, char *identificador, int linea, int columna);
 void agregarListaVariables(IdentificadorTemporal *listaTemporalIdentificadores, EspecificadorTipos tipoDato);
 void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *identificador, EspecificadorTipos tipoDato, int linea, int columna);
-void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, int contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores);
+void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores);
 char *enumAString(EspecificadorTipos tipoDato);
 
 char* obtenerTipoIdentificador(const char *identificador) ;
