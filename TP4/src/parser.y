@@ -82,7 +82,7 @@ line:
     ;
 
 expresion:
-      expresion_primaria                         { DBG_PRINT("expresion - EXPRESION_PRIMARIA\n"); }
+      expresion_primaria                         { DBG_PRINT("expresion - EXPRESION_PRIMARIA\n"); $$ = $1;}
     | expresion_postfija                         { DBG_PRINT("expresion - EXPRESION_POSTFIJA\n"); }
     | expresion_unaria                           { DBG_PRINT("expresion - EXPRESION_UNARIA\n"); }
     | expresion_multiplicativa                   { DBG_PRINT("expresion - EXPRESION_MULTIPLICATIVA\n"); }
@@ -95,12 +95,12 @@ expresion:
     ;
     
 expresion_primaria: 
-      IDENTIFICADOR                             { validarUsoDeVariable(&listaErroresSemanticos, $1, contextoActual, @1.last_line, @1.first_column, listaTemporalIdentificadores); DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
-    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1); }
-    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1); }
-    | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %d\n", $1); }
-    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1); }
-    | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");}
+      IDENTIFICADOR                             { validarUsoDeVariable(&listaErroresSemanticos, $1, contextoActual, @1.last_line, @1.first_column, listaTemporalIdentificadores); DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); $$ = $1;}
+    | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1);  $$ = "int";}
+    | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1); $$ = "float";}
+    | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %d\n", $1); $$ = "char";}
+    | LITERAL_CADENA                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1); $$ = "char";}
+    | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n"); $$ = "int";}
     ;
 expresion_postfija:
       IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); validarInvocacionAFuncion(&listaErroresSemanticos, $1, listaDeParametrosInvocacion, @1.first_line, @1.first_column); }
@@ -111,7 +111,7 @@ expresion_unaria:
     ;
 
 expresion_multiplicativa:
-      expresion OP_MULTIPLICATIVO expresion       { DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n"); }
+      expresion OP_MULTIPLICATIVO expresion       { validarMultiplicacion($1, $3, @1.last_line, @1.first_column, &listaErroresSemanticos); DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n"); }
     ;
 expresion_aditiva:
       expresion OP_ADITIVO expresion              { DBG_PRINT("expresion_aditiva: EXP1 +/- EXP2\n"); } 

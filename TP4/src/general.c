@@ -193,7 +193,7 @@ void imprimirVariables(NodoSimbolo *lista){
 
     while (actual != NULL && actual->tipo == VARIABLE){
         NodoVariableDeclarada *variable = (NodoVariableDeclarada *)actual->nodo;
-        printf("%s: %s, linea %d, columna %d\n", actual->nombre, enumAString(variable->tipoDato), actual->linea, actual->columna);
+        printf("%s: %s, linea %d, columna %d\n", actual->nombre, enumAString2(variable->tipoDato), actual->linea, actual->columna);
         actual = actual->siguiente;
         while (actual != NULL && actual->tipo != VARIABLE){
             actual = actual->siguiente;
@@ -634,6 +634,60 @@ int contarArgumentos(Parametro *listaDeParametros) {
     return contador;
 }
 
+bool esMultiplicable(char *expresion)
+{
+    if(
+    strcmp(expresion,"double")==0
+    || strcmp(expresion,"float")==0
+    || strcmp(expresion,"int")==0
+    || strcmp(expresion,"unsigned int")==0
+    || strcmp(expresion,"long")==0
+    || strcmp(expresion,"unsigned long")==0
+    || strcmp(expresion,"short")==0
+    || strcmp(expresion,"unsigned short")==0
+    )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+char *extraerTipoDato(char *expresion) //No extrae el tipo de variables que no estén en la TS, por más que hayan sido declaradas como parámetros
+{    
+    NodoSimbolo *nodo = buscar_simbolo(expresion);
+
+    if(nodo == NULL)
+    {
+        return expresion;
+    }
+    else if(nodo->tipo == VARIABLE)
+    {
+        NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodo->nodo;
+        return enumAString1(elemento->tipoDato);
+    }
+    else if(nodo->tipo == FUNCION)
+    {
+        NodoFuncion *elemento = (NodoFuncion *)nodo->nodo;
+        return enumAString1(elemento->retorno);
+    }
+}
+
+void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int columna, NodoErroresSemanticos **listaErroresSemanticos)
+{
+    char *tipoDato1 = extraerTipoDato(expresion1);
+    char *tipoDato2 = extraerTipoDato(expresion2);
+
+    if((!esMultiplicable(tipoDato1) || !esMultiplicable(tipoDato2)))
+    {
+        char mensaje[256];
+        snprintf(mensaje, sizeof(mensaje), "Operandos invalidos del operador binario * (tienen '%s' y '%s')", tipoDato1, tipoDato2);
+        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+    }
+}
+
 NodoVariableDeclarada *crearNodoVariableDeclarada(EspecificadorTipos tipoDato)
 {
     NodoVariableDeclarada *nuevo = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
@@ -717,13 +771,13 @@ void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos
             if (tipoDato.esTipoDato != tipoDatoPrevio.esTipoDato)
             {
                 char mensaje[256];
-                snprintf(mensaje, sizeof(mensaje), "conflicto de tipos para '%s'; la ultima es de tipo '%s'\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", identificador, enumAString(tipoDato), identificador, enumAString(tipoDatoPrevio), nodoPrevio->linea, nodoPrevio->columna);
+                snprintf(mensaje, sizeof(mensaje), "conflicto de tipos para '%s'; la ultima es de tipo '%s'\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", identificador, enumAString2(tipoDato), identificador, enumAString2(tipoDatoPrevio), nodoPrevio->linea, nodoPrevio->columna);
                 agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
             }
             else
             {
                 char mensaje[256];
-                snprintf(mensaje, sizeof(mensaje), "Redeclaracion de '%s'\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", identificador, identificador, enumAString(tipoDatoPrevio), nodoPrevio->linea, nodoPrevio->columna);
+                snprintf(mensaje, sizeof(mensaje), "Redeclaracion de '%s'\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", identificador, identificador, enumAString2(tipoDatoPrevio), nodoPrevio->linea, nodoPrevio->columna);
                 agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
             }
         }
@@ -732,7 +786,7 @@ void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos
             NodoFuncion *elemento = (NodoFuncion *)nodoPrevio->nodo;
             char mensaje[512]; // Aumentamos el tamano del buffer si es necesario
             snprintf(mensaje, sizeof(mensaje), "'%s' redeclarado como un tipo diferente de simbolo\nNota: la declaracion previa de '%s' es de tipo '%s(",
-                     identificador, identificador, enumAString(elemento->retorno));
+                     identificador, identificador, enumAString2(elemento->retorno));
 
             char *parametros = imprimirParametros(elemento->listaDeParametros);
             if (parametros != NULL)
@@ -1145,7 +1199,36 @@ int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
 } // puede ir algo por aca la validacion de tipos. En vez de return 1 o 0, se puede generar accion.
 */
 
-char *enumAString(EspecificadorTipos tipoDato)
+char *enumAString1(EspecificadorTipos tipoDato)
+{
+    // Asigna memoria para el buffer dinámico
+    char *buffer = (char *)malloc(150 * sizeof(char));
+    if (buffer == NULL) {
+        fprintf(stderr, "Error: No se pudo asignar memoria para el buffer.\n");
+        return NULL;
+    }
+
+    const char *tipoStr;
+
+    // Convertir esTipoDato
+    switch (tipoDato.esTipoDato) {
+        case VACIO_TIPODATO: tipoStr = ""; break;
+        case CHAR_TIPODATO: tipoStr = "char"; break;
+        case VOID_TIPODATO: tipoStr = "void"; break;
+        case DOUBLE_TIPODATO: tipoStr = "double"; break;
+        case FLOAT_TIPODATO: tipoStr = "float"; break;
+        case INT_TIPODATO: tipoStr = "int"; break;
+        case UNSIGNED_INT_TIPODATO: tipoStr = "unsigned int"; break;
+        case LONG_TIPODATO: tipoStr = "long"; break;
+        case UNSIGNED_LONG_TIPODATO: tipoStr = "unsigned long"; break;
+        case SHORT_TIPODATO: tipoStr = "short"; break;
+        case UNSIGNED_SHORT_TIPODATO: tipoStr = "unsigned short"; break;
+    }
+
+    return tipoStr;
+}
+
+char *enumAString2(EspecificadorTipos tipoDato)
 {
     // Asigna memoria para el buffer dinámico
     char *buffer = (char *)malloc(150 * sizeof(char));
