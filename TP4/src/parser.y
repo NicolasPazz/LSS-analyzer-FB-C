@@ -283,7 +283,7 @@ return:
 
 declaracion
     : especificador_declaracion lista_declaradores_variable ';'             { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, tipoRetorno, @1.first_line, @1.first_column, $1);*/ }
-    | especificador_declaracion lista_declaradores_funcion ';'              { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DECLARACION_FUNCION, @1.first_column); /*DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); */};
+    | especificador_declaracion lista_declaradores_funcion ';'              { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DECLARACION_FUNCION, @2.first_column);  /*DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); */};
     ;
 
 lista_declaradores_variable:
@@ -335,7 +335,7 @@ definiciones_externas:
     ;
 
 definicion_funcion: 
-      especificador_declaracion declarador_funcion sentencia_compuesta   {/*inicializarTipoRetorno($1) ; validarTipoReturn(&listaErroresSemanticos); agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DEFINICION_FUNCION, @1.first_column);*/ DBG_PRINT("definiciones_externas: definicion de funcion\n");}
+      especificador_declaracion declarador_funcion sentencia_compuesta   {/*inicializarTipoRetorno($1) ; validarTipoReturn(&listaErroresSemanticos); */agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DEFINICION_FUNCION, @2.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n");}
     ; 
 
 %%
@@ -367,7 +367,7 @@ int main(int argc, char *argv[]) {
     printf("\n");
 
     //2
-    //imprimirFunciones(listaFunciones);
+    imprimirFunciones(tablaSimbolos);
     //liberarFunciones(listaFunciones);
     printf("\n");
 
@@ -376,13 +376,13 @@ int main(int argc, char *argv[]) {
     printf("\n");
 
     //4
-    //imprimirErrorSintactico(listaErrorSintactico);
-    //liberarErrorSintactico(listaErrorSintactico);
+    imprimirErrorSintactico(listaErrorSintactico);
+    liberarErrorSintactico(listaErrorSintactico);
     printf("\n");
 
     //5 
-    //imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
-    //liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
+    imprimirCadenasNoReconocidas(listaCadenasNoReconocidas);
+    liberarCadenasNoReconocidas(listaCadenasNoReconocidas);
     printf("\n");
     return 0;
 }

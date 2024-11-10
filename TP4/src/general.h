@@ -75,7 +75,6 @@ void reinicializarUbicacion(void);
  }expresionPrimaria;
 
  extern expresionPrimaria tipoResultanteEvExpresion;
- 
 
  typedef struct EspecificadorTipos{
     tipoDato esTipoDato;
@@ -107,12 +106,9 @@ typedef enum tipoFuncion{
     OTRO
 }tipoFuncion;
 
-
 // VARIABLES DECLARADAS
 typedef struct NodoVariableDeclarada {
- 
   EspecificadorTipos  tipoDato;    
-
 } NodoVariableDeclarada;
 
 NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada,  tipoDato tipoDato, const int linea, const int columna);
@@ -124,7 +120,6 @@ void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista);
 
 extern NodoSimbolo* listaVariablesDeclaradas;
-
 
 // FUNCIONES
 typedef struct Parametro {
@@ -147,7 +142,7 @@ void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especifi
 
 char* unirParametros(const char* param1, const char* param2);
 
-void imprimirFunciones(NodoFuncion *lista);
+void imprimirFunciones(NodoSimbolo *lista);
 char* imprimirParametros(Parametro *listaDeParametros);
 void liberarFunciones(NodoFuncion *lista);
 
@@ -194,7 +189,7 @@ void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
 void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
-NodoSimbolo* crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, void* nodo);
+NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, int linea, int columna, void *nodo);
 
 extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
 //void reiniciarListaParametros(char **listaParametros);
@@ -302,6 +297,7 @@ char* obtenerTipoIdentificador(const char *identificador) ;
 extern const char* especificadorTiposString[];
 extern const char* especificadorAlmacenamientoString[];
 extern const char* calificadorTipoString[];
+extern const char *tipoFuncionString[];
 
 
 #endif
