@@ -134,9 +134,9 @@ const char *calificadorTipoString[] = {
     [VOLATILE_CALIFICADORTIPO] = "volatile",
     [VACIO_CALIFICADORTIPO] = "vacio"};
 
-char *imprimirParametros(Parametro *listaDeParametros){
+char *imprimirParametros(Parametro *listaDeParametros) {
     char *parametros = (char *)malloc(256);
-    if (parametros == NULL){
+    if (parametros == NULL) {
         printf("Error: No se pudo asignar memoria para los parametros\n");
         return NULL;
     }
@@ -144,38 +144,64 @@ char *imprimirParametros(Parametro *listaDeParametros){
     strcpy(parametros, "");
     Parametro *paramActual = listaDeParametros;
 
+    while (paramActual != NULL) {
+        // Inicializa lista de elementos para el parámetro actual
+        ElementosParametro *lista = NULL;
+        ElementosParametro *aux = NULL;
+
+        // Agregar cada especificador a la lista de elementos
+        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO) {
+            ElementosParametro *nuevoElemento = malloc(sizeof(ElementosParametro));
+            nuevoElemento->elemento = calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador];
+            nuevoElemento->siguiente = NULL;
+            if (lista == NULL) lista = nuevoElemento;
+            else aux->siguiente = nuevoElemento;
+            aux = nuevoElemento;
+        }
+        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC) {
+            ElementosParametro *nuevoElemento = malloc(sizeof(ElementosParametro));
+            nuevoElemento->elemento = especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento];
+            nuevoElemento->siguiente = NULL;
+            if (lista == NULL) lista = nuevoElemento;
+            else aux->siguiente = nuevoElemento;
+            aux = nuevoElemento;
+        }
+        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO) {
+            ElementosParametro *nuevoElemento = malloc(sizeof(ElementosParametro));
+            nuevoElemento->elemento = especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato];
+            nuevoElemento->siguiente = NULL;
+            if (lista == NULL) lista = nuevoElemento;
+            else aux->siguiente = nuevoElemento;
+            aux = nuevoElemento;
+        }
+        if (paramActual->identificador != NULL) {
+            ElementosParametro *nuevoElemento = malloc(sizeof(ElementosParametro));
+            nuevoElemento->elemento = paramActual->identificador;
+            nuevoElemento->siguiente = NULL;
+            if (lista == NULL) lista = nuevoElemento;
+            else aux->siguiente = nuevoElemento;
+            aux = nuevoElemento;
+        }
+
+        // Concatenar todos los elementos del parámetro actual
+        aux = lista;
+        while (aux != NULL) {
+            strcat(parametros, aux->elemento);
+            if (aux->siguiente != NULL) strcat(parametros, " ");
+            ElementosParametro *temp = aux;
+            aux = aux->siguiente;
+            free(temp);  // Liberar memoria del nodo
+        }
+
+        // Agregar ", " entre parámetros si no es el último
+        if (paramActual->siguiente != NULL) strcat(parametros, ", ");
         
-    while (paramActual != NULL){
-        // Agregar tipo de dato, almacenamiento y calificador si no están vacíos
-        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO){
-            strcat(parametros, especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato]);
-            strcat(parametros, " ");
-        }
-        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC){
-            strcat(parametros, especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento]);
-            strcat(parametros, " ");
-        }
-        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO){
-            strcat(parametros, calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador]);
-            strcat(parametros, " ");
-        }
-
-        // Agregar identificador
-        if (paramActual->identificador != NULL){
-            strcat(parametros, paramActual->identificador);
-        }
-
-        // Agregar coma y espacio si hay más parámetros
-        if (paramActual->siguiente != NULL){
-            strcat(parametros, ", ");
-        }
         paramActual = paramActual->siguiente;
     }
+
     return parametros;
-    
-
-
 }
+
 
 /*
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
@@ -415,7 +441,7 @@ NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, int linea, i
     return nuevo; // Retornar el nuevo nodo
 }
 
-/*
+
 // ERRORES SEMANTICOS
 NodoErroresSemanticos *crearNodoErroresSemanticos(const char *mensaje, const int linea, const int columna){
     NodoErroresSemanticos *nuevo = (NodoErroresSemanticos *)malloc(sizeof(NodoErroresSemanticos));
@@ -461,11 +487,11 @@ void imprimirErrorSemantico(NodoErroresSemanticos *lista){
         return;
     }
     while (actual != NULL){
-        printf("%d:%d %s\n", actual->linea, actual->columna, actual->mensaje);
+        printf("%d:%d: %s\n", actual->linea, actual->columna, actual->mensaje);
         actual = actual->siguiente;
     }
 }
-
+/*
 void liberarErrorSemantico(NodoErroresSemanticos *lista){
     NodoErroresSemanticos *actual = lista;
     NodoErroresSemanticos *siguiente = NULL;
@@ -621,18 +647,6 @@ int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operado
     return 0;
 }
 
-// Validacion de invocacion de funcion
-int validar_invocacion_funcion(NodoSimbolo *simbolo, int num_args)
-{ // Esta funcion no la entiendo, hice validarInvocacionAFuncion() que anda bien, pero no borro esta por las dudas
-    if (!simbolo || simbolo->tipo != FUNCION){
-        printf("Error: '%s' no es una funcion declarada.\n", simbolo->nombre);
-        return -1;
-    }
-    // Validacion especifica para funciones con respecto a los argumentos
-    // Tipo de datos de cada argumento a verificar en nodo de la funcion
-    return 0;
-}
-
 // Validacion de asignacion
 int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der){
     if (!simbolo_lado_izq || !simbolo_lado_der){
@@ -649,41 +663,73 @@ int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_
     }
     return 0;
 }
+*/
+void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, Parametro *listaDeParametros, int linea, int columna){
+    NodoSimbolo *funcion = buscar_simbolo(identificador);
+    
+    if(funcion == NULL){
+        char mensaje[256];
+        snprintf(mensaje, sizeof(mensaje), "Funcion '%s' sin declarar", identificador);
+        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        return;
+    }
 
-void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna){
-    NodoSimbolo *nodoPrevio = buscar_simbolo(identificador);
-    if (nodoPrevio == NULL){
+    if(funcion->tipo != FUNCION) {
         char mensaje[256];
-        snprintf(mensaje, sizeof(mensaje), " Funcion '%s' sin declarar", identificador);
+        snprintf(mensaje, sizeof(mensaje), "El objeto invocado %s no es una funcion o un puntero a una funcion\n Nota: declarado aqui %d:%d", identificador, funcion->linea, funcion->columna);
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        return;
     }
-    else if (nodoPrevio->tipo != FUNCION){
-        NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodoPrevio->nodo;
+    /*
+    int cantidadDeParametrosInvocada = contarArgumentos(listaDeParametros);
+    int cantidadDeParametrosEncontrada = contarArgumentos(((NodoFuncion *)(funcion)->nodo)->listaDeParametros);
+
+    if (cantidadDeParametrosInvocada > cantidadDeParametrosEncontrada){
         char mensaje[256];
-        snprintf(mensaje, sizeof(mensaje), " El objeto invocado %s no es una funcion o un puntero a una funcion\n Nota: declarado aqui %d:%d", identificador, elemento->linea, elemento->columna);
+        snprintf(mensaje, sizeof(mensaje), "Demasiados argumentos para la funcion '%s'", identificador);
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        return;
     }
-    //    else {
-    //        char mensaje[256];
-    //        snprintf(mensaje, sizeof(mensaje), " Lista de argumentos %d", listaDeArgumentos);
-    //        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
-    //    }
+
+    if (cantidadDeParametrosInvocada < cantidadDeParametrosEncontrada){
+        char mensaje[256];
+        snprintf(mensaje, sizeof(mensaje), "Insuficientes argumentos para la funcion '%s'", identificador);
+        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        return;
+    }
+
+    int numeroDeParametro = validarListasDeParametros(((NodoFuncion *)(funcion)->nodo)->listaDeParametros, listaDeParametros);
+    if(numeroDeParametro != -1){
+        Parametro *parametroEncontrado = ((NodoFuncion *)(funcion)->nodo)->listaDeParametros;
+        for(int i = 0; i < numeroDeParametro; i++){
+            parametroEncontrado = parametroEncontrado->siguiente;
+        }
+        Parametro *parametroInvocado = listaDeParametros;
+        for(int i = 0; i < numeroDeParametro; i++){
+            parametroInvocado = parametroInvocado->siguiente;
+        }
+        char mensaje[256];
+        snprintf(mensaje, sizeof(mensaje), "Incompatibilidad de tipos para el argumento %d de '%s'\nNota: se esperaba '%s' pero el argumento es de tipo '%s': %d:%d", numeroDeParametro, identificador, tipoFuncionString[parametroEncontrado->especificadorDeclaracion.esTipoDato], tipoFuncionString[parametroInvocado->especificadorDeclaracion.esTipoDato], parametroEncontrado->linea, parametroEncontrado->columna);
+        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        return;
+    }
+    //FALTA EL CASO 6
+    // 6.	Cuando se trata de operar con el valor de retorno de una función que retorna void (ya sea para asignación, multiplicación, etc.). L:C indica la ubicación de la invocación de función en el archivo de entrada.
+    // L:C: No se ignora el valor de retorno void como deberia ser
+    */
 }
 
-int contarArgumentos(char *listaDeArgumentos){
+int contarArgumentos(Parametro *listaDeParametros) {
     int contador = 0;
-    char *token;
-    token = strtok(listaDeArgumentos, ",");
-    while (token != NULL){
+    while (listaDeParametros != NULL) {
         contador++;
-        token = strtok(NULL, ",");
+        listaDeParametros = listaDeParametros->siguiente;
     }
     return contador;
-}*/
-
+}
 
 // FUNCIONES
-Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador){
+Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador, int linea, int columna){
     // Crear nuevo nodo y asignar memoria
     Parametro *nuevo = (Parametro *)malloc(sizeof(Parametro));
     if (nuevo == NULL)
@@ -693,14 +739,16 @@ Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const
     }
     nuevo->especificadorDeclaracion = especificadorDeclaracion;
     nuevo->identificador = copiarCadena(identificador);
+    nuevo->linea = linea;
+    nuevo->columna = columna;
     nuevo->siguiente = NULL;
 
     return nuevo;
 }
 
-void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador){
+void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador, int linea, int columna){
     // Crear el nodo usando la funcion de creacion
-    Parametro *nuevo = crearNodoParametro(especificadorDeclaracion, identificador);
+    Parametro *nuevo = crearNodoParametro(especificadorDeclaracion, identificador, linea, columna);
 
     if (nuevo == NULL){
         printf("Error: no se pudo crear el nuevo nodo de parametro.\n");
@@ -984,4 +1032,53 @@ EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, Especificado
         inicial.esCalificador = b.esCalificador;
 
     return inicial;
+}
+
+
+expresionPrimaria buscarTipoDeDato(char* nombre){
+    NodoSimbolo *nodo = buscar_simbolo(nombre);
+    if (nodo != NULL){
+        if (nodo->tipo == VARIABLE){
+            NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodo->nodo;
+            switch(var->tipoDato.esTipoDato){
+                //CONSTANTES --> enum CONSTANTE_EXPRESIONPRIMARIA
+                case FLOAT_TIPODATO:
+                case INT_TIPODATO:
+                case CHAR_TIPODATO:
+                case DOUBLE_TIPODATO:
+                case UNSIGNED_INT_TIPODATO:
+                case LONG_TIPODATO:
+                case SHORT_TIPODATO:                
+                case UNSIGNED_LONG_TIPODATO:                                
+                case UNSIGNED_SHORT_TIPODATO:
+                    return CONSTANTE_EXPRESIONPRIMARIA;
+                    break;  
+                //////////////////////
+                /*case VOID_TIPODATO:
+                break;
+                                          
+                case VACIO_TIPODATO:
+                break;
+*/
+                default:
+                    printf(" no se encontro el tipo expresion primaria para el tipo de dato de la variable %s\n", nombre);
+                    break;
+            }
+        }
+        /*else if (nodo->tipo == FUNCION){
+            return;
+        }*/
+    } else { printf("buscarTipoDeDato: Error: '%s' no fue declarado.\n", nombre); }
+}
+
+int validarListasDeParametros(Parametro* listaDeParametrosEncontrados, Parametro* listaDeParametrosInvocados) {
+        int i;
+        for(i = 0; i < contarArgumentos(listaDeParametrosEncontrados); i++) {
+            if(listaDeParametrosEncontrados->especificadorDeclaracion.esTipoDato != listaDeParametrosInvocados->especificadorDeclaracion.esTipoDato) {
+                return -1;
+            }
+            listaDeParametrosEncontrados = listaDeParametrosEncontrados->siguiente;
+            listaDeParametrosInvocados = listaDeParametrosInvocados->siguiente;
+        }
+        return i+1;
 }

@@ -16,6 +16,7 @@ NodoErrorSintactico* listaErrorSintactico = NULL;
 NodoErrorSintactico* listaSecuenciasLeidas = NULL;
 NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 Parametro* listaDeParametros = NULL;
+Parametro* listaDeParametrosInvocacion = NULL;
 NodoSimbolo* nodoGenericoFuncion = NULL;
 // Variables globales definidas
 //char *tipoReturnEsperado = NULL;
@@ -52,7 +53,7 @@ EspecificadorTipos tipoRetorno;
 %token <entero> CONSTANTE_ENTERA CONSTANTE_CARACTER
 %token <real> CONSTANTE_REAL
 
-%type <cadena> lista_declaradores_funcion lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion expresion_op sentencias_compuestas_sin_llaves sentencias expresion expresion_primaria expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion 
+%type <cadena> lista_declaradores_funcion lista_declaradores_variable lista_declaradores_variable_prototipo   lista_argumentos_prototipo argumento_prototipo lista_declaradores_variable_for declarador_variable_for  declarador_variable_prototipo inicializacion_variable_prototipo inicializacion_variable_for declarador_variable inicializacion_variable lista_argumentos_invocacion  declarador_funcion  definicion_funcion definiciones_externas declaracion sentencia_de_salto break continue return sentencia_for sentencia_do_while sentencia_switch sentencia_etiquetada cases default case sentencia_if_else sentencia_compuesta sentencia_de_expresion sentencias_compuestas_sin_llaves sentencias expresion_primaria expresion expresion_op expresion_postfija expresion_unaria expresion_multiplicativa expresion_aditiva expresion_relacional expresion_de_igualdad expresion_and expresion_or expresion_de_asignacion 
 %type <especificadorTipos> sufijo especificador_declaracion
 %type <esTipoDato> tipo_de_dato
 %type <esCalificador> calificador_tipo
@@ -90,6 +91,7 @@ expresion:
     | expresion_or                               { DBG_PRINT("expresion - EXPRESION_OR\n"); }
     | expresion_de_asignacion                    { DBG_PRINT("expresion - EXPRESION_DE_ASIGNACION\n"); }
     ;
+    
 expresion_primaria: 
       IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
     | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1); }
@@ -99,7 +101,7 @@ expresion_primaria:
     | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n");}
     ;
 expresion_postfija:
-      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); /*validarInvocacionAFuncion(&listaErroresSemanticos, $1, $3, @1.last_line, @1.first_column);*/ }
+      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); validarInvocacionAFuncion(&listaErroresSemanticos, $1, listaDeParametrosInvocacion, @1.first_line, @1.first_column); }
     | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); }
     ;
 expresion_unaria:
@@ -113,7 +115,7 @@ expresion_aditiva:
       expresion OP_ADITIVO expresion              { DBG_PRINT("expresion_aditiva: EXP1 +/- EXP2\n"); } 
     ;
 expresion_relacional:
-      expresion OP_RELACIONAL expresion
+      expresion OP_RELACIONAL expresion           { DBG_PRINT("expresion_relacional: EXP1 OP_RELACIONAL EXP2\n"); }
     ;
 expresion_de_igualdad:
       expresion OP_IGUALDAD expresion             { DBG_PRINT("expresion_de_igualdad: EXP1 ==/!= EXP2\n"); }
@@ -125,11 +127,11 @@ expresion_or:
       expresion OP_OR expresion                   { DBG_PRINT("expresion_or\n"); } 
     ;
 expresion_de_asignacion:
-      expresion OP_ASIGNACION expresion
+      expresion OP_ASIGNACION expresion           { DBG_PRINT("expresion_de_asignacion\n"); }
     ;
 lista_argumentos_invocacion
     : /*VACIO*/
-    | expresion                                   { DBG_PRINT("ARGUMENTO\n"); } 
+    | expresion                                   { /*agregarParametro(......);*/ DBG_PRINT("ARGUMENTO\n"); } 
     | lista_argumentos_invocacion ',' expresion   { DBG_PRINT("ARGUMENTO\n"); } 
     ;
 
@@ -252,7 +254,7 @@ expresion_op
 primera_parte_for
     : /*VACIO*/
     | especificador_declaracion lista_declaradores_variable_for { DBG_PRINT("primera_parte_for\n");}
-    | IDENTIFICADOR                                       { DBG_PRINT("primera_parte_for\n");}
+    | IDENTIFICADOR                                             { DBG_PRINT("primera_parte_for\n");}
     ;
 lista_declaradores_variable_for:
       declarador_variable_for                                       { DBG_PRINT("lista_declaradores_variable\n"); }
@@ -312,10 +314,10 @@ lista_argumentos_prototipo:
     ;
        
 argumento_prototipo
-    : /*VACIO*/                                     { agregarParametro(&listaDeParametros, especificadorVacio, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
-    | IDENTIFICADOR                                 { agregarParametro(&listaDeParametros, especificadorVacio, $1); DBG_PRINT("argumento_prototipo_final\n"); }
-    | especificador_declaracion                     { agregarParametro(&listaDeParametros, $1, NULL); DBG_PRINT("argumento_prototipo_final\n"); }
-    | especificador_declaracion IDENTIFICADOR       { agregarParametro(&listaDeParametros, $1, $2); DBG_PRINT("argumento_prototipo_final\n"); }
+    : /*VACIO*/                                     { agregarParametro(&listaDeParametros, especificadorVacio, NULL,  yylloc.first_line, yyloc.first_column); DBG_PRINT("argumento_prototipo_final\n"); }
+    | IDENTIFICADOR                                 { agregarParametro(&listaDeParametros, especificadorVacio, $1, @1.first_line, @1.first_column); DBG_PRINT("argumento_prototipo_final\n"); }
+    | especificador_declaracion                     { agregarParametro(&listaDeParametros, $1, NULL, @1.first_line, @1.first_column); DBG_PRINT("argumento_prototipo_final\n"); }
+    | especificador_declaracion IDENTIFICADOR       { agregarParametro(&listaDeParametros, $1, $2, @1.first_line, @2.first_column); DBG_PRINT("argumento_prototipo_final\n"); }
     ;
 lista_declaradores_variable_prototipo:
       declarador_variable_prototipo                                               { DBG_PRINT("lista_declaradores_variable\n"); }
@@ -369,9 +371,10 @@ int main(int argc, char *argv[]) {
     //2
     imprimirFunciones(tablaSimbolos);
     //liberarFunciones(listaFunciones);
+    printf("\n");
 
-   //3
-    //imprimirErrorSemantico(listaErroresSemanticos);
+    //3
+    imprimirErrorSemantico(listaErroresSemanticos);
     printf("\n");
 
     //4

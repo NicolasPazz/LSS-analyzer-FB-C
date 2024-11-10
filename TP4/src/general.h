@@ -33,7 +33,10 @@ void reinicializarUbicacion(void);
  
  //desarrolamos ya identificamos que es tipo IDENTIFICADOR
  //con ese IDENTIFICADOR Vamos a la tabla de simbolos
-
+typedef struct ElementosParametro{
+    char * elemento;
+    struct ElementosParametro *siguiente;
+}ElementosParametro;
  typedef enum tipoDato{
     VACIO_TIPODATO,
 
@@ -73,6 +76,12 @@ void reinicializarUbicacion(void);
     VACIA_EXPRESIONPRIMARIA, //NULL EL return
     CADENA_EXPRESIONPRIMARIA      
  }expresionPrimaria;
+
+ typedef struct ExpresionesTipo{
+    expresionPrimaria tipoExpresion;
+    
+ }ExpresionesTipo;
+ 
 
  extern expresionPrimaria tipoResultanteEvExpresion;
 
@@ -125,6 +134,8 @@ extern NodoSimbolo* listaVariablesDeclaradas;
 typedef struct Parametro {
     EspecificadorTipos especificadorDeclaracion;
     char *identificador;
+    int linea;
+    int columna;
     struct Parametro *siguiente;
 } Parametro;
 
@@ -138,7 +149,7 @@ typedef struct NodoFuncion {
 NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos retorno, tipoFuncion tipogramatica);
 void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo**nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna);
 bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFuncion);
-void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador);
+void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador, int linea, int columna);
 
 char* unirParametros(const char* param1, const char* param2);
 
@@ -149,6 +160,7 @@ void liberarFunciones(NodoFuncion *lista);
 extern NodoSimbolo* listaFunciones;
 
 extern Parametro* listaDeParametros;
+extern Parametro* listaDeParametrosInvocacion;
 
 extern NodoSimbolo* nodoGenericoFuncion;
 
@@ -273,18 +285,17 @@ extern EspecificadorTipos tipoRetorno;
 void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
 
 
-//NodoSimbolo *agregarSimboloTS (char const *sym_name, int sym_type);
-//NodoSimbolo *obtenerSimboloTS (char const *sym_name);
 
-int validar_invocacion_funcion(NodoSimbolo *simbolo, int num_args);
 int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der);
 int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador) ;
 int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
 NodoSimbolo *buscar_simbolo(char *nombre);
-void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *listaDeArgumentos, int linea, int columna);
-Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador);
+void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, Parametro *listaDeParametros, int linea, int columna);
+Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador, int linea, int columna);
 void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *identificador, Parametro **listaDeParametros);
 void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos);
+
+int validarListasDeParametros(Parametro* listaDeParametrosEncontrados, Parametro* listaDeParametrosInvocados);
 
 void inicializarTipoRetorno(const char *tipo) ;
 void registrarReturn(const char *tipo, int linea, int columna);
@@ -298,6 +309,8 @@ extern const char* especificadorTiposString[];
 extern const char* especificadorAlmacenamientoString[];
 extern const char* calificadorTipoString[];
 extern const char *tipoFuncionString[];
-
+int contarArgumentos(Parametro *listaDeParametros);
+expresionPrimaria buscarTipoDeDato(char* nombre);
+int contarArgumentos(Parametro *listaDeParametros);
 
 #endif
