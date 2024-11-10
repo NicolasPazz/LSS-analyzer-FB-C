@@ -19,7 +19,7 @@ Parametro* listaDeParametros = NULL;
 Parametro* listaDeParametrosInvocacion = NULL;
 NodoSimbolo* nodoGenericoFuncion = NULL;
 IdentificadorTemporal *listaTemporalIdentificadores = NULL; 
-int contextoActual=0;
+char *contextoActual="";
 // Variables globales definidas
 //char *tipoReturnEsperado = NULL;
 //TipoRetorno* tipoReturnEncontrado =NULL;
@@ -308,7 +308,7 @@ lista_declaradores_funcion:
     | lista_declaradores_funcion ',' declarador_funcion    { DBG_PRINT("lista_declaradores_funcion\n"); }
     ;
 declarador_funcion:
-    IDENTIFICADOR '(' lista_argumentos_prototipo ')'      { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1); contextoActual=1;}
+    IDENTIFICADOR '(' lista_argumentos_prototipo ')'      { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1); contextoActual=$1; }
     ;
 lista_argumentos_prototipo:
       argumento_prototipo                                   { DBG_PRINT("argumento_prototipo\n"); }
@@ -339,7 +339,7 @@ definiciones_externas:
     ;
 
 definicion_funcion: 
-      especificador_declaracion declarador_funcion sentencia_compuesta   {/*inicializarTipoRetorno($1) ; validarTipoReturn(&listaErroresSemanticos); */agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DEFINICION_FUNCION, @2.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); contextoActual=0;}
+      especificador_declaracion declarador_funcion sentencia_compuesta   {/*inicializarTipoRetorno($1) ; validarTipoReturn(&listaErroresSemanticos); */agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DEFINICION_FUNCION, @2.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); contextoActual="";}
     ; 
 
 %%

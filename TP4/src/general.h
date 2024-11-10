@@ -99,7 +99,7 @@ typedef struct IdentificadorTemporal {
 } IdentificadorTemporal;
 
 extern IdentificadorTemporal *listaTemporalIdentificadores;
-extern int contextoActual;
+extern char *contextoActual;
 
 
 // Tabla de simbolos

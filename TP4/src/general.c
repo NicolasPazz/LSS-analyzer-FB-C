@@ -932,7 +932,7 @@ void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *
     if (!estaSiendoDeclarada)
     {
         NodoSimbolo *nodoPrevio = buscar_simbolo(identificador);
-        if (nodoPrevio == NULL && contextoActual == 0){
+        if (nodoPrevio == NULL && strcmp(contextoActual,"main")==0){
             char mensaje[256];
             snprintf(mensaje, sizeof(mensaje), "'%s' sin declarar", identificador);
             agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
