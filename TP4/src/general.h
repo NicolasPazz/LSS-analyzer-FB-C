@@ -334,4 +334,11 @@ int contarArgumentos(Parametro *listaDeParametros);
 char *asignarTipoDatoFuncion(char* identificador);
 void ValidarInicializacionVoid(char* tipoDato, int linea, int columna);
 
+//funciones de validacion de asignacion
+// bool esValorModificable(NodoSimbolo *simbolo);
+// void validarAsignacion(NodoErroresSemanticos **listaErroresSemanticos, NodoSimbolo *simboloLadoIzq,  EspecificadorTipos tipoLadoDer, bool esValorModificable, int linea, int columna) ;
+
+//funciones de validaciones de return
+//void validarSentenciaReturn(NodoErroresSemanticos **listaErroresSemanticos,  EspecificadorTipos tipoRetornoDeclarado, EspecificadorTipos tipoReturnSentencia,  int lineaReturn, int columnaReturn, int lineaDeclaracion, int columnaDeclaracion);
+
 #endif

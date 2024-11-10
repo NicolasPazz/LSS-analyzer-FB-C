@@ -1384,3 +1384,68 @@ void ValidarInicializacionVoid(char* tipoDato, int linea, int columna){
         return;
     }
 }
+
+// //validacion de asignacion 
+// // Funcion para verificar que sea L-Modificable 
+// bool esValorModificable(NodoSimbolo *simbolo) {
+//     // Verificar si el símbolo es una variable
+//     // if (simbolo->tipo != VARIABLE) {
+//     //     return false;  // No es una variable, por lo tanto, no es modificable
+//     // }
+
+//     // Obtener la información de tipo del símbolo
+//     NodoVariableDeclarada *variable = (NodoVariableDeclarada *)simbolo->nodo;
+
+//     // Verificar si tiene el calificador const
+//     if (variable->tipoDato.esCalificador == CONST_CALIFICADORTIPO) {
+//         return false;  // Es const, por lo tanto, no es modificable
+//     }
+
+//     // Cumple con las condiciones para ser un valor-L modificable
+//     return true;
+// }
+
+// void validarAsignacion(NodoErroresSemanticos **listaErroresSemanticos, NodoSimbolo *simboloLadoIzq,  EspecificadorTipos tipoLadoDer, bool esValorModificable, int linea, int columna) {
+
+//     // 1. Validar incompatibilidad de tipos en la inicialización
+// //este no estoy seguro si funciona el resto , creo que si 
+//     NodoVariableDeclarada *variable = (NodoVariableDeclarada *)simboloLadoIzq->nodo;
+//     // if (variable->tipoDato.esTipoDato != tipoLadoDer.esTipoDato) {
+//     //     char mensaje[256];
+//     //     snprintf(mensaje, sizeof(mensaje), "%d:%d: Incompatibilidad de tipos al inicializar el tipo '%s' usando el tipo '%s'",  linea, columna, enumAString2(variable->tipoDato), enumAString2(tipoLadoDer));
+//     //     agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+//     // }
+
+//     // 2. Validar reasignación de variable const
+//     if (variable->tipoDato.esCalificador == CONST_CALIFICADORTIPO) {
+//         char mensaje[256];
+//         snprintf(mensaje, sizeof(mensaje),"%d:%d: Asignacion de la variable de solo lectura '%s'", linea, columna, simboloLadoIzq->nombre);
+//         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+//     }
+
+//     // 3. Validar que el lado izquierdo es un valor-L modificable
+//     if (!esValorModificable) {
+//         char mensaje[256];
+//         snprintf(mensaje, sizeof(mensaje), "%d:%d: Se requiere un valor-L modificable como operando izquierdo de la asignacion", linea, columna);
+//         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+//     }
+// }
+
+
+
+// //validacion sentencia return 
+// void validarSentenciaReturn(NodoErroresSemanticos **listaErroresSemanticos,  EspecificadorTipos tipoRetornoDeclarado, EspecificadorTipos tipoReturnSentencia,  int lineaReturn, int columnaReturn, int lineaDeclaracion, int columnaDeclaracion) {  // Caso 1: Se espera un tipo de retorno distinto de void pero se usa un return sin valor
+//     if (tipoRetornoDeclarado.esTipoDato != VOID_TIPODATO && tipoReturnSentencia.esTipoDato == VACIO_TIPODATO) {
+//      char mensaje[256];
+//         snprintf(mensaje, sizeof(mensaje), "%d:%d: 'return' sin valor en una funcion que no retorna void\nNota: declarado aqui: %d:%d", lineaReturn, columnaReturn, lineaDeclaracion, columnaDeclaracion);
+//         agregarErrorSemantico(listaErroresSemanticos, mensaje, lineaReturn, columnaReturn);
+//         return;
+//     }
+//     // Caso 2: Incompatibilidad de tipos entre el valor retornado y el tipo de retorno declarado
+//     //la condicion creo q hay chequear pero el resto es lo mismo que los errores , si terminan de reavisar la condicion creo q esta
+//     if (tipoRetornoDeclarado.esTipoDato != tipoReturnSentencia.esTipoDato) {
+//         char mensaje[256];
+//         snprintf(mensaje, sizeof(mensaje),"%d:%d: Incompatibilidad de tipos al retornar el tipo '%s' pero se esperaba '%s'",  lineaReturn, columnaReturn, enumAString2(tipoReturnSentencia),enumAString2(tipoRetornoDeclarado));  
+//         agregarErrorSemantico(listaErroresSemanticos, mensaje, lineaReturn, columnaReturn);
+//     }
+// }
