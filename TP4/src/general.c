@@ -881,7 +881,7 @@ void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos
             if (tipoDato.esTipoDato != tipoDatoPrevio.esTipoDato)
             {
                 char mensaje[256];
-                snprintf(mensaje, sizeof(mensaje), "conflicto de tipos para '%s'; la ultima es de tipo '%s'\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", identificador, enumAString(tipoDato), identificador, enumAString(tipoDatoPrevio), elemento->tipoDato, nodoPrevio->linea, nodoPrevio->columna);
+                snprintf(mensaje, sizeof(mensaje), "conflicto de tipos para '%s'; la ultima es de tipo '%s'\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", identificador, enumAString(tipoDato), identificador, enumAString(tipoDatoPrevio), nodoPrevio->linea, nodoPrevio->columna);
                 agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
             }
             else
