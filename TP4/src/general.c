@@ -1340,3 +1340,20 @@ int validarListasDeParametros(Parametro* listaDeParametrosEncontrados, Parametro
         }
         return i+1;
 }
+
+char *asignarTipoDatoFuncion(char* identificador){
+    NodoSimbolo* encontrada = buscar_simbolo(identificador); 
+    if(encontrada != NULL){
+        return especificadorTiposString[((NodoFuncion *)(encontrada->nodo))->retorno.esTipoDato];
+    }
+    return "vacio";
+}
+
+void ValidarInicializacionVoid(char* tipoDato, int linea, int columna){
+    if(strcmp(tipoDato, "void") == 0){
+        char mensaje[256];
+        snprintf(mensaje, sizeof(mensaje), "No se ignora el valor de retorno void como deberia ser");
+        agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
+        return;
+    }
+}

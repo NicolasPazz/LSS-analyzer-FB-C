@@ -83,7 +83,7 @@ line:
 
 expresion:
       expresion_primaria                         { DBG_PRINT("expresion - EXPRESION_PRIMARIA\n"); $$ = $1;}
-    | expresion_postfija                         { DBG_PRINT("expresion - EXPRESION_POSTFIJA\n"); }
+    | expresion_postfija                         { $$=$1; DBG_PRINT("expresion - EXPRESION_POSTFIJA\n"); }
     | expresion_unaria                           { DBG_PRINT("expresion - EXPRESION_UNARIA\n"); }
     | expresion_multiplicativa                   { DBG_PRINT("expresion - EXPRESION_MULTIPLICATIVA\n"); }
     | expresion_aditiva                          { DBG_PRINT("expresion - EXPRESION_ADITIVA\n"); }
@@ -103,7 +103,7 @@ expresion_primaria:
     | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n"); $$ = "int";}
     ;
 expresion_postfija:
-      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); validarInvocacionAFuncion(&listaErroresSemanticos, $1, listaDeParametrosInvocacion, @1.first_line, @1.first_column); }
+      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { $$=asignarTipoDatoFuncion($1); validarInvocacionAFuncion(&listaErroresSemanticos, $1, listaDeParametrosInvocacion, @1.first_line, @1.first_column); DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); }
     | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { validarUsoDeVariable(&listaErroresSemanticos, $1, contextoActual, @1.last_line, @1.first_column, listaTemporalIdentificadores); DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); }
     ;
 expresion_unaria:
@@ -129,7 +129,7 @@ expresion_or:
       expresion OP_OR expresion                   { DBG_PRINT("expresion_or\n"); } 
     ;
 expresion_de_asignacion:
-      expresion OP_ASIGNACION expresion           { DBG_PRINT("expresion_de_asignacion\n"); }
+      expresion OP_ASIGNACION expresion           { ValidarInicializacionVoid($3, @2.first_line, @2.first_column); DBG_PRINT("expresion_de_asignacion\n"); }
     ;
 lista_argumentos_invocacion
     : /*VACIO*/
@@ -299,8 +299,8 @@ declarador_variable:
     ;
 inicializacion_variable
     : /*VACIO*/
-    | OP_ASIGNACION OP_ADITIVO expresion    { DBG_PRINT("inicializacion de variable \n"); }
-    | OP_ASIGNACION expresion               { DBG_PRINT("inicializacion de variable \n"); }
+    | OP_ASIGNACION OP_ADITIVO expresion    { ValidarInicializacionVoid($3, @1.first_line, @1.first_column); DBG_PRINT("inicializacion de variable \n"); }
+    | OP_ASIGNACION expresion               { ValidarInicializacionVoid($2, @1.first_line, @1.first_column); DBG_PRINT("inicializacion de variable \n"); }
     ;
 
 lista_declaradores_funcion:

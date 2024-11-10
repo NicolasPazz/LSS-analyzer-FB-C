@@ -330,5 +330,7 @@ extern const char *tipoFuncionString[];
 int contarArgumentos(Parametro *listaDeParametros);
 expresionPrimaria buscarTipoDeDato(char* nombre);
 int contarArgumentos(Parametro *listaDeParametros);
+char *asignarTipoDatoFuncion(char* identificador);
+void ValidarInicializacionVoid(char* tipoDato, int linea, int columna);
 
 #endif
