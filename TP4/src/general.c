@@ -627,16 +627,11 @@ int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo){
     return 0;
 }*/
 
-NodoSimbolo *buscar_simbolo(char *nombre)
-{
+NodoSimbolo *buscar_simbolo(char *nombre){
     NodoSimbolo *nodo_actual = tablaSimbolos;
-    printf("buscar_simbolo 1: nombre: %s\n", nombre);
 
-    while (nodo_actual != NULL)
-    {
-        printf("buscar_simbolo 2: nombre: %s\n", nodo_actual->nombre); // No imprime este
-        if (strcmp(nodo_actual->nombre, nombre) == 0)
-        {
+    while (nodo_actual != NULL){
+        if (strcmp(nodo_actual->nombre, nombre) == 0){
             return nodo_actual; // Retornar el nodo encontrado
         }
         nodo_actual = nodo_actual->siguiente; // Mover al siguiente nodo
@@ -750,59 +745,36 @@ Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const
 }
 
 void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador){
-    printf("agregarParametro: Identificador pasado: %s\n", identificador);
-    printf("agregarParametro: EspecificadorDeclaracion pasado: Tipo de dato = %s, Almacenamiento = %s, Calificador = %s\n",
-           especificadorTiposString[especificadorDeclaracion.esTipoDato],
-           especificadorAlmacenamientoString[especificadorDeclaracion.esAlmacenamiento],
-           calificadorTipoString[especificadorDeclaracion.esCalificador]);
-
     // Crear el nodo usando la funcion de creacion
     Parametro *nuevo = crearNodoParametro(especificadorDeclaracion, identificador);
 
-    if (nuevo == NULL)
-    {
+    if (nuevo == NULL){
         printf("Error: no se pudo crear el nuevo nodo de parametro.\n");
         return; // En caso de error en la creacion del nodo
     }
 
     // Agregar el nodo a la lista
-    if (*listaDeParametros == NULL)
-    {
-        printf("La lista de parámetros estaba vacía. Agregando el primer nodo.\n");
+    if (*listaDeParametros == NULL){
         *listaDeParametros = nuevo;
     }
-    else
-    {
+    else{
         Parametro *actual = *listaDeParametros;
-        while (actual->siguiente != NULL)
-        {
+        while (actual->siguiente != NULL){
             printf("Nodo actual: identificador = %s\n", actual->identificador);
             actual = actual->siguiente;
         }
         actual->siguiente = nuevo;
-        printf("Nuevo nodo agregado al final: identificador = %s\n", nuevo->identificador);
-    }
-
-    printf("\nagregarParametro: Nuevo nodo creado: identificador = %s\n", nuevo->identificador);
-    // Imprimir el valor de especificadorDeclaracion del nodo agregado al final de la lista
-    printf("agregarParametro; EspecificadorDeclaracion del nodo agregado: Tipo de dato = %s, Almacenamiento = %s, Calificador = %s\n\n",
-           especificadorTiposString[nuevo->especificadorDeclaracion.esTipoDato],
-           especificadorAlmacenamientoString[nuevo->especificadorDeclaracion.esAlmacenamiento],
-           calificadorTipoString[nuevo->especificadorDeclaracion.esCalificador]);
+    }   
 }
 
 void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *identificador, Parametro **listaDeParametros){
-    // Imprimir los datos de entrada antes de realizar cualquier asignación
-    printf("llenarNodoGenericoFuncion: Identificador pasado: %s\n", identificador);
-
     // Asignación de EspecificadorTipos vacío
     EspecificadorTipos especificadorVacio = {.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
 
     // Crear el nodo de tipo NodoFuncion utilizando la función crearNodoFuncion
     NodoFuncion *nuevaFuncion = crearNodoFuncion(*listaDeParametros, especificadorVacio, OTRO);
 
-    if (nuevaFuncion == NULL)
-    {
+    if (nuevaFuncion == NULL){
         printf("Error al crear la función\n");
         return;
     }
@@ -810,11 +782,6 @@ void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *id
     // Imprimir los datos del nodo de función
     Parametro *paramActual = *listaDeParametros;
     while (paramActual != NULL){
-        printf("llenarNodoGenericoFuncion: Parámetro en listaDeParametros: identificador = %s, Tipo de dato = %s, Almacenamiento = %s, Calificador = %s\n\n",
-               paramActual->identificador,
-               especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato],
-               especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento],
-               calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador]);
         paramActual = paramActual->siguiente;
     }
 
@@ -827,15 +794,10 @@ void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *id
         return;
     }
 
-    printf("llenarNodoGenericoFuncion: (*nodoGenericoFuncion)-> identificador: %s\n", (*nodoGenericoFuncion)->nombre);
-    printf("llenarNodoGenericoFuncion: (*nodoGenericoFuncion)-> linea: %d\n", (*nodoGenericoFuncion)->linea);
-    printf("llenarNodoGenericoFuncion: (*nodoGenericoFuncion)-> columna: %d\n", (*nodoGenericoFuncion)->columna);
     if ((*nodoGenericoFuncion) != NULL && (*nodoGenericoFuncion)->nodo != NULL) {
         // Hacer el cast a NodoFuncion
-        NodoFuncion *nodoFuncion = (NodoFuncion *)(*nodoGenericoFuncion)->nodo;
-
-        char *parametros = imprimirParametros(nodoFuncion->listaDeParametros);
-        printf("  Parámetros: %s\n\n", parametros);
+       // NodoFuncion *nodoFuncion = (NodoFuncion *)(*nodoGenericoFuncion)->nodo;
+        //char *parametros = imprimirParametros(nodoFuncion->listaDeParametros);
     } else {
         printf("Error: El nodo generico o el nodo de la funcion es NULL\n");
     }
@@ -867,76 +829,39 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
         return;
     }
 
-    /*
-    NodoFuncion *nuevaFuncion = (*nodoGenericoFuncion)->nodo;
-    nuevaFuncion->tipogramatica = tipogramatica;
-    nuevaFuncion->retorno = retorno;
-
-    printf("Consigo retorno funcion: %s\n", especificadorTiposString[nuevaFuncion->retorno.esTipoDato]);  //Me reconoce el retorno 
-
-*/
     (*nodoGenericoFuncion)->linea = linea;
     (*nodoGenericoFuncion)->columna = columna;
-
-    printf("Linea Funcion: %d\n", (*nodoGenericoFuncion)->linea);
-    printf("Columna Funcion: %d\n", (*nodoGenericoFuncion)->columna);
   
-    imprimirTablaSimbolos(*tablaSimbolos);
-    /*
-    // si esta declarado y quiero definir, puedo
-    // si esta definido y quiero declararar, no tiene efecto (no lo imprime en el reporte como funcion y no es error semantico)
-    //
-    // printf("\n\n(*nodoGenericoFuncion)->funcion): %s\n", (*nodoGenericoFuncion)->funcion);
-    printf("(*nodoGenericoFuncion)->nombre %s\n", (*nodoGenericoFuncion)->nombre);*/
+    //imprimirTablaSimbolos(*tablaSimbolos);
+    
     NodoSimbolo *nodoEncontrado = buscar_simbolo((*nodoGenericoFuncion)->nombre);
     NodoFuncion *nuevaFuncion = (NodoFuncion *)(*nodoGenericoFuncion)->nodo;
     nuevaFuncion->retorno = retorno;
     nuevaFuncion->tipogramatica = tipogramatica;
-    // if (nodoEncontrado != NULL){printf("tipogramatica encontrada: %s\n", ((NodoFuncion*)nodoEncontrado->nodo)->tipogramatica);}
-    // if (nodoGenericoFuncion != NULL){printf("tipogramatica generico: %s\n", (*nodoGenericoFuncion)->tipogramatica);}
-    if (                          // El identificador no fue usado antes
-        nodoEncontrado == NULL || /// o
-        // El identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes
-        ((nodoEncontrado != NULL &&
-          nodoEncontrado->tipo == FUNCION &&
-          ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DECLARACION_FUNCION &&
-          nuevaFuncion->tipogramatica == DEFINICION_FUNCION &&
-          noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion))))
-    {
-
+    
+    // Si el identificador no fue usado antes o el identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes
+    if (nodoEncontrado == NULL || ((nodoEncontrado != NULL && nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DECLARACION_FUNCION && nuevaFuncion->tipogramatica == DEFINICION_FUNCION && noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion)))){
         // Si el identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes. Validar que los parametros que se pretenden usar en la definicion, sean compatibles con los de la declaracion
-        if (nodoEncontrado != NULL &&
-            nodoEncontrado->tipo == FUNCION &&
-            ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DECLARACION_FUNCION &&
-            nuevaFuncion->tipogramatica == DEFINICION_FUNCION &&
-            noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion))
-        {
+        if (nodoEncontrado != NULL && nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DECLARACION_FUNCION && nuevaFuncion->tipogramatica == DEFINICION_FUNCION && noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion)){
             Parametro *paramDeclaracion = ((NodoFuncion *)nodoEncontrado->nodo)->listaDeParametros;
             Parametro *paramDefinicion = nuevaFuncion->listaDeParametros;
 
-            while (paramDeclaracion != NULL && paramDefinicion != NULL)
-            {
+            while (paramDeclaracion != NULL && paramDefinicion != NULL){
                 // Comprobar solo si ambos sufijos no son NULL
-                if (paramDeclaracion->especificadorDeclaracion.esTipoDato != NULL && paramDefinicion->especificadorDeclaracion.esTipoDato != NULL)
-                {
-                    if (paramDeclaracion->especificadorDeclaracion.esTipoDato != paramDefinicion->especificadorDeclaracion.esTipoDato)
-                    {
+                if (paramDeclaracion->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO && paramDefinicion->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO){
+                    if (paramDeclaracion->especificadorDeclaracion.esTipoDato != paramDefinicion->especificadorDeclaracion.esTipoDato){
                         // printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
                         return;
                     }
                 }
-                if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != NULL && paramDefinicion->especificadorDeclaracion.esAlmacenamiento != NULL)
-                {
-                    if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != paramDefinicion->especificadorDeclaracion.esAlmacenamiento)
-                    {
+                if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC && paramDefinicion->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC){
+                    if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != paramDefinicion->especificadorDeclaracion.esAlmacenamiento){
                         // printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
                         return;
                     }
                 }
-                if (paramDeclaracion->especificadorDeclaracion.esCalificador != NULL && paramDefinicion->especificadorDeclaracion.esCalificador != NULL)
-                {
-                    if (paramDeclaracion->especificadorDeclaracion.esCalificador != paramDefinicion->especificadorDeclaracion.esCalificador)
-                    {
+                if (paramDeclaracion->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO && paramDefinicion->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO){
+                    if (paramDeclaracion->especificadorDeclaracion.esCalificador != paramDefinicion->especificadorDeclaracion.esCalificador){
                         // printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
                         return;
                     }
@@ -945,15 +870,12 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
                 paramDefinicion = paramDefinicion->siguiente;
             }
 
-            if (paramDeclaracion != NULL || paramDefinicion != NULL)
-            {
+            if (paramDeclaracion != NULL || paramDefinicion != NULL){
                 printf("Error: La cantidad de parametros entre declaracion y definicion no coincide para la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
                 return;
             }
         }
         NodoSimbolo * nuevoSimbolo = crearNodoSimbolo((*nodoGenericoFuncion)->nombre, (*nodoGenericoFuncion)->tipo, (*nodoGenericoFuncion)->linea, (*nodoGenericoFuncion)->columna, (NodoFuncion*)(*nodoGenericoFuncion)->nodo);
-        //printf("nuevoSimbolo: Linea: %d\n", nuevoSimbolo->linea);
-        //printf("nuevoSimbolo: Columna: %d\n", nuevoSimbolo->columna);
 
         // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
         if (*tablaSimbolos == NULL)
@@ -1020,36 +942,36 @@ void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
     printf("Tabla de Símbolos:\n");
     if (nodoActual == NULL)
     {
-        printf("La tabla de símbolos está vacía :(\n\n");
+      //  printf("La tabla de símbolos está vacía :(\n\n");
     }
 
     while (nodoActual != NULL)
     {
-        printf("Nombre: %s\n", nodoActual->nombre);
-        printf("Tipo: %s\n", nodoActual->tipo == VARIABLE ? "VARIABLE" : "FUNCION");
-        printf("Linea: %d\n", nodoActual->linea);
-        printf("Columna: %d\n", nodoActual->columna);
+       // printf("Nombre: %s\n", nodoActual->nombre);
+        //printf("Tipo: %s\n", nodoActual->tipo == VARIABLE ? "VARIABLE" : "FUNCION");
+        //printf("Linea: %d\n", nodoActual->linea);
+        //printf("Columna: %d\n", nodoActual->columna);
 
         if (nodoActual->tipo == VARIABLE)
         {
-            NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodoActual->nodo;
-            printf("Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n",
+            //NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodoActual->nodo;
+          /* printf("Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n",
                    especificadorTiposString[var->tipoDato.esTipoDato],
                    especificadorAlmacenamientoString[var->tipoDato.esAlmacenamiento],
-                   calificadorTipoString[var->tipoDato.esCalificador]);
+                   calificadorTipoString[var->tipoDato.esCalificador]);*/
         }
         else if (nodoActual->tipo == FUNCION)
         {
             NodoFuncion *func = (NodoFuncion *)nodoActual->nodo;
-            printf("Retorno: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n",
+           /* printf("Retorno: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n",
                    especificadorTiposString[func->retorno.esTipoDato],
                    especificadorAlmacenamientoString[func->retorno.esAlmacenamiento],
-                   calificadorTipoString[func->retorno.esCalificador]);
-            printf("Tipo de gramática: %s\n", func->tipogramatica == DEFINICION_FUNCION ? "DEFINICION" : "DECLARACION");
+                   calificadorTipoString[func->retorno.esCalificador]);*/
+           // printf("Tipo de gramática: %s\n", func->tipogramatica == DEFINICION_FUNCION ? "DEFINICION" : "DECLARACION");
 
             // Imprimir parámetros usando tu función
             char *parametros = imprimirParametros(func->listaDeParametros);
-            printf("  Parámetros: %s\n\n", parametros);
+           // printf("  Parámetros: %s\n\n", parametros);
             free(parametros); // Liberar memoria después de imprimir
         }
 
@@ -1091,7 +1013,7 @@ void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos) {
     tipoReturnEncontrado->tipoDato = NULL;
 }
 
-/*
+
 char* obtenerTipoIdentificador(const char *identificador) {
     NodoSimbolo *simbolo = buscar_simbolo(identificador);
     if (simbolo) {
@@ -1107,7 +1029,7 @@ char* obtenerTipoIdentificador(const char *identificador) {
 }
 
 NodoVariableDeclarada
-/*
+
 int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
     if (tipoReturn == tipoFuncion) {
         return 1;
