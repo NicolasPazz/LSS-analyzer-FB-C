@@ -24,6 +24,7 @@ char *contextoActual="";
 //char *tipoReturnEsperado = NULL;
 //TipoRetorno* tipoReturnEncontrado =NULL;
 EspecificadorTipos especificadorVacio = {.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
+int cantidadDeParametros = 0;
 
 EspecificadorTipos tipoRetorno;
 
@@ -103,7 +104,7 @@ expresion_primaria:
     | '(' expresion ')'                         { DBG_PRINT("expresion_primaria - (EXP)\n"); $$ = "int";}
     ;
 expresion_postfija:
-      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { $$=asignarTipoDatoFuncion($1); validarInvocacionAFuncion(&listaErroresSemanticos, $1, listaDeParametrosInvocacion, @1.first_line, @1.first_column); DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); }
+      IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { $$=asignarTipoDatoFuncion($1); validarInvocacionAFuncion(&listaErroresSemanticos, $1, listaDeParametrosInvocacion, @1.first_line, @1.first_column, cantidadDeParametros); cantidadDeParametros = 0; DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); }
     | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { validarUsoDeVariable(&listaErroresSemanticos, $1, contextoActual, @1.last_line, @1.first_column, listaTemporalIdentificadores); DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); }
     ;
 expresion_unaria:
@@ -133,8 +134,8 @@ expresion_de_asignacion:
     ;
 lista_argumentos_invocacion
     : /*VACIO*/
-    | expresion                                   { /*agregarParametro(......);*/ DBG_PRINT("ARGUMENTO\n"); } 
-    | lista_argumentos_invocacion ',' expresion   { DBG_PRINT("ARGUMENTO\n"); } 
+    | expresion                                   { cantidadDeParametros++; /*printf("Cantidad de parametros: %d\n", cantidadDeParametros); *//*agregarParametro(......);*/ DBG_PRINT("ARGUMENTO\n"); } 
+    | lista_argumentos_invocacion ',' expresion   { cantidadDeParametros++; /*printf("Cantidad de parametros: %d\n", cantidadDeParametros);*/ DBG_PRINT("ARGUMENTO\n"); } 
     ;
 
 tipo_de_dato

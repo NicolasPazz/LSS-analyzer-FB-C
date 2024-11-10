@@ -569,7 +569,7 @@ int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_
     return 0;
 }
 */
-void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, Parametro *listaDeParametros, int linea, int columna){
+void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, Parametro *listaDeParametros, int linea, int columna, int cantidadDeParametros){
     NodoSimbolo *funcion = buscar_simbolo(identificador);
     
     if(funcion == NULL){
@@ -586,8 +586,8 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
         return;
     }
 
-    /* ESTO ESTA COMENTADO PORQUE LISTA DE PARAMETROS DE LA INVOCACION NO ESTA 
-    int cantidadDeParametrosInvocada = contarArgumentos(listaDeParametros);
+    
+    int cantidadDeParametrosInvocada = cantidadDeParametros;
     int cantidadDeParametrosEncontrada = contarArgumentos(((NodoFuncion *)(funcion)->nodo)->listaDeParametros);
 
     if (cantidadDeParametrosInvocada > cantidadDeParametrosEncontrada){
@@ -603,7 +603,7 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         return;
     }
-
+    /* ESTO ESTA COMENTADO PORQUE LISTA DE PARAMETROS DE LA INVOCACION NO ESTA DESAROLLADO
     int numeroDeParametro = validarListasDeParametros(((NodoFuncion *)(funcion)->nodo)->listaDeParametros, listaDeParametros);
     if(numeroDeParametro != -1){
         Parametro *parametroEncontrado = ((NodoFuncion *)(funcion)->nodo)->listaDeParametros;
@@ -927,7 +927,7 @@ NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos r
     return nuevo;
 }
 
-bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFuncion){
+bool fueDefinidaAntes(NodoSimbolo *tablaSimbolos, char* nombre){
     NodoSimbolo *nodoActual = tablaSimbolos;
 
     while (nodoActual != NULL){
@@ -935,13 +935,13 @@ bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFun
             NodoFuncion *nodoFuncion = (NodoFuncion *)(nodoActual->nodo);
 
             // Comparar nombre de la funcion y verificar que no haya sido definida antes
-            if (nodoActual->nombre == nodoGenericoFuncion->nombre && nodoFuncion->tipogramatica == DEFINICION_FUNCION){
-                return false; 
+            if (strcmp(nodoActual->nombre,nombre) == 0 && nodoFuncion->tipogramatica == DEFINICION_FUNCION){
+                return true; 
             }
         }
         nodoActual = nodoActual->siguiente; 
     }
-    return true;
+    return false;
 }
 
 void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo **nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna){   
@@ -974,7 +974,6 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
         NodoFuncion* funcionEncontrada = (NodoFuncion *)nodoEncontrado->nodo;
         Parametro *paramDeclaracion = funcionEncontrada->listaDeParametros;
         Parametro *paramDefinicion = nuevaFuncion->listaDeParametros;
-
         if (paramDeclaracion != NULL && paramDefinicion != NULL && paramDeclaracion->especificadorDeclaracion.esTipoDato != paramDefinicion->especificadorDeclaracion.esTipoDato){
             //3.	Cuando se redeclara/redefine un identificador con tipo igual de símbolo (ej. variable/variable - función/función) pero con tipos de datos diferentes. LA:CA y LB:CB indican las ubicaciones del identificador en el archivo de entrada.
             //LA:CA: conflicto de tipos para 'IDENTIFICADOR'; la ultima es de tipo 'TIPO_DATOA'
@@ -985,6 +984,10 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
             "conflicto de tipos para '%s'; la ultima es de tipo '%s(%s)'\nNota: la declaracion previa de '%s' es de tipo '%s(%s)': %d:%d", 
             (*nodoGenericoFuncion)->nombre, especificadorTiposString[nuevaFuncion->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDefinicion), (*nodoGenericoFuncion)->nombre, especificadorTiposString[funcionEncontrada->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDeclaracion), nodoEncontrado->linea, nodoEncontrado->columna);
             agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
+            return;
+        }
+        if (fueDefinidaAntes(*tablaSimbolos, (*nodoGenericoFuncion)->nombre)){
+            //SI LA FUNCION YA FUE DEFINIDA ANTES, NO ES UN ERROR SEMANTICO PERO TAMPOCO SE AGREGA A LA TABLA
             return;
         }
     }
@@ -1198,8 +1201,7 @@ char *enumAString1(EspecificadorTipos tipoDato)
     return tipoStr;
 }
 
-char *enumAString2(EspecificadorTipos tipoDato)
-{
+char *enumAString2(EspecificadorTipos tipoDato){
     // Asigna memoria para el buffer dinámico
     char *buffer = (char *)malloc(150 * sizeof(char));
     if (buffer == NULL) {
