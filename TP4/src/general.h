@@ -91,6 +91,16 @@ typedef struct ElementosParametro{
     calificadorTipo esCalificador;
  }EspecificadorTipos;
 
+typedef struct IdentificadorTemporal {
+    char *identificador;
+    int linea;
+    int columna;
+    struct IdentificadorTemporal *siguiente;
+} IdentificadorTemporal;
+
+extern IdentificadorTemporal *listaTemporalIdentificadores;
+extern int contextoActual;
+
 
 // Tabla de simbolos
  typedef enum tipoSimbolo{
@@ -119,10 +129,6 @@ typedef enum tipoFuncion{
 typedef struct NodoVariableDeclarada {
   EspecificadorTipos  tipoDato;    
 } NodoVariableDeclarada;
-
-NodoVariableDeclarada* crearNodoVariableDeclarada(const char *variableDeclarada,  tipoDato tipoDato, const int linea, const int columna);
-
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *variableDeclarada, EspecificadorTipos tipoDato, const int linea, const int columna, const char *sufijo);
 
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
 
@@ -303,6 +309,13 @@ void registrarReturn(const char *tipo, int linea, int columna);
 void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos);
 
 EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b) ;
+
+NodoVariableDeclarada *crearNodoVariableDeclarada(EspecificadorTipos tipoDato);
+void agregarIdentificadorTemporal(IdentificadorTemporal **listaTemporalIdentificadores, char *identificador, int linea, int columna);
+void agregarListaVariables(IdentificadorTemporal *listaTemporalIdentificadores, EspecificadorTipos tipoDato);
+void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *identificador, EspecificadorTipos tipoDato, int linea, int columna);
+void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, int contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores);
+char *enumAString(EspecificadorTipos tipoDato);
 
 char* obtenerTipoIdentificador(const char *identificador) ;
 

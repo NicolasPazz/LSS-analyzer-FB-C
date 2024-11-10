@@ -334,7 +334,13 @@ void imprimirFunciones(NodoSimbolo *lista){
         
         printf(", linea %d\n", actual->linea);
         free(funcion);
+
         actual = actual->siguiente;
+
+        while (actual != NULL && actual->tipo != FUNCION)
+        {
+            actual = actual->siguiente;
+        }
     }
 }
 /*void liberarFunciones(NodoFuncion *lista){
@@ -792,6 +798,148 @@ int contarArgumentos(Parametro *listaDeParametros) {
     return contador;
 }
 
+NodoVariableDeclarada *crearNodoVariableDeclarada(EspecificadorTipos tipoDato)
+{
+    NodoVariableDeclarada *nuevo = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
+    nuevo->tipoDato = tipoDato;
+    return nuevo;
+}
+
+void agregarIdentificadorTemporal(IdentificadorTemporal **listaTemporalIdentificadores, char *identificador, int linea, int columna)
+{
+    IdentificadorTemporal *nuevo = (IdentificadorTemporal *)malloc(sizeof(IdentificadorTemporal));
+    if (nuevo == NULL){
+        printf("Error: no se pudo asignar memoria para el nuevo IdentificadorTemporal.\n");
+    }
+
+    // Asignar valores a los campos del nodo
+    nuevo->identificador = copiarCadena(identificador);
+    nuevo->linea = linea;
+    nuevo->columna = columna;
+    nuevo->siguiente = NULL;
+
+    // Agregar el nodo a la lista
+    if (*listaTemporalIdentificadores == NULL){
+        *listaTemporalIdentificadores = nuevo;
+    }
+    else
+    {
+        IdentificadorTemporal *actual = *listaTemporalIdentificadores;
+        while (actual->siguiente != NULL)
+        {
+            actual = actual->siguiente;
+        }
+        actual->siguiente = nuevo;
+    }
+}
+
+void agregarListaVariables(IdentificadorTemporal *listaTemporalIdentificadores, EspecificadorTipos tipoDato)
+{
+    IdentificadorTemporal* actual = listaTemporalIdentificadores;  // Apuntar al primer nodo de la lista
+
+    // Recorrer la lista mientras el nodo actual no sea NULL
+    while (actual != NULL) {
+        agregarVariableDeclarada(&tablaSimbolos, &listaErroresSemanticos, actual->identificador, tipoDato, actual->linea, actual->columna);  // Pasar el nodo actual a la función
+        actual = actual->siguiente;  // Moverse al siguiente nodo
+    }
+}
+
+void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *identificador, EspecificadorTipos tipoDato, int linea, int columna)
+{
+    NodoSimbolo *nodoPrevio = buscar_simbolo(identificador);
+    if (nodoPrevio == NULL){
+        // Crear el nuevo nodo
+        NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(tipoDato);
+
+        // Crear el nuevo NodoSimbolo
+        NodoSimbolo *nuevoNodoSimbolo = crearNodoSimbolo(identificador, VARIABLE, linea, columna, nuevoNodo);
+
+        // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
+        if (*tablaSimbolos == NULL)
+        {
+            *tablaSimbolos = nuevoNodoSimbolo;
+            return;
+        }
+
+        // Si la lista no esta vacia, recorrer hasta el final
+        NodoSimbolo *actual_simbolo = *tablaSimbolos;
+        while (actual_simbolo->siguiente != NULL)
+        {
+            actual_simbolo = actual_simbolo->siguiente;
+        }
+
+        // Enlazar el nuevo nodo al final de la lista
+        actual_simbolo->siguiente = nuevoNodoSimbolo;
+    }
+    else
+    {
+        if (nodoPrevio->tipo == VARIABLE)
+        {
+            NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodoPrevio->nodo;
+            EspecificadorTipos tipoDatoPrevio = elemento->tipoDato;
+
+            if (tipoDato.esTipoDato != tipoDatoPrevio.esTipoDato)
+            {
+                char mensaje[256];
+                snprintf(mensaje, sizeof(mensaje), "conflicto de tipos para '%s'; la ultima es de tipo '%s'\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", identificador, enumAString(tipoDato), identificador, enumAString(tipoDatoPrevio), elemento->tipoDato, nodoPrevio->linea, nodoPrevio->columna);
+                agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+            }
+            else
+            {
+                char mensaje[256];
+                snprintf(mensaje, sizeof(mensaje), "Redeclaracion de '%s'\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", identificador, identificador, enumAString(tipoDatoPrevio), nodoPrevio->linea, nodoPrevio->columna);
+                agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+            }
+        }
+        else if (nodoPrevio->tipo == FUNCION)
+        {
+            NodoFuncion *elemento = (NodoFuncion *)nodoPrevio->nodo;
+            char mensaje[512]; // Aumentamos el tamano del buffer si es necesario
+            snprintf(mensaje, sizeof(mensaje), "'%s' redeclarado como un tipo diferente de simbolo\nNota: la declaracion previa de '%s' es de tipo '%s(",
+                     identificador, identificador, enumAString(elemento->retorno));
+
+            char *parametros = imprimirParametros(elemento->listaDeParametros);
+            if (parametros != NULL)
+            {
+                // Aniadir los parametros al mensaje
+                snprintf(mensaje + strlen(mensaje), sizeof(mensaje) - strlen(mensaje), "'%s'): %d:%d",
+                         parametros, nodoPrevio->linea, nodoPrevio->columna);
+                free(parametros); // Liberamos la memoria asignada
+            }
+            else
+            {
+                // Manejo de error en caso de que no se pueda imprimir parametros
+                snprintf(mensaje + strlen(mensaje), sizeof(mensaje) - strlen(mensaje), "Error al obtener parametros'): %d:%d",
+                         nodoPrevio->linea, nodoPrevio->columna);
+            }
+
+            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        }
+    }
+}
+
+void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, int contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores)
+{
+    bool estaSiendoDeclarada = false;
+    IdentificadorTemporal* actual = listaTemporalIdentificadores;
+    while (actual != NULL) {
+        if (strcmp(actual->identificador, identificador) == 0)
+        {
+            estaSiendoDeclarada = true;
+        }
+        actual = actual->siguiente;  // Moverse al siguiente nodo
+    }
+    if (!estaSiendoDeclarada)
+    {
+        NodoSimbolo *nodoPrevio = buscar_simbolo(identificador);
+        if (nodoPrevio == NULL && contextoActual == 0){
+            char mensaje[256];
+            snprintf(mensaje, sizeof(mensaje), "'%s' sin declarar", identificador);
+            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        }
+    }
+}
+
 // FUNCIONES
 Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador, int linea, int columna){
     // Crear nuevo nodo y asignar memoria
@@ -1091,6 +1239,51 @@ int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
     }
 } // puede ir algo por aca la validacion de tipos. En vez de return 1 o 0, se puede generar accion.
 */
+
+char *enumAString(EspecificadorTipos tipoDato)
+{
+    // Asigna memoria para el buffer dinámico
+    char *buffer = (char *)malloc(150 * sizeof(char));
+    if (buffer == NULL) {
+        fprintf(stderr, "Error: No se pudo asignar memoria para el buffer.\n");
+        return NULL;
+    }
+
+    const char *tipoStr, *calificadorStr;
+
+    // Convertir esTipoDato
+    switch (tipoDato.esTipoDato) {
+        case VACIO_TIPODATO: tipoStr = ""; break;
+        case CHAR_TIPODATO: tipoStr = "char"; break;
+        case VOID_TIPODATO: tipoStr = "void"; break;
+        case DOUBLE_TIPODATO: tipoStr = "double"; break;
+        case FLOAT_TIPODATO: tipoStr = "float"; break;
+        case INT_TIPODATO: tipoStr = "int"; break;
+        case UNSIGNED_INT_TIPODATO: tipoStr = "unsigned int"; break;
+        case LONG_TIPODATO: tipoStr = "long"; break;
+        case UNSIGNED_LONG_TIPODATO: tipoStr = "unsigned long"; break;
+        case SHORT_TIPODATO: tipoStr = "short"; break;
+        case UNSIGNED_SHORT_TIPODATO: tipoStr = "unsigned short"; break;
+    }
+
+    // Convertir esCalificador
+    switch (tipoDato.esCalificador) {
+        case CONST_CALIFICADORTIPO: calificadorStr = "const"; break;
+        case VOLATILE_CALIFICADORTIPO: calificadorStr = "volatile"; break;
+        case VACIO_CALIFICADORTIPO: calificadorStr = ""; break;
+    }
+
+    if (tipoDato.esCalificador != 2)
+    {
+        snprintf(buffer, 150, "%s %s", calificadorStr, tipoStr);
+    }
+    else
+    {
+        snprintf(buffer, 150, tipoStr);
+    }
+
+    return buffer;
+}
 
 EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b){
     EspecificadorTipos inicial = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};

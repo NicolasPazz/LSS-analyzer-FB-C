@@ -18,6 +18,8 @@ NodoCadenaNoReconocida* listaCadenasNoReconocidas  = NULL;
 Parametro* listaDeParametros = NULL;
 Parametro* listaDeParametrosInvocacion = NULL;
 NodoSimbolo* nodoGenericoFuncion = NULL;
+IdentificadorTemporal *listaTemporalIdentificadores = NULL; 
+int contextoActual=0;
 // Variables globales definidas
 //char *tipoReturnEsperado = NULL;
 //TipoRetorno* tipoReturnEncontrado =NULL;
@@ -93,7 +95,7 @@ expresion:
     ;
     
 expresion_primaria: 
-      IDENTIFICADOR                             { DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
+      IDENTIFICADOR                             { validarUsoDeVariable(&listaErroresSemanticos, $1, contextoActual, @1.last_line, @1.first_column, listaTemporalIdentificadores); DBG_PRINT("expresion_primaria - IDENTIFICADOR: %s\n", $1); }
     | CONSTANTE_ENTERA                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1); }
     | CONSTANTE_REAL                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1); }
     | CONSTANTE_CARACTER                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %d\n", $1); }
@@ -102,10 +104,10 @@ expresion_primaria:
     ;
 expresion_postfija:
       IDENTIFICADOR '(' lista_argumentos_invocacion ')'     { DBG_PRINT("expresion_postfija - INVOCACION FUNCION: (argumentos)\n"); validarInvocacionAFuncion(&listaErroresSemanticos, $1, listaDeParametrosInvocacion, @1.first_line, @1.first_column); }
-    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); }
+    | IDENTIFICADOR OP_INCREMENTO_DECREMENTO                { validarUsoDeVariable(&listaErroresSemanticos, $1, contextoActual, @1.last_line, @1.first_column, listaTemporalIdentificadores); DBG_PRINT("expresion_postfija - INCREMENTO/DECREMENTO: \n"); }
     ;
 expresion_unaria:
-      OP_INCREMENTO_DECREMENTO IDENTIFICADOR      { DBG_PRINT("expresion_unaria - INCREMENTO/DECREMENTO:\n"); }
+      OP_INCREMENTO_DECREMENTO IDENTIFICADOR      { validarUsoDeVariable(&listaErroresSemanticos, $2, contextoActual, @1.last_line, @1.first_column, listaTemporalIdentificadores); DBG_PRINT("expresion_unaria - INCREMENTO/DECREMENTO:\n"); }
     ;
 
 expresion_multiplicativa:
@@ -284,7 +286,7 @@ return:
     ;
 
 declaracion
-    : especificador_declaracion lista_declaradores_variable ';'             { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, tipoRetorno, @1.first_line, @1.first_column, $1);*/ }
+    : especificador_declaracion lista_declaradores_variable ';'             { agregarListaVariables(listaTemporalIdentificadores, $1); listaTemporalIdentificadores = NULL; /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, tipoRetorno, @1.first_line, @1.first_column, $1);*/ }
     | especificador_declaracion lista_declaradores_funcion ';'              { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DECLARACION_FUNCION, @2.first_column);  /*DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); */};
     ;
 
@@ -293,7 +295,7 @@ lista_declaradores_variable:
     | lista_declaradores_variable ',' declarador_variable  { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
-    IDENTIFICADOR inicializacion_variable   { /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.especificadorTipos,  @1.first_line, @1.first_column, yyval.sufijo); */DBG_PRINT("declarador_variable \n"); }
+    IDENTIFICADOR inicializacion_variable   { agregarIdentificadorTemporal(&listaTemporalIdentificadores, $1, @1.first_line, @1.first_column); /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.especificadorTipos,  @1.first_line, @1.first_column, yyval.sufijo); */DBG_PRINT("declarador_variable \n"); }
     ;
 inicializacion_variable
     : /*VACIO*/
@@ -306,7 +308,7 @@ lista_declaradores_funcion:
     | lista_declaradores_funcion ',' declarador_funcion    { DBG_PRINT("lista_declaradores_funcion\n"); }
     ;
 declarador_funcion:
-    IDENTIFICADOR '(' lista_argumentos_prototipo ')'      { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1);}
+    IDENTIFICADOR '(' lista_argumentos_prototipo ')'      { llenarNodoGenericoFuncion(&nodoGenericoFuncion, $1, &listaDeParametros); DBG_PRINT("declarador_funcion %s\n", $1); contextoActual=1;}
     ;
 lista_argumentos_prototipo:
       argumento_prototipo                                   { DBG_PRINT("argumento_prototipo\n"); }
@@ -337,7 +339,7 @@ definiciones_externas:
     ;
 
 definicion_funcion: 
-      especificador_declaracion declarador_funcion sentencia_compuesta   {/*inicializarTipoRetorno($1) ; validarTipoReturn(&listaErroresSemanticos); */agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DEFINICION_FUNCION, @2.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n");}
+      especificador_declaracion declarador_funcion sentencia_compuesta   {/*inicializarTipoRetorno($1) ; validarTipoReturn(&listaErroresSemanticos); */agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DEFINICION_FUNCION, @2.first_column); DBG_PRINT("definiciones_externas: definicion de funcion\n"); contextoActual=0;}
     ; 
 
 %%
