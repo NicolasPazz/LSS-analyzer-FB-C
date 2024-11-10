@@ -202,6 +202,69 @@ char *imprimirParametros(Parametro *listaDeParametros) {
     return parametros;
 }
 
+char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros) {
+    char *parametros = (char *)malloc(256);
+    if (parametros == NULL) {
+        printf("Error: No se pudo asignar memoria para los parametros\n");
+        return NULL;
+    }
+
+    strcpy(parametros, "");
+    Parametro *paramActual = listaDeParametros;
+
+    typedef struct ElementosParametro {
+        char *elemento;
+        struct ElementosParametro *siguiente;
+    } ElementosParametro;
+
+    while (paramActual != NULL) {
+        // Crear lista temporal de elementos para el parámetro actual
+        ElementosParametro* lista = malloc(sizeof(ElementosParametro));
+        ElementosParametro* aux = lista;
+
+        // Agregar los especificadores de almacenamiento, calificador y tipo de dato, si no están vacíos
+        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO) {
+            aux->elemento = calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador];
+            aux->siguiente = malloc(sizeof(ElementosParametro));
+            aux = aux->siguiente;
+        }
+        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC) {
+            aux->elemento = especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento];
+            aux->siguiente = malloc(sizeof(ElementosParametro));
+            aux = aux->siguiente;
+        }
+        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO) {
+            aux->elemento = especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato];
+            aux->siguiente = NULL;  // Último elemento
+        }
+
+        // Concatenar los elementos del parámetro actual
+        aux = lista;
+        while (aux != NULL) {
+            strcat(parametros, aux->elemento);
+            if (aux->siguiente != NULL) {
+                strcat(parametros, " ");
+            }
+            aux = aux->siguiente;
+        }
+
+        // Liberar la lista temporal
+        while (lista != NULL) {
+            ElementosParametro *temp = lista;
+            lista = lista->siguiente;
+            free(temp);
+        }
+
+        // Agregar coma si hay otro parámetro siguiente
+        if (paramActual->siguiente != NULL) {
+            strcat(parametros, ", ");
+        }
+
+        paramActual = paramActual->siguiente;
+    }
+    return parametros;
+}
+
 
 /*
 void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
@@ -680,7 +743,8 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         return;
     }
-    /*
+
+    /* ESTO ESTA COMENTADO PORQUE LISTA DE PARAMETROS DE LA INVOCACION NO ESTA 
     int cantidadDeParametrosInvocada = contarArgumentos(listaDeParametros);
     int cantidadDeParametrosEncontrada = contarArgumentos(((NodoFuncion *)(funcion)->nodo)->listaDeParametros);
 
@@ -852,19 +916,31 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
                 // Comprobar solo si ambos sufijos no son NULL
                 if (paramDeclaracion->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO && paramDefinicion->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO){
                     if (paramDeclaracion->especificadorDeclaracion.esTipoDato != paramDefinicion->especificadorDeclaracion.esTipoDato){
-                        // printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
+                        //3.	Cuando se redeclara/redefine un identificador con tipo igual de símbolo (ej. variable/variable - función/función) pero con tipos de datos diferentes. LA:CA y LB:CB indican las ubicaciones del identificador en el archivo de entrada.
+                        //LA:CA: conflicto de tipos para 'IDENTIFICADOR'; la ultima es de tipo 'TIPO_DATOA'
+                        //Nota: la declaracion previa de 'IDENTIFICADOR' es de tipo 'TIPO_DATOB': LB:CB
+
+                        char mensaje[256];
+                        snprintf(mensaje, sizeof(mensaje), 
+                        "conflicto de tipos para '%s'; la ultima es de tipo '%s(%s)'\nNota: la declaracion previa de '%s' es de tipo '%s(%s)': %d:%d", 
+                        (*nodoGenericoFuncion)->nombre, especificadorTiposString[nuevaFuncion->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDefinicion), (*nodoGenericoFuncion)->nombre, especificadorTiposString[((NodoFuncion *)nodoEncontrado->nodo)->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDeclaracion), nodoEncontrado->linea, nodoEncontrado->columna);
+                        agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
                         return;
                     }
                 }
                 if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC && paramDefinicion->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC){
                     if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != paramDefinicion->especificadorDeclaracion.esAlmacenamiento){
-                        // printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
+                        char mensaje[256];
+                        snprintf(mensaje, sizeof(mensaje), "Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
+                        agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
                         return;
                     }
                 }
                 if (paramDeclaracion->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO && paramDefinicion->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO){
                     if (paramDeclaracion->especificadorDeclaracion.esCalificador != paramDefinicion->especificadorDeclaracion.esCalificador){
-                        // printf("Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->funcion);
+                        char mensaje[256];
+                        snprintf(mensaje, sizeof(mensaje), "Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
+                        agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
                         return;
                     }
                 }
@@ -873,7 +949,10 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
             }
 
             if (paramDeclaracion != NULL || paramDefinicion != NULL){
-                printf("Error: La cantidad de parametros entre declaracion y definicion no coincide para la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
+
+                char mensaje[256];
+                snprintf(mensaje, sizeof(mensaje), "Error: La cantidad de parametros entre declaracion y definicion no coincide para la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
+                agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
                 return;
             }
         }
@@ -898,9 +977,7 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
     else if (nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == nuevaFuncion->tipogramatica){
         // redeclaracion o redefinicion de funcion
     }
-    else{
-        // agregarErrorSemantico("%d:%d Funcion '%s' sin declarar", linea, columna, (*nodoGenericoFuncion)->funcion); // SEGMENTATION FAULT
-    }
+
     free(*nodoGenericoFuncion);
     (*nodoGenericoFuncion) = NULL;
 }

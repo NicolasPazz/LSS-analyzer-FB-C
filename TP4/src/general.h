@@ -155,6 +155,7 @@ char* unirParametros(const char* param1, const char* param2);
 
 void imprimirFunciones(NodoSimbolo *lista);
 char* imprimirParametros(Parametro *listaDeParametros);
+char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros);
 void liberarFunciones(NodoFuncion *lista);
 
 extern NodoSimbolo* listaFunciones;
