@@ -130,7 +130,7 @@ typedef struct NodoVariableDeclarada {
   EspecificadorTipos  tipoDato;    
 } NodoVariableDeclarada;
 
-void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista);
+void imprimirVariables(NodoSimbolo *lista);
 
 void liberarVariablesDeclaradas(NodoVariableDeclarada *lista);
 

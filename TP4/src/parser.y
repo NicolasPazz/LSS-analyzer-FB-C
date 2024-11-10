@@ -366,7 +366,7 @@ int main(int argc, char *argv[]) {
 
 //Reporte
     //1
-    //imprimirVariablesDeclaradas(listaVariablesDeclaradas);
+    imprimirVariables(tablaSimbolos);
     //liberarVariablesDeclaradas(listaVariablesDeclaradas); 
     printf("\n");
 

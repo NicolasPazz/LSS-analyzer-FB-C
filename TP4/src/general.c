@@ -265,10 +265,10 @@ char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros) {
     return parametros;
 }
 
+void imprimirVariables(NodoSimbolo *lista)
+{
+    NodoSimbolo *actual = lista;
 
-/*
-void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
-    NodoVariableDeclarada *actual = lista;
     printf("* Listado de variables declaradas (tipo de dato y numero de linea):\n");
 
     if (actual == NULL){
@@ -276,29 +276,24 @@ void imprimirVariablesDeclaradas(NodoVariableDeclarada *lista){
         return;
     }
 
-    while (actual != NULL){
-        if (actual->sufijo != NULL){
-            printf("%s: %s %s, linea %d, columna %d\n", actual->variableDeclarada, actual->sufijo, actual->tipoDato, actual->linea, actual->columna);
-        }
-        else{
-            printf("%s: %s, linea %d, columna %d\n", actual->variableDeclarada, actual->tipoDato, actual->linea, actual->columna);
-        }
+    while (actual != NULL && actual->tipo != VARIABLE)
+    {
         actual = actual->siguiente;
     }
-}
 
-void liberarVariablesDeclaradas(NodoVariableDeclarada *lista){
-    NodoVariableDeclarada *actual = lista;
-    NodoVariableDeclarada *siguiente = NULL;
+    while (actual != NULL && actual->tipo == VARIABLE){
+        NodoVariableDeclarada *variable = (NodoVariableDeclarada *)actual->nodo;
 
-    while (actual != NULL){
-        siguiente = actual->siguiente;
-        free(actual);
-        actual = siguiente;
+        printf("%s: %s, linea %d, columna %d\n", actual->nombre, enumAString(variable->tipoDato), actual->linea, actual->columna);
+
+        actual = actual->siguiente;
+
+        while (actual != NULL && actual->tipo != VARIABLE)
+        {
+            actual = actual->siguiente;
+        }
     }
 }
-*/
-
 
 void imprimirFunciones(NodoSimbolo *lista){
     NodoSimbolo *actual = lista;
