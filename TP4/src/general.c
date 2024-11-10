@@ -592,14 +592,14 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
 
     if (cantidadDeParametrosInvocada > cantidadDeParametrosEncontrada){
         char mensaje[256];
-        snprintf(mensaje, sizeof(mensaje), "Demasiados argumentos para la funcion '%s'", identificador);
+        snprintf(mensaje, sizeof(mensaje), "Demasiados argumentos para la funcion '%s'\nNota: declarado aqui: %d:%d", identificador, funcion->linea, funcion->columna);
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         return;
     }
 
     if (cantidadDeParametrosInvocada < cantidadDeParametrosEncontrada){
         char mensaje[256];
-        snprintf(mensaje, sizeof(mensaje), "Insuficientes argumentos para la funcion '%s'", identificador);
+        snprintf(mensaje, sizeof(mensaje), "Insuficientes argumentos para la funcion '%s'\nNota: declarado aqui: %d:%d", identificador, funcion->linea, funcion->columna);
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         return;
     }
