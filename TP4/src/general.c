@@ -103,8 +103,8 @@ void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tabla
             agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         }
     }
-}
-*/
+}*/
+
 const char *tipoFuncionString[] = {
     [DEFINICION_FUNCION] = "definicion",
     [DECLARACION_FUNCION] = "declaracion",
@@ -134,11 +134,9 @@ const char *calificadorTipoString[] = {
     [VOLATILE_CALIFICADORTIPO] = "volatile",
     [VACIO_CALIFICADORTIPO] = "vacio"};
 
-char *imprimirParametros(Parametro *listaDeParametros)
-{
+char *imprimirParametros(Parametro *listaDeParametros){
     char *parametros = (char *)malloc(256);
-    if (parametros == NULL)
-    {
+    if (parametros == NULL){
         printf("Error: No se pudo asignar memoria para los parametros\n");
         return NULL;
     }
@@ -146,41 +144,37 @@ char *imprimirParametros(Parametro *listaDeParametros)
     strcpy(parametros, "");
     Parametro *paramActual = listaDeParametros;
 
-    while (paramActual != NULL)
-    {
+        
+    while (paramActual != NULL){
         // Agregar tipo de dato, almacenamiento y calificador si no están vacíos
-        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO)
-        {
+        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO){
             strcat(parametros, especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato]);
             strcat(parametros, " ");
         }
-        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC)
-        {
+        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC){
             strcat(parametros, especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento]);
             strcat(parametros, " ");
         }
-        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO)
-        {
+        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO){
             strcat(parametros, calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador]);
             strcat(parametros, " ");
         }
 
         // Agregar identificador
-        if (paramActual->identificador != NULL)
-        {
+        if (paramActual->identificador != NULL){
             strcat(parametros, paramActual->identificador);
         }
 
         // Agregar coma y espacio si hay más parámetros
-        if (paramActual->siguiente != NULL)
-        {
+        if (paramActual->siguiente != NULL){
             strcat(parametros, ", ");
         }
-
         paramActual = paramActual->siguiente;
     }
-
     return parametros;
+    
+
+
 }
 
 /*
@@ -254,8 +248,7 @@ void imprimirFunciones(NodoSimbolo *lista){
         actual = actual->siguiente;
     }
 }
-/*
-void liberarFunciones(NodoFuncion *lista){
+/*void liberarFunciones(NodoFuncion *lista){
     NodoFuncion *actual = lista;
     NodoFuncion *siguiente = NULL;
 
@@ -265,11 +258,10 @@ void liberarFunciones(NodoFuncion *lista){
         free(actual);
         actual = siguiente;
     }
-}
-*/
+}*/
+
 // ESTRUCTURAS NO RECONOCIDAS
-NodoErrorSintactico *crearNodoErrorSintactico(const char *errorSintactico, const int linea)
-{
+NodoErrorSintactico *crearNodoErrorSintactico(const char *errorSintactico, const int linea){
     NodoErrorSintactico *nuevo = (NodoErrorSintactico *)malloc(sizeof(NodoErrorSintactico));
     nuevo->errorSintactico = copiarCadena(errorSintactico);
     nuevo->linea = linea;
@@ -277,8 +269,7 @@ NodoErrorSintactico *crearNodoErrorSintactico(const char *errorSintactico, const
     return nuevo;
 }
 
-void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoErrorSintactico **listaSecuenciasLeidas)
-{
+void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoErrorSintactico **listaSecuenciasLeidas){
     if (*listaSecuenciasLeidas == NULL)
         return; // No hay nada en la lista de secuencias leidas
 
@@ -286,16 +277,13 @@ void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoE
     NodoErrorSintactico *actual = *listaSecuenciasLeidas;
 
     // Verificar si hay solo un nodo
-    if (actual->siguiente == NULL)
-    {
+    if (actual->siguiente == NULL){
         // Si solo hay un nodo, copiar ese nodo
         nodoError = crearNodoErrorSintactico(actual->errorSintactico, actual->linea);
     }
-    else
-    {
+    else{
         // Recorrer hasta el anteultimo nodo
-        while (actual->siguiente != NULL && actual->siguiente->siguiente != NULL && actual->siguiente->siguiente->siguiente != NULL)
-        {
+        while (actual->siguiente != NULL && actual->siguiente->siguiente != NULL && actual->siguiente->siguiente->siguiente != NULL){
             actual = actual->siguiente;
         }
         // Ahora `actual` es el anteultimo nodo
@@ -308,51 +296,42 @@ void agregarErrorSintactico(NodoErrorSintactico **listaErroresSintacticos, NodoE
     *listaErroresSintacticos = nodoError;
 }
 
-void eliminarEspacios(char *cadena)
-{
+void eliminarEspacios(char *cadena){
     char *src = cadena; // Puntero para recorrer la cadena
     char *dst = cadena; // Puntero para la posicion de escritura
 
     // Mover el puntero src hasta el primer caracter no espacio
-    while (*src == ' ')
-    {
+    while (*src == ' '){
         src++;
     }
 
     // Copiar el resto de la cadena, omitiendo los espacios al inicio
-    while (*src)
-    {
+    while (*src){
         *dst++ = *src++;
     }
-
     *dst = '\0'; // Terminar la cadena resultante
 }
 
-void imprimirErrorSintactico(NodoErrorSintactico *lista)
-{
+void imprimirErrorSintactico(NodoErrorSintactico *lista){
     NodoErrorSintactico *actual = lista;
     printf("* Listado de errores sintacticos:\n");
 
-    if (actual == NULL)
-    {
+    if (actual == NULL){
         printf("-\n");
         return;
     }
 
-    while (actual != NULL)
-    {
+    while (actual != NULL){
         printf("\"%s\": linea %d\n", actual->errorSintactico, actual->linea);
         actual = actual->siguiente;
     }
 }
 
-void liberarErrorSintactico(NodoErrorSintactico *lista)
-{
+void liberarErrorSintactico(NodoErrorSintactico *lista){
     NodoErrorSintactico *actual = lista;
     NodoErrorSintactico *siguiente = NULL;
 
-    while (actual != NULL)
-    {
+    while (actual != NULL){
         siguiente = actual->siguiente;
         free(actual->errorSintactico);
         free(actual);
@@ -361,8 +340,7 @@ void liberarErrorSintactico(NodoErrorSintactico *lista)
 }
 
 // CADENAS NO RECONOCIDAS
-NodoCadenaNoReconocida *crearNodoCadenaNoReconocida(const char *cadenaNoReconocida, int linea, int columna)
-{
+NodoCadenaNoReconocida *crearNodoCadenaNoReconocida(const char *cadenaNoReconocida, int linea, int columna){
     NodoCadenaNoReconocida *nuevo = (NodoCadenaNoReconocida *)malloc(sizeof(NodoCadenaNoReconocida));
     nuevo->cadenaNoReconocida = copiarCadena(cadenaNoReconocida);
     nuevo->linea = linea;
@@ -371,22 +349,19 @@ NodoCadenaNoReconocida *crearNodoCadenaNoReconocida(const char *cadenaNoReconoci
     return nuevo;
 }
 
-void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *cadenaNoReconocida, int linea, int columna)
-{
+void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *cadenaNoReconocida, int linea, int columna){
     // Crear el nuevo nodo
     NodoCadenaNoReconocida *nuevoNodo = crearNodoCadenaNoReconocida(cadenaNoReconocida, linea, columna);
 
     // Si la lista esta vacia, el nuevo nodo es el primer nodo
-    if (*lista == NULL)
-    {
+    if (*lista == NULL){
         *lista = nuevoNodo;
         return;
     }
 
     // Si la lista no esta vacia, recorrer hasta el final
     NodoCadenaNoReconocida *actual = *lista;
-    while (actual->siguiente != NULL)
-    {
+    while (actual->siguiente != NULL){
         actual = actual->siguiente;
     }
 
@@ -394,31 +369,26 @@ void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *caden
     actual->siguiente = nuevoNodo;
 }
 
-void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista)
-{
+void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista){
     NodoCadenaNoReconocida *actual = lista;
     printf("* Listado de errores lexicos:\n");
 
-    if (actual == NULL)
-    {
+    if (actual == NULL){
         printf("-\n");
         return;
     }
 
-    while (actual != NULL)
-    {
+    while (actual != NULL){
         printf("%s: linea %d, columna %d\n", actual->cadenaNoReconocida, actual->linea, actual->columna);
         actual = actual->siguiente;
     }
 }
 
-void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista)
-{
+void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista){
     NodoCadenaNoReconocida *actual = lista;
     NodoCadenaNoReconocida *siguiente = NULL;
 
-    while (actual != NULL)
-    {
+    while (actual != NULL){
         siguiente = actual->siguiente;
         free(actual->cadenaNoReconocida);
         free(actual);
@@ -429,8 +399,7 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista)
 NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, int linea, int columna, void *nodo){
     // Asignar memoria para el nuevo nodo de tipo NodoSimbolo
     NodoSimbolo *nuevo = (NodoSimbolo *)malloc(sizeof(NodoSimbolo));
-    if (nuevo == NULL)
-    {
+    if (nuevo == NULL){
         printf("Error: no se pudo asignar memoria para el nuevo nodo de símbolo.\n");
         return NULL;
     }
@@ -510,17 +479,14 @@ void liberarErrorSemantico(NodoErroresSemanticos *lista){
 }
 */
 // Funciones de Utilidad
-char *copiarCadena(const char *str)
-{
-    if (str == NULL)
-    {                // Verifica si la cadena es NULL
+char *copiarCadena(const char *str){
+    if (str == NULL){ // Verifica si la cadena es NULL
         return NULL; // Devuelve NULL si la cadena de entrada es NULL
     }
 
     size_t len = strlen(str);                // Obtiene la longitud de la cadena de entrada
     char *copiado = (char *)malloc(len + 1); // Asigna memoria para la nueva cadena
-    if (copiado != NULL)
-    {
+    if (copiado != NULL){
         strcpy(copiado, str); // Copia el contenido de la cadena de entrada a la nueva cadena
     }
     return copiado; // Devuelve la nueva cadena
@@ -549,45 +515,36 @@ char *copiarCadena(const char *str)
     return TIPO_ERROR;  // Devuelve error si no coincide con las reglas
 }
 */
-void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea)
-{
+void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea){
     // Si es un caracter de corte, crea un nuevo nodo y lo agrega al final de la lista
-    if (strcmp(yytext, ";") == 0 || strcmp(yytext, "\n") == 0)
-    {
-        if (*listaSecuenciasLeidas == NULL)
-        {
+    if (strcmp(yytext, ";") == 0 || strcmp(yytext, "\n") == 0){
+        if (*listaSecuenciasLeidas == NULL){
             // Si la lista esta vacia, crea el primer nodo
             *listaSecuenciasLeidas = crearNodoErrorSintactico("", linea);
         }
-        else
-        {
+        else{
             // Si hay nodos, busca el final de la lista
             NodoErrorSintactico *nuevoNodo = crearNodoErrorSintactico("", linea);
             NodoErrorSintactico *actual = *listaSecuenciasLeidas;
             // Recorrer hasta el ultimo nodo
-            while (actual->siguiente != NULL)
-            {
+            while (actual->siguiente != NULL){
                 actual = actual->siguiente;
             }
             // Enlazar el nuevo nodo al final
             actual->siguiente = nuevoNodo;
         }
     }
-    else
-    {
+    else{
         // Si la lista esta vacia, crea el primer nodo
-        if (*listaSecuenciasLeidas == NULL)
-        {
+        if (*listaSecuenciasLeidas == NULL){
             *listaSecuenciasLeidas = crearNodoErrorSintactico(yytext, linea);
         }
-        else
-        {
+        else{
             // Encuentra el ultimo nodo en la lista y concatena yytext a su errorSintactico
             NodoErrorSintactico *actual = *listaSecuenciasLeidas;
 
             // Recorrer hasta el ultimo nodo
-            while (actual->siguiente != NULL)
-            {
+            while (actual->siguiente != NULL){
                 actual = actual->siguiente;
             }
 
@@ -595,8 +552,7 @@ void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yy
 
             // Redimensiona y concatena la nueva cadena
             char *nuevaCadena = realloc(actual->errorSintactico, nuevoTamanio);
-            if (nuevaCadena == NULL)
-            {
+            if (nuevaCadena == NULL){
                 perror("realloc");
                 exit(EXIT_FAILURE);
             }
@@ -608,6 +564,7 @@ void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yy
         }
     }
 }
+
 /*
 // Insercion de simbolo en la tabla
 int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo){
@@ -726,9 +683,6 @@ int contarArgumentos(char *listaDeArgumentos){
 
 
 // FUNCIONES
-
-
-
 Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador){
     // Crear nuevo nodo y asignar memoria
     Parametro *nuevo = (Parametro *)malloc(sizeof(Parametro));
@@ -794,13 +748,13 @@ void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *id
         return;
     }
 
-    if ((*nodoGenericoFuncion) != NULL && (*nodoGenericoFuncion)->nodo != NULL) {
-        // Hacer el cast a NodoFuncion
-       // NodoFuncion *nodoFuncion = (NodoFuncion *)(*nodoGenericoFuncion)->nodo;
-        //char *parametros = imprimirParametros(nodoFuncion->listaDeParametros);
+    /*if ((*nodoGenericoFuncion) != NULL && (*nodoGenericoFuncion)->nodo != NULL) {
+        // Hacer el casteo a NodoFuncion
+        NodoFuncion *nodoFuncion = (NodoFuncion *)(*nodoGenericoFuncion)->nodo;
+        char *parametros = imprimirParametros(nodoFuncion->listaDeParametros);
     } else {
         printf("Error: El nodo generico o el nodo de la funcion es NULL\n");
-    }
+    }*/
 
     // Limpiar la lista de parámetros
     *listaDeParametros = NULL;
@@ -878,61 +832,46 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
         NodoSimbolo * nuevoSimbolo = crearNodoSimbolo((*nodoGenericoFuncion)->nombre, (*nodoGenericoFuncion)->tipo, (*nodoGenericoFuncion)->linea, (*nodoGenericoFuncion)->columna, (NodoFuncion*)(*nodoGenericoFuncion)->nodo);
 
         // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
-        if (*tablaSimbolos == NULL)
-        {
+        if (*tablaSimbolos == NULL){
             *tablaSimbolos = nuevoSimbolo;
         }
-        else
-        { // Si la lista no esta vacia, recorrer hasta el final
+        else{ // Si la lista no esta vacia, recorrer hasta el final
             NodoSimbolo *actual_simbolo = *tablaSimbolos;
-            while (actual_simbolo->siguiente != NULL)
-            {
+            while (actual_simbolo->siguiente != NULL){
                 actual_simbolo = actual_simbolo->siguiente;
             }
             // Enlazar el nuevo nodo al final de la lista
             actual_simbolo->siguiente = nuevoSimbolo;
         }
     }
-    else if (nodoEncontrado->tipo == FUNCION &&
-             ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DEFINICION_FUNCION &&
-             nuevaFuncion->tipogramatica == DECLARACION_FUNCION)
-    {
+    else if (nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DEFINICION_FUNCION && nuevaFuncion->tipogramatica == DECLARACION_FUNCION){
         // definicion ya existente, y se intenta declarar (sin efecto)
     }
-    else if (nodoEncontrado->tipo == FUNCION &&
-             ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == nuevaFuncion->tipogramatica)
-    {
+    else if (nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == nuevaFuncion->tipogramatica){
         // redeclaracion o redefinicion de funcion
     }
-    else
-    {
+    else{
         // agregarErrorSemantico("%d:%d Funcion '%s' sin declarar", linea, columna, (*nodoGenericoFuncion)->funcion); // SEGMENTATION FAULT
     }
     free(*nodoGenericoFuncion);
     (*nodoGenericoFuncion) = NULL;
 }
 
-bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFuncion)
-{
+bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFuncion){
     NodoSimbolo *nodoActual = tablaSimbolos;
 
-    while (nodoActual != NULL)
-    {
-        if (nodoActual->tipo == FUNCION)
-        {
+    while (nodoActual != NULL){
+        if (nodoActual->tipo == FUNCION){
             NodoFuncion *nodoFuncion = (NodoFuncion *)(nodoActual->nodo);
 
             // Comparar nombre de la funcion y verificar que no haya sido definida antes
-            if (nodoActual->nombre == nodoGenericoFuncion->nombre &&
-                nodoFuncion->tipogramatica == DEFINICION_FUNCION)
-            {
-                return false; // Ya fue definida antes
+            if (nodoActual->nombre == nodoGenericoFuncion->nombre && nodoFuncion->tipogramatica == DEFINICION_FUNCION){
+                return false; 
             }
         }
-        nodoActual = nodoActual->siguiente; // Avanzar al siguiente simbolo en la tabla
+        nodoActual = nodoActual->siguiente; 
     }
-
-    return true; // No fue definida antes
+    return true;
 }
 
 
@@ -940,41 +879,30 @@ void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
     NodoSimbolo *nodoActual = tablaSimbolos;
 
     printf("Tabla de Símbolos:\n");
-    if (nodoActual == NULL)
-    {
-      //  printf("La tabla de símbolos está vacía :(\n\n");
+    if (nodoActual == NULL){
+        printf("La tabla de símbolos está vacía :( \n\n");
     }
 
-    while (nodoActual != NULL)
-    {
-       // printf("Nombre: %s\n", nodoActual->nombre);
-        //printf("Tipo: %s\n", nodoActual->tipo == VARIABLE ? "VARIABLE" : "FUNCION");
-        //printf("Linea: %d\n", nodoActual->linea);
-        //printf("Columna: %d\n", nodoActual->columna);
+    while (nodoActual != NULL){
+        printf("Nombre: %s\n", nodoActual->nombre);
+        printf("Tipo: %s\n", nodoActual->tipo == VARIABLE ? "VARIABLE" : "FUNCION");
+        printf("Linea: %d\n", nodoActual->linea);
+        printf("Columna: %d\n", nodoActual->columna);
 
-        if (nodoActual->tipo == VARIABLE)
-        {
-            //NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodoActual->nodo;
-          /* printf("Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n",
-                   especificadorTiposString[var->tipoDato.esTipoDato],
-                   especificadorAlmacenamientoString[var->tipoDato.esAlmacenamiento],
-                   calificadorTipoString[var->tipoDato.esCalificador]);*/
+        if (nodoActual->tipo == VARIABLE){
+            NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodoActual->nodo;
+            printf("Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[var->tipoDato.esTipoDato], especificadorAlmacenamientoString[var->tipoDato.esAlmacenamiento], calificadorTipoString[var->tipoDato.esCalificador]);
         }
-        else if (nodoActual->tipo == FUNCION)
-        {
+        else if (nodoActual->tipo == FUNCION){
             NodoFuncion *func = (NodoFuncion *)nodoActual->nodo;
-           /* printf("Retorno: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n",
-                   especificadorTiposString[func->retorno.esTipoDato],
-                   especificadorAlmacenamientoString[func->retorno.esAlmacenamiento],
-                   calificadorTipoString[func->retorno.esCalificador]);*/
-           // printf("Tipo de gramática: %s\n", func->tipogramatica == DEFINICION_FUNCION ? "DEFINICION" : "DECLARACION");
+            printf("Retorno: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[func->retorno.esTipoDato], especificadorAlmacenamientoString[func->retorno.esAlmacenamiento], calificadorTipoString[func->retorno.esCalificador]);
+            printf("Tipo de gramática: %s\n", func->tipogramatica == DEFINICION_FUNCION ? "DEFINICION" : "DECLARACION");
 
             // Imprimir parámetros usando tu función
             char *parametros = imprimirParametros(func->listaDeParametros);
-           // printf("  Parámetros: %s\n\n", parametros);
+            printf("  Parámetros: %s\n\n", parametros);
             free(parametros); // Liberar memoria después de imprimir
         }
-
         printf("\n");
         nodoActual = nodoActual->siguiente;
     }

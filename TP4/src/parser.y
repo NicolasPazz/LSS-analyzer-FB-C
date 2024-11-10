@@ -369,7 +369,6 @@ int main(int argc, char *argv[]) {
     //2
     imprimirFunciones(tablaSimbolos);
     //liberarFunciones(listaFunciones);
-    printf("\n");
 
    //3
     //imprimirErrorSemantico(listaErroresSemanticos);
