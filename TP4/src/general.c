@@ -745,7 +745,7 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
 
     if(funcion->tipo != FUNCION) {
         char mensaje[256];
-        snprintf(mensaje, sizeof(mensaje), "El objeto invocado %s no es una funcion o un puntero a una funcion\n Nota: declarado aqui %d:%d", identificador, funcion->linea, funcion->columna);
+        snprintf(mensaje, sizeof(mensaje), "El objeto invocado '%s' no es una funcion o un puntero a una funcion\nNota: declarado aqui: %d:%d", identificador, funcion->linea, funcion->columna);
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         return;
     }
@@ -902,7 +902,7 @@ void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos
             if (parametros != NULL)
             {
                 // Aniadir los parametros al mensaje
-                snprintf(mensaje + strlen(mensaje), sizeof(mensaje) - strlen(mensaje), "'%s'): %d:%d",
+                snprintf(mensaje + strlen(mensaje), sizeof(mensaje) - strlen(mensaje), "%s)': %d:%d",
                          parametros, nodoPrevio->linea, nodoPrevio->columna);
                 free(parametros); // Liberamos la memoria asignada
             }
