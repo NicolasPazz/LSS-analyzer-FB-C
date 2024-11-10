@@ -2,114 +2,27 @@
 
 extern YYLTYPE yylloc;
 extern int yyval;
-void pausa(void)
-{
+void pausa(void){
     printf("Presione ENTER para continuar...\n");
     getchar();
 }
 
-void inicializarUbicacion(void)
-{
+void inicializarUbicacion(void){
     yylloc.first_line = yylloc.last_line = INICIO_CONTEO_LINEA;
     yylloc.first_column = yylloc.last_column = INICIO_CONTEO_COLUMNA;
 }
 
-void reinicializarUbicacion(void)
-{
+void reinicializarUbicacion(void){
     yylloc.first_line = yylloc.last_line;
     yylloc.first_column = yylloc.last_column;
 }
-/*
-// VARIABLES DECLARADAS
-NodoSimbolo *crearNodoVariableDeclarada(const char *variableDeclarada, EspecificadorTipos tipoDato, const int linea, const int columna){
-    NodoSimbolo *nuevoSimbolo = (NodoSimbolo *)malloc(sizeof(NodoSimbolo));
-    NodoVariableDeclarada *nuevaVariableDeclarada = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
-    nuevoSimbolo->nombre = copiarCadena(variableDeclarada);
-    nuevoSimbolo->tipo = VARIABLE;
-    nuevoSimbolo->linea = linea;
-    nuevoSimbolo->columna = columna;
-    nuevoSimbolo->nodo = nuevaVariableDeclarada;
-    nuevaVariableDeclarada->tipoDato = tipoDato;
-    nuevoSimbolo->siguiente = NULL;
-    return nuevoSimbolo;
-}
-
-void agregarVariableDeclarada(NodoVariableDeclarada **lista, NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *variableDeclarada, EspecificadorTipos tipoDato, const int linea, const int columna, const char *sufijo){
-    NodoSimbolo *nodoPrevio = buscar_simbolo(variableDeclarada);
-    if (nodoPrevio == NULL){
-        // Crear el nuevo nodo
-        NodoVariableDeclarada *nuevoNodo = crearNodoVariableDeclarada(variableDeclarada, tipoDato, linea, columna);
-
-        // Si la lista esta vacia, el nuevo nodo es el primer nodo
-        if (*lista == NULL){
-            *lista = nuevoNodo;
-            return;
-        }
-
-        // Si la lista no esta vacia, recorrer hasta el final
-        NodoVariableDeclarada *actual = *lista;
-        while (actual->siguiente != NULL){
-            actual = actual->siguiente;
-        }
-
-        // Enlazar el nuevo nodo al final de la lista
-        actual->siguiente = nuevoNodo;
-
-        // Crear el nuevo NodoSimbolo
-        NodoSimbolo *nuevoNodoSimbolo = crearNodoSimbolo(variableDeclarada, VARIABLE, nuevoNodo);
-
-        // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
-        if (*tablaSimbolos == NULL){
-            *tablaSimbolos = nuevoNodoSimbolo;
-            return;
-        }
-
-        // Si la lista no esta vacia, recorrer hasta el final
-        NodoSimbolo *actual_simbolo = *tablaSimbolos;
-        while (actual_simbolo->siguiente != NULL){
-            actual_simbolo = actual_simbolo->siguiente;
-        }
-
-        // Enlazar el nuevo nodo al final de la lista
-        actual_simbolo->siguiente = nuevoNodoSimbolo;
-    }
-
-    else{
-        if (nodoPrevio->tipo == VARIABLE){
-            NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodoPrevio->nodo;
-            char mensaje[256];
-            snprintf(mensaje, sizeof(mensaje), "'%s' redeclarado como un tipo diferente de simbolo \n Nota: la declaracion previa de '%s' es de tipo '%s': %d:%d", variableDeclarada, variableDeclarada, elemento->tipoDato, elemento->linea, elemento->columna);
-            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
-        }
-        else if (nodoPrevio->tipo == FUNCION){
-            NodoFuncion *elemento = nodoPrevio->nodo;
-            char mensaje[512]; // Aumentamos el tamano del buffer si es necesario
-            snprintf(mensaje, sizeof(mensaje), "'%s' redeclarado como un tipo diferente de simbolo\nNota: la declaracion previa de '%s' es de tipo '%s(",
-                     variableDeclarada, variableDeclarada, elemento->retorno);
-
-            char *parametros = imprimirParametros(elemento->listaDeParametros);
-            if (parametros != NULL){
-                // Aniadir los parametros al mensaje
-                snprintf(mensaje + strlen(mensaje), sizeof(mensaje) - strlen(mensaje), "%s)': %d:%d",
-                         parametros, elemento->linea, elemento->columna);
-                free(parametros); // Liberamos la memoria asignada
-            }
-            else{
-                // Manejo de error en caso de que no se pueda imprimir parametros
-                snprintf(mensaje + strlen(mensaje), sizeof(mensaje) - strlen(mensaje), "Error al obtener parametros'): %d:%d",
-                         elemento->linea, elemento->columna);
-            }
-
-            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
-        }
-    }
-}*/
 
 const char *tipoFuncionString[] = {
     [DEFINICION_FUNCION] = "definicion",
     [DECLARACION_FUNCION] = "declaracion",
     [OTRO] = "ERROR"
 };
+
 const char *especificadorTiposString[] = {
     [VACIO_TIPODATO] = "vacio",
     [CHAR_TIPODATO] = "char",
@@ -134,7 +47,7 @@ const char *calificadorTipoString[] = {
     [VOLATILE_CALIFICADORTIPO] = "volatile",
     [VACIO_CALIFICADORTIPO] = "vacio"};
 
-char *imprimirParametros(Parametro *listaDeParametros) {
+char *imprimirParametros(Parametro *listaDeParametros){
     char *parametros = (char *)malloc(256);
     if (parametros == NULL) {
         printf("Error: No se pudo asignar memoria para los parametros\n");
@@ -150,31 +63,31 @@ char *imprimirParametros(Parametro *listaDeParametros) {
         ElementosParametro *aux = NULL;
 
         // Agregar cada especificador a la lista de elementos
-        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO) {
+        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO){
             ElementosParametro *nuevoElemento = malloc(sizeof(ElementosParametro));
-            nuevoElemento->elemento = calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador];
+            nuevoElemento->elemento = (char*)calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador];
             nuevoElemento->siguiente = NULL;
             if (lista == NULL) lista = nuevoElemento;
             else aux->siguiente = nuevoElemento;
             aux = nuevoElemento;
         }
-        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC) {
+        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC){
             ElementosParametro *nuevoElemento = malloc(sizeof(ElementosParametro));
-            nuevoElemento->elemento = especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento];
+            nuevoElemento->elemento = (char*)especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento];
             nuevoElemento->siguiente = NULL;
             if (lista == NULL) lista = nuevoElemento;
             else aux->siguiente = nuevoElemento;
             aux = nuevoElemento;
         }
-        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO) {
+        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO){
             ElementosParametro *nuevoElemento = malloc(sizeof(ElementosParametro));
-            nuevoElemento->elemento = especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato];
+            nuevoElemento->elemento = (char*)especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato];
             nuevoElemento->siguiente = NULL;
             if (lista == NULL) lista = nuevoElemento;
             else aux->siguiente = nuevoElemento;
             aux = nuevoElemento;
         }
-        if (paramActual->identificador != NULL) {
+        if (paramActual->identificador != NULL){
             ElementosParametro *nuevoElemento = malloc(sizeof(ElementosParametro));
             nuevoElemento->elemento = paramActual->identificador;
             nuevoElemento->siguiente = NULL;
@@ -185,7 +98,7 @@ char *imprimirParametros(Parametro *listaDeParametros) {
 
         // Concatenar todos los elementos del parámetro actual
         aux = lista;
-        while (aux != NULL) {
+        while (aux != NULL){
             strcat(parametros, aux->elemento);
             if (aux->siguiente != NULL) strcat(parametros, " ");
             ElementosParametro *temp = aux;
@@ -198,13 +111,12 @@ char *imprimirParametros(Parametro *listaDeParametros) {
         
         paramActual = paramActual->siguiente;
     }
-
     return parametros;
 }
 
-char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros) {
+char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros){
     char *parametros = (char *)malloc(256);
-    if (parametros == NULL) {
+    if (parametros == NULL){
         printf("Error: No se pudo asignar memoria para los parametros\n");
         return NULL;
     }
@@ -212,29 +124,29 @@ char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros) {
     strcpy(parametros, "");
     Parametro *paramActual = listaDeParametros;
 
-    typedef struct ElementosParametro {
+    typedef struct ElementosParametro{
         char *elemento;
         struct ElementosParametro *siguiente;
     } ElementosParametro;
 
-    while (paramActual != NULL) {
+    while (paramActual != NULL){
         // Crear lista temporal de elementos para el parámetro actual
         ElementosParametro* lista = malloc(sizeof(ElementosParametro));
         ElementosParametro* aux = lista;
 
         // Agregar los especificadores de almacenamiento, calificador y tipo de dato, si no están vacíos
-        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO) {
-            aux->elemento = calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador];
+        if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO){
+            aux->elemento = (char*)calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador];
             aux->siguiente = malloc(sizeof(ElementosParametro));
             aux = aux->siguiente;
         }
-        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC) {
-            aux->elemento = especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento];
+        if (paramActual->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC){
+            aux->elemento = (char*)especificadorAlmacenamientoString[paramActual->especificadorDeclaracion.esAlmacenamiento];
             aux->siguiente = malloc(sizeof(ElementosParametro));
             aux = aux->siguiente;
         }
-        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO) {
-            aux->elemento = especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato];
+        if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO){
+            aux->elemento =(char*) especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato];
             aux->siguiente = NULL;  // Último elemento
         }
 
@@ -265,8 +177,7 @@ char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros) {
     return parametros;
 }
 
-void imprimirVariables(NodoSimbolo *lista)
-{
+void imprimirVariables(NodoSimbolo *lista){
     NodoSimbolo *actual = lista;
 
     printf("* Listado de variables declaradas (tipo de dato y numero de linea):\n");
@@ -276,79 +187,19 @@ void imprimirVariables(NodoSimbolo *lista)
         return;
     }
 
-    while (actual != NULL && actual->tipo != VARIABLE)
-    {
+    while (actual != NULL && actual->tipo != VARIABLE){
         actual = actual->siguiente;
     }
 
     while (actual != NULL && actual->tipo == VARIABLE){
         NodoVariableDeclarada *variable = (NodoVariableDeclarada *)actual->nodo;
-
         printf("%s: %s, linea %d, columna %d\n", actual->nombre, enumAString(variable->tipoDato), actual->linea, actual->columna);
-
         actual = actual->siguiente;
-
-        while (actual != NULL && actual->tipo != VARIABLE)
-        {
+        while (actual != NULL && actual->tipo != VARIABLE){
             actual = actual->siguiente;
         }
     }
 }
-
-void imprimirFunciones(NodoSimbolo *lista){
-    NodoSimbolo *actual = lista;
-
-    printf("* Listado de funciones declaradas y definidas:\n");
-
-    if (actual == NULL){
-        printf("-\n");
-        return;
-    }
-
-    while (actual != NULL && actual->tipo == FUNCION){
-        NodoFuncion *funcion = (NodoFuncion *)actual->nodo;
-
-        const char* esCalificador = (funcion->retorno.esCalificador == VACIO_CALIFICADORTIPO) ? "" : calificadorTipoString[funcion->retorno.esCalificador];
-        const char* esAlmacenamiento = (funcion->retorno.esAlmacenamiento == VACIO_ESPALMAC) ? "" : especificadorAlmacenamientoString[funcion->retorno.esAlmacenamiento];
-        const char* esTipoDato = (funcion->retorno.esTipoDato == VACIO_TIPODATO) ? "" : especificadorTiposString[funcion->retorno.esTipoDato];
-
-        printf("%s: %s, input: ", actual->nombre, tipoFuncionString[funcion->tipogramatica]);
-
-        // Invocar la funcion para obtener los parametros
-        char *parametros = imprimirParametros(funcion->listaDeParametros);
-        if (parametros != NULL){
-            printf("%s", parametros);
-            free(parametros); // Liberar memoria despues de usar
-        }
-        else{
-            printf("Error al obtener los parametros");
-        }
-
-        printf(", retorna: %s%s%s", esCalificador, esAlmacenamiento, esTipoDato);
-        
-        
-        printf(", linea %d\n", actual->linea);
-        free(funcion);
-
-        actual = actual->siguiente;
-
-        while (actual != NULL && actual->tipo != FUNCION)
-        {
-            actual = actual->siguiente;
-        }
-    }
-}
-/*void liberarFunciones(NodoFuncion *lista){
-    NodoFuncion *actual = lista;
-    NodoFuncion *siguiente = NULL;
-
-    while (actual != NULL){
-        siguiente = actual->siguiente;
-        free(actual->funcion);
-        free(actual);
-        actual = siguiente;
-    }
-}*/
 
 // ESTRUCTURAS NO RECONOCIDAS
 NodoErrorSintactico *crearNodoErrorSintactico(const char *errorSintactico, const int linea){
@@ -674,17 +525,7 @@ int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo){
     return 0;
 }*/
 
-NodoSimbolo *buscar_simbolo(char *nombre){
-    NodoSimbolo *nodo_actual = tablaSimbolos;
 
-    while (nodo_actual != NULL){
-        if (strcmp(nodo_actual->nombre, nombre) == 0){
-            return nodo_actual; // Retornar el nodo encontrado
-        }
-        nodo_actual = nodo_actual->siguiente; // Mover al siguiente nodo
-    }
-    return NULL; // Retornar NULL si no se encuentra el nodo
-}
 
 /*
 // Validacion de operaciones especificas
@@ -930,7 +771,7 @@ void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *
         if (nodoPrevio == NULL && strcmp(contextoActual,"main")==0){
             char mensaje[256];
             snprintf(mensaje, sizeof(mensaje), "'%s' sin declarar", identificador);
-            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna+2);
         }
     }
 }
@@ -1032,6 +873,23 @@ NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos r
     return nuevo;
 }
 
+bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFuncion){
+    NodoSimbolo *nodoActual = tablaSimbolos;
+
+    while (nodoActual != NULL){
+        if (nodoActual->tipo == FUNCION){
+            NodoFuncion *nodoFuncion = (NodoFuncion *)(nodoActual->nodo);
+
+            // Comparar nombre de la funcion y verificar que no haya sido definida antes
+            if (nodoActual->nombre == nodoGenericoFuncion->nombre && nodoFuncion->tipogramatica == DEFINICION_FUNCION){
+                return false; 
+            }
+        }
+        nodoActual = nodoActual->siguiente; 
+    }
+    return true;
+}
+
 void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo **nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna){   
     if (nodoGenericoFuncion == NULL){
         printf("Error: nodoGenericoFuncion es NULL.\n");
@@ -1125,23 +983,75 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
     (*nodoGenericoFuncion) = NULL;
 }
 
-bool noFueDefinidaAntes(NodoSimbolo *tablaSimbolos, NodoSimbolo *nodoGenericoFuncion){
-    NodoSimbolo *nodoActual = tablaSimbolos;
+void imprimirFunciones(NodoSimbolo *lista){
+    NodoSimbolo *actual = lista;
 
-    while (nodoActual != NULL){
-        if (nodoActual->tipo == FUNCION){
-            NodoFuncion *nodoFuncion = (NodoFuncion *)(nodoActual->nodo);
+    printf("* Listado de funciones declaradas y definidas:\n");
 
-            // Comparar nombre de la funcion y verificar que no haya sido definida antes
-            if (nodoActual->nombre == nodoGenericoFuncion->nombre && nodoFuncion->tipogramatica == DEFINICION_FUNCION){
-                return false; 
-            }
-        }
-        nodoActual = nodoActual->siguiente; 
+    if (actual == NULL){
+        printf("-\n");
+        return;
     }
-    return true;
+
+    while (actual != NULL && actual->tipo == FUNCION){
+        NodoFuncion *funcion = (NodoFuncion *)actual->nodo;
+
+        const char* esCalificador = (funcion->retorno.esCalificador == VACIO_CALIFICADORTIPO) ? "" : calificadorTipoString[funcion->retorno.esCalificador];
+        const char* esAlmacenamiento = (funcion->retorno.esAlmacenamiento == VACIO_ESPALMAC) ? "" : especificadorAlmacenamientoString[funcion->retorno.esAlmacenamiento];
+        const char* esTipoDato = (funcion->retorno.esTipoDato == VACIO_TIPODATO) ? "" : especificadorTiposString[funcion->retorno.esTipoDato];
+
+        printf("%s: %s, input: ", actual->nombre, tipoFuncionString[funcion->tipogramatica]);
+
+        // Invocar la funcion para obtener los parametros
+        char *parametros = imprimirParametros(funcion->listaDeParametros);
+        if (parametros != NULL){
+            printf("%s", parametros);
+            free(parametros); // Liberar memoria despues de usar
+        }
+        else{
+            printf("Error al obtener los parametros");
+        }
+
+        printf(", retorna: %s%s%s", esCalificador, esAlmacenamiento, esTipoDato);
+        
+        
+        printf(", linea %d\n", actual->linea);
+        free(funcion);
+
+        actual = actual->siguiente;
+
+        while (actual != NULL && actual->tipo != FUNCION){
+            actual = actual->siguiente;
+        }
+    }
 }
 
+/*void liberarFunciones(NodoFuncion *lista){
+    NodoFuncion *actual = lista;
+    NodoFuncion *siguiente = NULL;
+
+    while (actual != NULL){
+        siguiente = actual->siguiente;
+        free(actual->funcion);
+        free(actual);
+        actual = siguiente;
+    }
+}*/
+
+
+// Tabla Simbolos
+
+NodoSimbolo *buscar_simbolo(char *nombre){
+    NodoSimbolo *nodo_actual = tablaSimbolos;
+
+    while (nodo_actual != NULL){
+        if (strcmp(nodo_actual->nombre, nombre) == 0){
+            return nodo_actual; // Retornar el nodo encontrado
+        }
+        nodo_actual = nodo_actual->siguiente; // Mover al siguiente nodo
+    }
+    return NULL; // Retornar NULL si no se encuentra el nodo
+}
 
 void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
     NodoSimbolo *nodoActual = tablaSimbolos;
