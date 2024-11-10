@@ -111,7 +111,7 @@ expresion_unaria:
     ;
 
 expresion_multiplicativa:
-      expresion OP_MULTIPLICATIVO expresion       { validarMultiplicacion($1, $3, @1.last_line, @1.first_column, &listaErroresSemanticos); DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n"); }
+      expresion OP_MULTIPLICATIVO expresion       { validarMultiplicacion($1, $3, @2.last_line, @2.first_column, &listaErroresSemanticos); DBG_PRINT("expresion_multiplicativa: EXP1  EXP2\n"); }
     ;
 expresion_aditiva:
       expresion OP_ADITIVO expresion              { DBG_PRINT("expresion_aditiva: EXP1 +/- EXP2\n"); } 

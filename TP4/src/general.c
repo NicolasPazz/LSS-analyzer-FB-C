@@ -675,6 +675,46 @@ char *extraerTipoDato(char *expresion) //No extrae el tipo de variables que no e
     }
 }
 
+const char *extraerTipoDato2(char *expresion) //No extrae el tipo de variables que no estén en la TS, por más que hayan sido declaradas como parámetros
+{    
+    NodoSimbolo *nodo = buscar_simbolo(expresion);
+    char *retorno;
+
+    if(nodo == NULL)
+    {
+        return expresion;
+    }
+    else if(nodo->tipo == VARIABLE)
+    {
+        NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodo->nodo;
+        return enumAString1(elemento->tipoDato);
+    }
+    else if(nodo->tipo == FUNCION)
+    {
+        NodoFuncion *elemento = (NodoFuncion *)nodo->nodo;
+        Parametro *parametros = elemento->listaDeParametros;
+        char tipoDato[256];
+        snprintf(tipoDato, sizeof(tipoDato), "%s (*)(", enumAString1(elemento->retorno));
+        char *parametrosNuevaFuncion = imprimirParametrosSinIdentificador(parametros);
+                if (parametrosNuevaFuncion != NULL)
+                {
+                    // Aniadir los parametros al tipoDato
+                    snprintf(tipoDato + strlen(tipoDato), sizeof(tipoDato) - strlen(tipoDato), "%s)",
+                            parametrosNuevaFuncion);
+                    free(parametrosNuevaFuncion); // Liberamos la memoria asignada
+                }
+                else
+                {
+                    // Manejo de error en caso de que no se pueda imprimir parametros
+                    snprintf(tipoDato + strlen(tipoDato), sizeof(tipoDato) - strlen(tipoDato), "Error al obtener parametros'): %d:%d",
+                            nodo->linea, nodo->columna);
+                }
+        retorno = strdup(tipoDato);
+        return retorno;
+    }
+    return "Tipo desconocido";
+}
+
 void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int columna, NodoErroresSemanticos **listaErroresSemanticos)
 {
     char *tipoDato1 = extraerTipoDato(expresion1);
@@ -683,8 +723,13 @@ void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int co
     if((!esMultiplicable(tipoDato1) || !esMultiplicable(tipoDato2)))
     {
         char mensaje[256];
-        snprintf(mensaje, sizeof(mensaje), "Operandos invalidos del operador binario * (tienen '%s' y '%s')", tipoDato1, tipoDato2);
+        const char *tipoDatoPrint1 =  extraerTipoDato2(expresion1);
+        const char *tipoDatoPrint2 = extraerTipoDato2(expresion2);
+        snprintf(mensaje, sizeof(mensaje), "Operandos invalidos del operador binario * (tienen '%s' y '%s')", tipoDatoPrint1, tipoDatoPrint2);
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        // Liberar memoria después del uso
+        if (tipoDatoPrint1 != expresion1) free((void *)tipoDatoPrint1);
+        if (tipoDatoPrint2 != expresion2) free((void *)tipoDatoPrint2);
     }
 }
 
@@ -1169,7 +1214,7 @@ int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
 } // puede ir algo por aca la validacion de tipos. En vez de return 1 o 0, se puede generar accion.
 */
 
-char *enumAString1(EspecificadorTipos tipoDato)
+const char *enumAString1(EspecificadorTipos tipoDato)
 {
     // Asigna memoria para el buffer dinámico
     char *buffer = (char *)malloc(150 * sizeof(char));

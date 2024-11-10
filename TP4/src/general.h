@@ -316,9 +316,10 @@ void agregarListaVariables(IdentificadorTemporal *listaTemporalIdentificadores, 
 void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *identificador, EspecificadorTipos tipoDato, int linea, int columna);
 void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores);
 char *enumAString2(EspecificadorTipos tipoDato);
-char *enumAString1(EspecificadorTipos tipoDato);
+const char *enumAString1(EspecificadorTipos tipoDato);
 bool esMultiplicable(char *expresion);
 char *extraerTipoDato(char *expresion);
+const char *extraerTipoDato2(char *expresion);
 void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int columna, NodoErroresSemanticos **listaErroresSemanticos);
 
 char* obtenerTipoIdentificador(const char *identificador) ;
