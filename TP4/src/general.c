@@ -952,85 +952,55 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
 
     (*nodoGenericoFuncion)->linea = linea;
     (*nodoGenericoFuncion)->columna = columna;
-  
-    //imprimirTablaSimbolos(*tablaSimbolos);
     
     NodoSimbolo *nodoEncontrado = buscar_simbolo((*nodoGenericoFuncion)->nombre);
     NodoFuncion *nuevaFuncion = (NodoFuncion *)(*nodoGenericoFuncion)->nodo;
     nuevaFuncion->retorno = retorno;
     nuevaFuncion->tipogramatica = tipogramatica;
+
+    if(nodoEncontrado != NULL && nodoEncontrado->tipo == VARIABLE){
+        NodoVariableDeclarada* variableEncontrada = (NodoVariableDeclarada *)nodoEncontrado->nodo;
+        
+        //2.	Cuando se redeclara un identificador con tipo diferente de símbolo (ej. variable/función - función/variable). LA:CA y LB:CB indican las ubicaciones del identificador en el archivo de entrada.
+        //LA:CA: 'IDENTIFICADOR' redeclarado como un tipo diferente de simbolo
+        //Nota: la declaracion previa de 'IDENTIFICADOR' es de tipo 'TIPO_DATO': LB:CB
+        char mensaje[256];
+        snprintf(mensaje, sizeof(mensaje), "'%s' redeclarado como un tipo diferente de simbolo\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", (*nodoGenericoFuncion)->nombre, (*nodoGenericoFuncion)->nombre, especificadorTiposString[variableEncontrada->tipoDato.esTipoDato], nodoEncontrado->linea, nodoEncontrado->columna);
+        agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
+        return;   
+    }
     
-    // Si el identificador no fue usado antes o el identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes
-    if (nodoEncontrado == NULL || ((nodoEncontrado != NULL && nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DECLARACION_FUNCION && nuevaFuncion->tipogramatica == DEFINICION_FUNCION && noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion)))){
-        // Si el identificador se uso en una declaracion de funcion y ahora se quiere definir, sin haber sido definida antes. Validar que los parametros que se pretenden usar en la definicion, sean compatibles con los de la declaracion
-        if (nodoEncontrado != NULL && nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DECLARACION_FUNCION && nuevaFuncion->tipogramatica == DEFINICION_FUNCION && noFueDefinidaAntes(*tablaSimbolos, *nodoGenericoFuncion)){
-            Parametro *paramDeclaracion = ((NodoFuncion *)nodoEncontrado->nodo)->listaDeParametros;
-            Parametro *paramDefinicion = nuevaFuncion->listaDeParametros;
+    if(nodoEncontrado != NULL && nodoEncontrado->tipo == FUNCION){
+        NodoFuncion* funcionEncontrada = (NodoFuncion *)nodoEncontrado->nodo;
+        Parametro *paramDeclaracion = funcionEncontrada->listaDeParametros;
+        Parametro *paramDefinicion = nuevaFuncion->listaDeParametros;
 
-            while (paramDeclaracion != NULL && paramDefinicion != NULL){
-                // Comprobar solo si ambos sufijos no son NULL
-                if (paramDeclaracion->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO && paramDefinicion->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO){
-                    if (paramDeclaracion->especificadorDeclaracion.esTipoDato != paramDefinicion->especificadorDeclaracion.esTipoDato){
-                        //3.	Cuando se redeclara/redefine un identificador con tipo igual de símbolo (ej. variable/variable - función/función) pero con tipos de datos diferentes. LA:CA y LB:CB indican las ubicaciones del identificador en el archivo de entrada.
-                        //LA:CA: conflicto de tipos para 'IDENTIFICADOR'; la ultima es de tipo 'TIPO_DATOA'
-                        //Nota: la declaracion previa de 'IDENTIFICADOR' es de tipo 'TIPO_DATOB': LB:CB
+        if (paramDeclaracion != NULL && paramDefinicion != NULL && paramDeclaracion->especificadorDeclaracion.esTipoDato != paramDefinicion->especificadorDeclaracion.esTipoDato){
+            //3.	Cuando se redeclara/redefine un identificador con tipo igual de símbolo (ej. variable/variable - función/función) pero con tipos de datos diferentes. LA:CA y LB:CB indican las ubicaciones del identificador en el archivo de entrada.
+            //LA:CA: conflicto de tipos para 'IDENTIFICADOR'; la ultima es de tipo 'TIPO_DATOA'
+            //Nota: la declaracion previa de 'IDENTIFICADOR' es de tipo 'TIPO_DATOB': LB:CB
 
-                        char mensaje[256];
-                        snprintf(mensaje, sizeof(mensaje), 
-                        "conflicto de tipos para '%s'; la ultima es de tipo '%s(%s)'\nNota: la declaracion previa de '%s' es de tipo '%s(%s)': %d:%d", 
-                        (*nodoGenericoFuncion)->nombre, especificadorTiposString[nuevaFuncion->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDefinicion), (*nodoGenericoFuncion)->nombre, especificadorTiposString[((NodoFuncion *)nodoEncontrado->nodo)->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDeclaracion), nodoEncontrado->linea, nodoEncontrado->columna);
-                        agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
-                        return;
-                    }
-                }
-                if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC && paramDefinicion->especificadorDeclaracion.esAlmacenamiento != VACIO_ESPALMAC){
-                    if (paramDeclaracion->especificadorDeclaracion.esAlmacenamiento != paramDefinicion->especificadorDeclaracion.esAlmacenamiento){
-                        char mensaje[256];
-                        snprintf(mensaje, sizeof(mensaje), "Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
-                        agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
-                        return;
-                    }
-                }
-                if (paramDeclaracion->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO && paramDefinicion->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO){
-                    if (paramDeclaracion->especificadorDeclaracion.esCalificador != paramDefinicion->especificadorDeclaracion.esCalificador){
-                        char mensaje[256];
-                        snprintf(mensaje, sizeof(mensaje), "Error: Incompatibilidad de sufijos entre declaracion y definicion en la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
-                        agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
-                        return;
-                    }
-                }
-                paramDeclaracion = paramDeclaracion->siguiente;
-                paramDefinicion = paramDefinicion->siguiente;
-            }
-
-            if (paramDeclaracion != NULL || paramDefinicion != NULL){
-
-                char mensaje[256];
-                snprintf(mensaje, sizeof(mensaje), "Error: La cantidad de parametros entre declaracion y definicion no coincide para la funcion '%s'.\n", (*nodoGenericoFuncion)->nombre);
-                agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
-                return;
-            }
-        }
-        NodoSimbolo * nuevoSimbolo = crearNodoSimbolo((*nodoGenericoFuncion)->nombre, (*nodoGenericoFuncion)->tipo, (*nodoGenericoFuncion)->linea, (*nodoGenericoFuncion)->columna, (NodoFuncion*)(*nodoGenericoFuncion)->nodo);
-
-        // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
-        if (*tablaSimbolos == NULL){
-            *tablaSimbolos = nuevoSimbolo;
-        }
-        else{ // Si la lista no esta vacia, recorrer hasta el final
-            NodoSimbolo *actual_simbolo = *tablaSimbolos;
-            while (actual_simbolo->siguiente != NULL){
-                actual_simbolo = actual_simbolo->siguiente;
-            }
-            // Enlazar el nuevo nodo al final de la lista
-            actual_simbolo->siguiente = nuevoSimbolo;
+            char mensaje[256];
+            snprintf(mensaje, sizeof(mensaje), 
+            "conflicto de tipos para '%s'; la ultima es de tipo '%s(%s)'\nNota: la declaracion previa de '%s' es de tipo '%s(%s)': %d:%d", 
+            (*nodoGenericoFuncion)->nombre, especificadorTiposString[nuevaFuncion->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDefinicion), (*nodoGenericoFuncion)->nombre, especificadorTiposString[funcionEncontrada->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDeclaracion), nodoEncontrado->linea, nodoEncontrado->columna);
+            agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
+            return;
         }
     }
-    else if (nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == DEFINICION_FUNCION && nuevaFuncion->tipogramatica == DECLARACION_FUNCION){
-        // definicion ya existente, y se intenta declarar (sin efecto)
-    }
-    else if (nodoEncontrado->tipo == FUNCION && ((NodoFuncion *)nodoEncontrado->nodo)->tipogramatica == nuevaFuncion->tipogramatica){
-        // redeclaracion o redefinicion de funcion
+
+    NodoSimbolo * nuevoSimbolo = crearNodoSimbolo((*nodoGenericoFuncion)->nombre, (*nodoGenericoFuncion)->tipo, (*nodoGenericoFuncion)->linea, (*nodoGenericoFuncion)->columna, (NodoFuncion*)(*nodoGenericoFuncion)->nodo);
+
+    // Si la lista esta vacia, el nuevo NodoSimbolo es el primer NodoSimbolo
+    if (*tablaSimbolos == NULL){
+        *tablaSimbolos = nuevoSimbolo;
+    } else{ // Si la lista no esta vacia, recorrer hasta el final
+        NodoSimbolo *actual_simbolo = *tablaSimbolos;
+        while (actual_simbolo->siguiente != NULL){
+            actual_simbolo = actual_simbolo->siguiente;
+        }
+        // Enlazar el nuevo nodo al final de la lista
+        actual_simbolo->siguiente = nuevoSimbolo;
     }
 
     free(*nodoGenericoFuncion);
