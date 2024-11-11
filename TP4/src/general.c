@@ -18,6 +18,8 @@ void reinicializarUbicacion(void){
     yylloc.first_column = yylloc.last_column;
 }
 
+
+// ESTRUCTURAS DE DATOS
 const char *tipoFuncionString[] = {
     [DEFINICION_FUNCION] = "definicion",
     [DECLARACION_FUNCION] = "declaracion",
@@ -35,7 +37,8 @@ const char *especificadorTiposString[] = {
     [LONG_TIPODATO] = "long",
     [UNSIGNED_LONG_TIPODATO] = "unsigned long",
     [SHORT_TIPODATO] = "short",
-    [UNSIGNED_SHORT_TIPODATO] = "unsigned short"};
+    [UNSIGNED_SHORT_TIPODATO] = "unsigned short"
+};
 
 const char *especificadorAlmacenamientoString[] = {
     [AUTO_ESPALMAC] = "auto",
@@ -43,12 +46,79 @@ const char *especificadorAlmacenamientoString[] = {
     [STATIC_ESPALMAC] = "static",
     [EXTERN_ESPALMAC] = "extern",
     [TYPEDEF_ESPALMAC] = "typedef",
-    [VACIO_ESPALMAC] = "vacio"};
+    [VACIO_ESPALMAC] = "vacio"
+};
 
 const char *calificadorTipoString[] = {
     [CONST_CALIFICADORTIPO] = "const",
     [VOLATILE_CALIFICADORTIPO] = "volatile",
-    [VACIO_CALIFICADORTIPO] = "vacio"};
+    [VACIO_CALIFICADORTIPO] = "vacio"
+};
+
+
+// TABLA DE SIMBOLOS
+NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, int linea, int columna, void *nodo){
+    // Asignar memoria para el nuevo nodo de tipo NodoSimbolo
+    NodoSimbolo *nuevo = (NodoSimbolo *)malloc(sizeof(NodoSimbolo));
+    if (nuevo == NULL){
+        printf("Error: no se pudo asignar memoria para el nuevo nodo de simbolo.\n");
+        return NULL;
+    }
+
+    // Asignar los valores a los campos del NodoSimbolo
+    nuevo->nombre = copiarCadena(nombre); // Copiar el nombre del simbolo
+    nuevo->tipo = tipo;                   // Asignar el tipo del simbolo (VARIABLE o FUNCION)
+    nuevo->nodo = nodo;                   // Asignar el nodo asociado (de tipo void*)
+    nuevo->linea = linea;                 // Asignar la linea actual leida (donde comienza la funcion)
+    nuevo->columna = columna;             // Asignar la columna actual leida (del identificador)
+    nuevo->siguiente = NULL;              // Inicializar el siguiente puntero a NULL
+
+    return nuevo; // Retornar el nuevo nodo
+}
+
+NodoSimbolo *buscar_simbolo(char *nombre){
+    NodoSimbolo *nodo_actual = tablaSimbolos;
+
+    while (nodo_actual != NULL){
+        if (strcmp(nodo_actual->nombre, nombre) == 0){
+            return nodo_actual; // Retornar el nodo encontrado
+        }
+        nodo_actual = nodo_actual->siguiente; // Mover al siguiente nodo
+    }
+    return NULL; // Retornar NULL si no se encuentra el nodo
+}
+
+void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
+    NodoSimbolo *nodoActual = tablaSimbolos;
+
+    printf("Tabla de Simbolos:\n");
+    if (nodoActual == NULL){
+        printf("La tabla de simbolos esta vacia :( \n\n");
+    }
+
+    while (nodoActual != NULL){
+        printf("Nombre: %s\n", nodoActual->nombre);
+        printf("Tipo: %s\n", nodoActual->tipo == VARIABLE ? "VARIABLE" : "FUNCION");
+        printf("Linea: %d\n", nodoActual->linea);
+        printf("Columna: %d\n", nodoActual->columna);
+
+        if (nodoActual->tipo == VARIABLE){
+            NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodoActual->nodo;
+            printf("Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[var->tipoDato.esTipoDato], especificadorAlmacenamientoString[var->tipoDato.esAlmacenamiento], calificadorTipoString[var->tipoDato.esCalificador]);
+        }
+        else if (nodoActual->tipo == FUNCION){
+            NodoFuncion *func = (NodoFuncion *)nodoActual->nodo;
+            printf("Retorno: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[func->retorno.esTipoDato], especificadorAlmacenamientoString[func->retorno.esAlmacenamiento], calificadorTipoString[func->retorno.esCalificador]);
+            printf("Tipo de gramatica: %s\n", func->tipogramatica == DEFINICION_FUNCION ? "DEFINICION" : "DECLARACION");
+
+            char *parametros = imprimirParametros(func->listaDeParametros);
+            printf("  Parametros: %s\n\n", parametros);
+            free(parametros); // Liberar memoria despues de imprimir
+        }
+        printf("\n");
+        nodoActual = nodoActual->siguiente;
+    }
+}
 
 
 // CADENAS NO RECONOCIDAS - ERRORES LEXICOS
@@ -106,25 +176,6 @@ void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista){
         free(actual);
         actual = siguiente;
     }
-}
-
-NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, int linea, int columna, void *nodo){
-    // Asignar memoria para el nuevo nodo de tipo NodoSimbolo
-    NodoSimbolo *nuevo = (NodoSimbolo *)malloc(sizeof(NodoSimbolo));
-    if (nuevo == NULL){
-        printf("Error: no se pudo asignar memoria para el nuevo nodo de símbolo.\n");
-        return NULL;
-    }
-
-    // Asignar los valores a los campos del NodoSimbolo
-    nuevo->nombre = copiarCadena(nombre); // Copiar el nombre del símbolo
-    nuevo->tipo = tipo;                   // Asignar el tipo del símbolo (VARIABLE o FUNCION)
-    nuevo->nodo = nodo;                   // Asignar el nodo asociado (de tipo void*)
-    nuevo->linea = linea;                 // Asignar la linea actual leida (donde comienza la funcion)
-    nuevo->columna = columna;             // Asignar la columna actual leida (del identificador)
-    nuevo->siguiente = NULL;              // Inicializar el siguiente puntero a NULL
-
-    return nuevo; // Retornar el nuevo nodo
 }
 
 
@@ -207,50 +258,53 @@ void liberarErrorSintactico(NodoErrorSintactico *lista){
     }
 }
 
-
-// Tabla Simbolos
-NodoSimbolo *buscar_simbolo(char *nombre){
-    NodoSimbolo *nodo_actual = tablaSimbolos;
-
-    while (nodo_actual != NULL){
-        if (strcmp(nodo_actual->nombre, nombre) == 0){
-            return nodo_actual; // Retornar el nodo encontrado
+void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea){
+    // Si es un caracter de corte, crea un nuevo nodo y lo agrega al final de la lista
+    if (strcmp(yytext, ";") == 0 || strcmp(yytext, "\n") == 0){
+        if (*listaSecuenciasLeidas == NULL){
+            // Si la lista esta vacia, crea el primer nodo
+            *listaSecuenciasLeidas = crearNodoErrorSintactico("", linea);
         }
-        nodo_actual = nodo_actual->siguiente; // Mover al siguiente nodo
+        else{
+            // Si hay nodos, busca el final de la lista
+            NodoErrorSintactico *nuevoNodo = crearNodoErrorSintactico("", linea);
+            NodoErrorSintactico *actual = *listaSecuenciasLeidas;
+            // Recorrer hasta el ultimo nodo
+            while (actual->siguiente != NULL){
+                actual = actual->siguiente;
+            }
+            // Enlazar el nuevo nodo al final
+            actual->siguiente = nuevoNodo;
+        }
     }
-    return NULL; // Retornar NULL si no se encuentra el nodo
-}
-
-void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos){
-    NodoSimbolo *nodoActual = tablaSimbolos;
-
-    printf("Tabla de Símbolos:\n");
-    if (nodoActual == NULL){
-        printf("La tabla de símbolos está vacía :( \n\n");
-    }
-
-    while (nodoActual != NULL){
-        printf("Nombre: %s\n", nodoActual->nombre);
-        printf("Tipo: %s\n", nodoActual->tipo == VARIABLE ? "VARIABLE" : "FUNCION");
-        printf("Linea: %d\n", nodoActual->linea);
-        printf("Columna: %d\n", nodoActual->columna);
-
-        if (nodoActual->tipo == VARIABLE){
-            NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodoActual->nodo;
-            printf("Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[var->tipoDato.esTipoDato], especificadorAlmacenamientoString[var->tipoDato.esAlmacenamiento], calificadorTipoString[var->tipoDato.esCalificador]);
+    else{
+        // Si la lista esta vacia, crea el primer nodo
+        if (*listaSecuenciasLeidas == NULL){
+            *listaSecuenciasLeidas = crearNodoErrorSintactico(yytext, linea);
         }
-        else if (nodoActual->tipo == FUNCION){
-            NodoFuncion *func = (NodoFuncion *)nodoActual->nodo;
-            printf("Retorno: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[func->retorno.esTipoDato], especificadorAlmacenamientoString[func->retorno.esAlmacenamiento], calificadorTipoString[func->retorno.esCalificador]);
-            printf("Tipo de gramática: %s\n", func->tipogramatica == DEFINICION_FUNCION ? "DEFINICION" : "DECLARACION");
+        else{
+            // Encuentra el ultimo nodo en la lista y concatena yytext a su errorSintactico
+            NodoErrorSintactico *actual = *listaSecuenciasLeidas;
 
-            // Imprimir parámetros usando tu función
-            char *parametros = imprimirParametros(func->listaDeParametros);
-            printf("  Parámetros: %s\n\n", parametros);
-            free(parametros); // Liberar memoria después de imprimir
+            // Recorrer hasta el ultimo nodo
+            while (actual->siguiente != NULL){
+                actual = actual->siguiente;
+            }
+
+            size_t nuevoTamanio = strlen(actual->errorSintactico) + strlen(yytext) + 1;
+
+            // Redimensiona y concatena la nueva cadena
+            char *nuevaCadena = realloc(actual->errorSintactico, nuevoTamanio);
+            if (nuevaCadena == NULL){
+                perror("realloc");
+                exit(EXIT_FAILURE);
+            }
+            actual->errorSintactico = nuevaCadena;
+            strcat(actual->errorSintactico, yytext);
+
+            // Actualiza la linea en caso de que el nodo se haya iniciado antes de esta linea
+            actual->linea = linea;
         }
-        printf("\n");
-        nodoActual = nodoActual->siguiente;
     }
 }
 
@@ -316,14 +370,87 @@ void imprimirErrorSemantico(NodoErroresSemanticos *lista){
     }
 }*/
 
+bool esMultiplicable(char *expresion){
+    if(strcmp(expresion,"double")==0 || strcmp(expresion,"float")==0 || strcmp(expresion,"int")==0 || strcmp(expresion,"unsigned int")==0 || strcmp(expresion,"long")==0 || strcmp(expresion,"unsigned long")==0 || strcmp(expresion,"short")==0 || strcmp(expresion,"unsigned short")==0){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+char *extraerTipoDato(char *expresion){ //No extrae el tipo de variables que no esten en la TS, por mas que hayan sido declaradas como parametros    
+    NodoSimbolo *nodo = buscar_simbolo(expresion);
+    if(nodo == NULL){
+        return expresion;
+    }
+    else if(nodo->tipo == VARIABLE){
+        NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodo->nodo;
+        return enumAString1(elemento->tipoDato);
+    }
+    else if(nodo->tipo == FUNCION){
+        NodoFuncion *elemento = (NodoFuncion *)nodo->nodo;
+        return enumAString1(elemento->retorno);
+    }
+}
+
+const char *extraerTipoDato2(char *expresion){ //No extrae el tipo de variables que no esten en la TS, por mas que hayan sido declaradas como parametros    
+    NodoSimbolo *nodo = buscar_simbolo(expresion);
+    char *retorno;
+
+    if(nodo == NULL){
+        return expresion;
+    }
+    else if(nodo->tipo == VARIABLE){
+        NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodo->nodo;
+        return enumAString1(elemento->tipoDato);
+    }
+    else if(nodo->tipo == FUNCION){
+        NodoFuncion *elemento = (NodoFuncion *)nodo->nodo;
+        Parametro *parametros = elemento->listaDeParametros;
+        char tipoDato[256];
+        snprintf(tipoDato, sizeof(tipoDato), "%s (*)(", enumAString1(elemento->retorno));
+        char *parametrosNuevaFuncion = imprimirParametrosSinIdentificador(parametros);
+                if (parametrosNuevaFuncion != NULL){
+                    // Aniadir los parametros al tipoDato
+                    snprintf(tipoDato + strlen(tipoDato), sizeof(tipoDato) - strlen(tipoDato), "%s)", parametrosNuevaFuncion);     
+                    free(parametrosNuevaFuncion); // Liberamos la memoria asignada
+                }
+                else{
+                    // Manejo de error en caso de que no se pueda imprimir parametros
+                    snprintf(tipoDato + strlen(tipoDato), sizeof(tipoDato) - strlen(tipoDato), "Error al obtener parametros'): %d:%d",
+                            nodo->linea, nodo->columna);
+                }
+        retorno = strdup(tipoDato);
+        return retorno;
+    }
+    return "Tipo desconocido";
+}
+
+void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int columna, NodoErroresSemanticos **listaErroresSemanticos){
+    char *tipoDato1 = extraerTipoDato(expresion1);
+    char *tipoDato2 = extraerTipoDato(expresion2);
+
+    if((!esMultiplicable(tipoDato1) || !esMultiplicable(tipoDato2))){
+        char mensaje[256];
+        const char *tipoDatoPrint1 =  extraerTipoDato2(expresion1);
+        const char *tipoDatoPrint2 = extraerTipoDato2(expresion2);
+        snprintf(mensaje, sizeof(mensaje), "Operandos invalidos del operador binario * (tienen '%s' y '%s')", tipoDatoPrint1, tipoDatoPrint2);
+        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        // Liberar memoria despues del uso
+        if (tipoDatoPrint1 != expresion1) free((void *)tipoDatoPrint1);
+        if (tipoDatoPrint2 != expresion2) free((void *)tipoDatoPrint2);
+    }
+}
+
+
 
 // PARAMETROS
 Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador, int linea, int columna){
     // Crear nuevo nodo y asignar memoria
     Parametro *nuevo = (Parametro *)malloc(sizeof(Parametro));
-    if (nuevo == NULL)
-    {
-        fprintf(stderr, "Error: no se pudo asignar memoria para el nuevo parámetro.\n");
+    if (nuevo == NULL){
+        fprintf(stderr, "Error: no se pudo asignar memoria para el nuevo parametro.\n");
         return NULL;
     }
     nuevo->especificadorDeclaracion = especificadorDeclaracion;
@@ -333,6 +460,15 @@ Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const
     nuevo->siguiente = NULL;
 
     return nuevo;
+}
+
+int contarArgumentos(Parametro *listaDeParametros) {
+    int contador = 0;
+    while (listaDeParametros != NULL) {
+        contador++;
+        listaDeParametros = listaDeParametros->siguiente;
+    }
+    return contador;
 }
 
 void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador, int linea, int columna){
@@ -369,7 +505,7 @@ char *imprimirParametros(Parametro *listaDeParametros){
     Parametro *paramActual = listaDeParametros;
 
     while (paramActual != NULL) {
-        // Inicializa lista de elementos para el parámetro actual
+        // Inicializa lista de elementos para el parametro actual
         ElementosParametro *lista = NULL;
         ElementosParametro *aux = NULL;
 
@@ -407,7 +543,7 @@ char *imprimirParametros(Parametro *listaDeParametros){
             aux = nuevoElemento;
         }
 
-        // Concatenar todos los elementos del parámetro actual
+        // Concatenar todos los elementos del parametro actual
         aux = lista;
         while (aux != NULL){
             strcat(parametros, aux->elemento);
@@ -417,12 +553,24 @@ char *imprimirParametros(Parametro *listaDeParametros){
             free(temp);  // Liberar memoria del nodo
         }
 
-        // Agregar ", " entre parámetros si no es el último
+        // Agregar ", " entre parametros si no es el ultimo
         if (paramActual->siguiente != NULL) strcat(parametros, ", ");
         
         paramActual = paramActual->siguiente;
     }
     return parametros;
+}
+
+int validarListasDeParametros(Parametro* listaDeParametrosEncontrados, Parametro* listaDeParametrosInvocados){
+        int i;
+        for(i = 0; i < contarArgumentos(listaDeParametrosEncontrados); i++){
+            if(listaDeParametrosEncontrados->especificadorDeclaracion.esTipoDato != listaDeParametrosInvocados->especificadorDeclaracion.esTipoDato) {
+                return -1;
+            }
+            listaDeParametrosEncontrados = listaDeParametrosEncontrados->siguiente;
+            listaDeParametrosInvocados = listaDeParametrosInvocados->siguiente;
+        }
+        return i+1;
 }
 
 char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros){
@@ -441,11 +589,11 @@ char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros){
     } ElementosParametro;
 
     while (paramActual != NULL){
-        // Crear lista temporal de elementos para el parámetro actual
+        // Crear lista temporal de elementos para el parametro actual
         ElementosParametro* lista = malloc(sizeof(ElementosParametro));
         ElementosParametro* aux = lista;
 
-        // Agregar los especificadores de almacenamiento, calificador y tipo de dato, si no están vacíos
+        // Agregar los especificadores de almacenamiento, calificador y tipo de dato, si no estan vacios
         if (paramActual->especificadorDeclaracion.esCalificador != VACIO_CALIFICADORTIPO){
             aux->elemento = (char*)calificadorTipoString[paramActual->especificadorDeclaracion.esCalificador];
             aux->siguiente = malloc(sizeof(ElementosParametro));
@@ -458,10 +606,10 @@ char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros){
         }
         if (paramActual->especificadorDeclaracion.esTipoDato != VACIO_TIPODATO){
             aux->elemento =(char*) especificadorTiposString[paramActual->especificadorDeclaracion.esTipoDato];
-            aux->siguiente = NULL;  // Último elemento
+            aux->siguiente = NULL;  // ultimo elemento
         }
 
-        // Concatenar los elementos del parámetro actual
+        // Concatenar los elementos del parametro actual
         aux = lista;
         while (aux != NULL) {
             strcat(parametros, aux->elemento);
@@ -478,7 +626,7 @@ char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros){
             free(temp);
         }
 
-        // Agregar coma si hay otro parámetro siguiente
+        // Agregar coma si hay otro parametro siguiente
         if (paramActual->siguiente != NULL) {
             strcat(parametros, ", ");
         }
@@ -488,89 +636,23 @@ char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros){
     return parametros;
 }
 
-void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *identificador, Parametro **listaDeParametros){
-    // Asignación de EspecificadorTipos vacío
-    EspecificadorTipos especificadorVacio = {.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
-
-    // Crear el nodo de tipo NodoFuncion utilizando la función crearNodoFuncion
-    NodoFuncion *nuevaFuncion = crearNodoFuncion(*listaDeParametros, especificadorVacio, OTRO);
-
-    if (nuevaFuncion == NULL){
-        printf("Error al crear la función\n");
-        return;
-    }
-
-    // Imprimir los datos del nodo de función
-    Parametro *paramActual = *listaDeParametros;
-    while (paramActual != NULL){
-        paramActual = paramActual->siguiente;
-    }
-
-    // Crear el nodo de tipo NodoSimbolo para almacenar la función
-    *nodoGenericoFuncion = crearNodoSimbolo(identificador, FUNCION, -1, -1, nuevaFuncion);
-
-    // Comprobación de la creación del nodo NodoSimbolo
-    if (*nodoGenericoFuncion == NULL){
-        printf("Error al crear el NodoSimbolo para la función\n");
-        return;
-    }
-
-    /*if ((*nodoGenericoFuncion) != NULL && (*nodoGenericoFuncion)->nodo != NULL) {
-        // Hacer el casteo a NodoFuncion
-        NodoFuncion *nodoFuncion = (NodoFuncion *)(*nodoGenericoFuncion)->nodo;
-        char *parametros = imprimirParametros(nodoFuncion->listaDeParametros);
-    } else {
-        printf("Error: El nodo generico o el nodo de la funcion es NULL\n");
-    }*/
-
-    // Limpiar la lista de parámetros
-    *listaDeParametros = NULL;
-}
-
-int contarArgumentos(Parametro *listaDeParametros) {
-    int contador = 0;
-    while (listaDeParametros != NULL) {
-        contador++;
-        listaDeParametros = listaDeParametros->siguiente;
-    }
-    return contador;
-}
-
 
 // FUNCIONES
 NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos retorno, tipoFuncion tipogramatica){
     // Asignar memoria para un nuevo nodo de tipo NodoFuncion
     NodoFuncion *nuevo = (NodoFuncion *)malloc(sizeof(NodoFuncion));
     if (nuevo == NULL){
-        printf("Error: no se pudo asignar memoria para el nuevo nodo de función.\n");
+        printf("Error: no se pudo asignar memoria para el nuevo nodo de funcion.\n");
         return NULL;
     }
 
     // Asignar los valores a los campos del NodoFuncion
     nuevo->retorno = retorno;                     // Copiar el especificador de retorno
-    nuevo->tipogramatica = tipogramatica;         // Asignar el tipo de función (DEFINICION_FUNCION o DECLARACION_FUNCION)
-    nuevo->listaDeParametros = listaDeParametros; // Asignar la lista de parámetros
+    nuevo->tipogramatica = tipogramatica;         // Asignar el tipo de funcion (DEFINICION_FUNCION o DECLARACION_FUNCION)
+    nuevo->listaDeParametros = listaDeParametros; // Asignar la lista de parametros
     nuevo->siguiente = NULL;                      // Inicializamos el siguiente puntero a NULL
 
     return nuevo;
-}
-
-NodoSimbolo* fueDefinidaAntes(NodoSimbolo *tablaSimbolos, char* nombre) {
-    NodoSimbolo *nodoActual = tablaSimbolos;
-
-    while (nodoActual != NULL) {
-        // Verificar si es una función y si coincide el nombre
-        if (nodoActual->tipo == FUNCION) {
-            NodoFuncion *nodoFuncion = (NodoFuncion *)(nodoActual->nodo);
-
-            // Comparar el nombre de la función y verificar si ya fue definida
-            if (strcmp(nodoActual->nombre, nombre) == 0 && nodoFuncion->tipogramatica == DEFINICION_FUNCION) {
-                return nodoActual; // Retornar el nodo si ya está definida
-            }
-        }
-        nodoActual = nodoActual->siguiente; // Avanzar al siguiente nodo
-    }
-    return NULL; // Retornar NULL si no se encuentra ninguna definición previa
 }
 
 void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo **nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna){   
@@ -587,26 +669,21 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
     nuevaFuncion->retorno = retorno;
     nuevaFuncion->tipogramatica = tipogramatica;
 
+    // PUNTO 2
     if(nodoEncontrado != NULL && nodoEncontrado->tipo == VARIABLE){
         NodoVariableDeclarada* variableEncontrada = (NodoVariableDeclarada *)nodoEncontrado->nodo;
-        
-        //2.	Cuando se redeclara un identificador con tipo diferente de símbolo (ej. variable/función - función/variable). LA:CA y LB:CB indican las ubicaciones del identificador en el archivo de entrada.
-        //LA:CA: 'IDENTIFICADOR' redeclarado como un tipo diferente de simbolo
-        //Nota: la declaracion previa de 'IDENTIFICADOR' es de tipo 'TIPO_DATO': LB:CB
         char mensaje[256];
         snprintf(mensaje, sizeof(mensaje), "'%s' redeclarado como un tipo diferente de simbolo\nNota: la declaracion previa de '%s' es de tipo '%s': %d:%d", (*nodoGenericoFuncion)->nombre, (*nodoGenericoFuncion)->nombre, especificadorTiposString[variableEncontrada->tipoDato.esTipoDato], nodoEncontrado->linea, nodoEncontrado->columna);
         agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
         return;   
     }
     
+    // PUNTO 3
     if(nodoEncontrado != NULL && nodoEncontrado->tipo == FUNCION){
         NodoFuncion* funcionEncontrada = (NodoFuncion *)nodoEncontrado->nodo;
         Parametro *paramDeclaracion = funcionEncontrada->listaDeParametros;
         Parametro *paramDefinicion = nuevaFuncion->listaDeParametros;
         if (paramDeclaracion != NULL && paramDefinicion != NULL && paramDeclaracion->especificadorDeclaracion.esTipoDato != paramDefinicion->especificadorDeclaracion.esTipoDato){
-            //3.	Cuando se redeclara/redefine un identificador con tipo igual de símbolo (ej. variable/variable - función/función) pero con tipos de datos diferentes. LA:CA y LB:CB indican las ubicaciones del identificador en el archivo de entrada.
-            //LA:CA: conflicto de tipos para 'IDENTIFICADOR'; la ultima es de tipo 'TIPO_DATOA'
-            //Nota: la declaracion previa de 'IDENTIFICADOR' es de tipo 'TIPO_DATOB': LB:CB
 
             char mensaje[256];
             snprintf(mensaje, sizeof(mensaje), 
@@ -615,10 +692,10 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
             agregarErrorSemantico(&listaErroresSemanticos, mensaje, linea, columna);
             return;
         }
+       
+        // REDEFINICION DE FUNCION
         NodoSimbolo* definicionAnterior = fueDefinidaAntes(*tablaSimbolos, (*nodoGenericoFuncion)->nombre);
         if (definicionAnterior != NULL && tipogramatica == DEFINICION_FUNCION){
-            //47:5: Redefinicion de 'incremento'
-            //Nota: la definicion previa de 'incremento' es de tipo 'int(int)': 43:5
             //SI LA FUNCION YA FUE DEFINIDA ANTES Y SE QUIERE DEFINIR
             char mensaje[256];
             snprintf(mensaje, sizeof(mensaje), "Redefinicion de '%s'\nNota: la definicion previa de '%s' es de tipo '%s(%s)': %d:%d", (*nodoGenericoFuncion)->nombre, (*nodoGenericoFuncion)->nombre, especificadorTiposString[funcionEncontrada->retorno.esTipoDato], imprimirParametrosSinIdentificador(paramDeclaracion), definicionAnterior->linea, definicionAnterior->columna);
@@ -646,6 +723,24 @@ void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, Especifica
 
     free(*nodoGenericoFuncion);
     (*nodoGenericoFuncion) = NULL;
+}
+
+NodoSimbolo* fueDefinidaAntes(NodoSimbolo *tablaSimbolos, char* nombre) {
+    NodoSimbolo *nodoActual = tablaSimbolos;
+
+    while (nodoActual != NULL) {
+        // Verificar si es una funcion y si coincide el nombre
+        if (nodoActual->tipo == FUNCION) {
+            NodoFuncion *nodoFuncion = (NodoFuncion *)(nodoActual->nodo);
+
+            // Comparar el nombre de la funcion y verificar si ya fue definida
+            if (strcmp(nodoActual->nombre, nombre) == 0 && nodoFuncion->tipogramatica == DEFINICION_FUNCION) {
+                return nodoActual; // Retornar el nodo si ya esta definida
+            }
+        }
+        nodoActual = nodoActual->siguiente; // Avanzar al siguiente nodo
+    }
+    return NULL; // Retornar NULL si no se encuentra ninguna definicion previa
 }
 
 void imprimirFunciones(NodoSimbolo *lista){
@@ -736,7 +831,7 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         return;
     }
-    /* ESTO ESTA COMENTADO PORQUE LISTA DE PARAMETROS DE LA INVOCACION NO ESTA DESAROLLADO
+    /* PUNTO 5: ESTO ESTA COMENTADO PORQUE LISTA DE PARAMETROS DE LA INVOCACION NO ESTA FUNCIONANDO
     int numeroDeParametro = validarListasDeParametros(((NodoFuncion *)(funcion)->nodo)->listaDeParametros, listaDeParametros);
     if(numeroDeParametro != -1){
         Parametro *parametroEncontrado = ((NodoFuncion *)(funcion)->nodo)->listaDeParametros;
@@ -752,107 +847,38 @@ void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, c
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         return;
     }
-    //FALTA EL CASO 6
-    // 6.	Cuando se trata de operar con el valor de retorno de una función que retorna void (ya sea para asignación, multiplicación, etc.). L:C indica la ubicación de la invocación de función en el archivo de entrada.
-    // L:C: No se ignora el valor de retorno void como deberia ser
     */
 }
 
-int validarListasDeParametros(Parametro* listaDeParametrosEncontrados, Parametro* listaDeParametrosInvocados){
-        int i;
-        for(i = 0; i < contarArgumentos(listaDeParametrosEncontrados); i++){
-            if(listaDeParametrosEncontrados->especificadorDeclaracion.esTipoDato != listaDeParametrosInvocados->especificadorDeclaracion.esTipoDato) {
-                return -1;
-            }
-            listaDeParametrosEncontrados = listaDeParametrosEncontrados->siguiente;
-            listaDeParametrosInvocados = listaDeParametrosInvocados->siguiente;
-        }
-        return i+1;
-}
+void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *identificador, Parametro **listaDeParametros){
+    // Asignacion de EspecificadorTipos vacio
+    EspecificadorTipos especificadorVacio = {.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
 
+    // Crear el nodo de tipo NodoFuncion utilizando la funcion crearNodoFuncion
+    NodoFuncion *nuevaFuncion = crearNodoFuncion(*listaDeParametros, especificadorVacio, OTRO);
 
-
-// Funciones de Utilidad
-char *copiarCadena(const char *str){
-    if (str == NULL){ // Verifica si la cadena es NULL
-        return NULL; // Devuelve NULL si la cadena de entrada es NULL
+    if (nuevaFuncion == NULL){
+        printf("Error al crear la funcion\n");
+        return;
     }
 
-    size_t len = strlen(str);                // Obtiene la longitud de la cadena de entrada
-    char *copiado = (char *)malloc(len + 1); // Asigna memoria para la nueva cadena
-    if (copiado != NULL){
-        strcpy(copiado, str); // Copia el contenido de la cadena de entrada a la nueva cadena
+    // Imprimir los datos del nodo de funcion
+    Parametro *paramActual = *listaDeParametros;
+    while (paramActual != NULL){
+        paramActual = paramActual->siguiente;
     }
-    return copiado; // Devuelve la nueva cadena
-}
 
-void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea){
-    // Si es un caracter de corte, crea un nuevo nodo y lo agrega al final de la lista
-    if (strcmp(yytext, ";") == 0 || strcmp(yytext, "\n") == 0){
-        if (*listaSecuenciasLeidas == NULL){
-            // Si la lista esta vacia, crea el primer nodo
-            *listaSecuenciasLeidas = crearNodoErrorSintactico("", linea);
-        }
-        else{
-            // Si hay nodos, busca el final de la lista
-            NodoErrorSintactico *nuevoNodo = crearNodoErrorSintactico("", linea);
-            NodoErrorSintactico *actual = *listaSecuenciasLeidas;
-            // Recorrer hasta el ultimo nodo
-            while (actual->siguiente != NULL){
-                actual = actual->siguiente;
-            }
-            // Enlazar el nuevo nodo al final
-            actual->siguiente = nuevoNodo;
-        }
+    // Crear el nodo de tipo NodoSimbolo para almacenar la funcion
+    *nodoGenericoFuncion = crearNodoSimbolo(identificador, FUNCION, -1, -1, nuevaFuncion);
+
+    // Comprobacion de la creacion del nodo NodoSimbolo
+    if (*nodoGenericoFuncion == NULL){
+        printf("Error al crear el NodoSimbolo para la funcion\n");
+        return;
     }
-    else{
-        // Si la lista esta vacia, crea el primer nodo
-        if (*listaSecuenciasLeidas == NULL){
-            *listaSecuenciasLeidas = crearNodoErrorSintactico(yytext, linea);
-        }
-        else{
-            // Encuentra el ultimo nodo en la lista y concatena yytext a su errorSintactico
-            NodoErrorSintactico *actual = *listaSecuenciasLeidas;
 
-            // Recorrer hasta el ultimo nodo
-            while (actual->siguiente != NULL){
-                actual = actual->siguiente;
-            }
-
-            size_t nuevoTamanio = strlen(actual->errorSintactico) + strlen(yytext) + 1;
-
-            // Redimensiona y concatena la nueva cadena
-            char *nuevaCadena = realloc(actual->errorSintactico, nuevoTamanio);
-            if (nuevaCadena == NULL){
-                perror("realloc");
-                exit(EXIT_FAILURE);
-            }
-            actual->errorSintactico = nuevaCadena;
-            strcat(actual->errorSintactico, yytext);
-
-            // Actualiza la linea en caso de que el nodo se haya iniciado antes de esta linea
-            actual->linea = linea;
-        }
-    }
-}
-
-EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b){
-    EspecificadorTipos inicial = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
-    if (a.esTipoDato != VACIO_TIPODATO)
-        inicial.esTipoDato = a.esTipoDato;
-    if (a.esAlmacenamiento != VACIO_ESPALMAC)
-        inicial.esAlmacenamiento = a.esAlmacenamiento;
-    if (a.esCalificador != VACIO_CALIFICADORTIPO)
-        inicial.esCalificador = a.esCalificador;
-
-    if (b.esTipoDato != VACIO_TIPODATO)
-        inicial.esTipoDato = b.esTipoDato;
-    if (b.esAlmacenamiento != VACIO_ESPALMAC)
-        inicial.esAlmacenamiento = b.esAlmacenamiento;
-    if (b.esCalificador != VACIO_CALIFICADORTIPO)
-        inicial.esCalificador = b.esCalificador;
-
-    return inicial;
+    // Limpiar la lista de parametros
+    *listaDeParametros = NULL;
 }
 
 char *asignarTipoDatoFuncion(char* identificador){
@@ -872,159 +898,12 @@ void ValidarInicializacionVoid(char* tipoDato, int linea, int columna){
     }
 }
 
-expresionPrimaria buscarTipoDeDato(char* nombre){
-    NodoSimbolo *nodo = buscar_simbolo(nombre);
-    if (nodo != NULL){
-        if (nodo->tipo == VARIABLE){
-            NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodo->nodo;
-            switch(var->tipoDato.esTipoDato){
-                //CONSTANTES --> enum CONSTANTE_EXPRESIONPRIMARIA
-                case FLOAT_TIPODATO:
-                case INT_TIPODATO:
-                case CHAR_TIPODATO:
-                case DOUBLE_TIPODATO:
-                case UNSIGNED_INT_TIPODATO:
-                case LONG_TIPODATO:
-                case SHORT_TIPODATO:                
-                case UNSIGNED_LONG_TIPODATO:                                
-                case UNSIGNED_SHORT_TIPODATO:
-                    return CONSTANTE_EXPRESIONPRIMARIA;
-                    break;  
-                //////////////////////
-                /*case VOID_TIPODATO:
-                break;
-                                          
-                case VACIO_TIPODATO:
-                break;
-*/
-                default:
-                    printf(" no se encontro el tipo expresion primaria para el tipo de dato de la variable %s\n", nombre);
-                    break;
-            }
-        }
-        /*else if (nodo->tipo == FUNCION){
-            return;
-        }*/
-    } 
-    else{ 
-        printf("buscarTipoDeDato: Error: '%s' no fue declarado.\n", nombre); 
-    }
-}
 
-
-
-bool esMultiplicable(char *expresion){
-    if(strcmp(expresion,"double")==0 || strcmp(expresion,"float")==0 || strcmp(expresion,"int")==0 || strcmp(expresion,"unsigned int")==0 || strcmp(expresion,"long")==0 || strcmp(expresion,"unsigned long")==0 || strcmp(expresion,"short")==0 || strcmp(expresion,"unsigned short")==0){
-        return true;
-    }
-    else{
-        return false;
-    }
-}
-
-char *extraerTipoDato(char *expresion){ //No extrae el tipo de variables que no estén en la TS, por más que hayan sido declaradas como parámetros    
-    NodoSimbolo *nodo = buscar_simbolo(expresion);
-    if(nodo == NULL){
-        return expresion;
-    }
-    else if(nodo->tipo == VARIABLE){
-        NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodo->nodo;
-        return enumAString1(elemento->tipoDato);
-    }
-    else if(nodo->tipo == FUNCION){
-        NodoFuncion *elemento = (NodoFuncion *)nodo->nodo;
-        return enumAString1(elemento->retorno);
-    }
-}
-
-const char *extraerTipoDato2(char *expresion){ //No extrae el tipo de variables que no estén en la TS, por más que hayan sido declaradas como parámetros    
-    NodoSimbolo *nodo = buscar_simbolo(expresion);
-    char *retorno;
-
-    if(nodo == NULL){
-        return expresion;
-    }
-    else if(nodo->tipo == VARIABLE){
-        NodoVariableDeclarada *elemento = (NodoVariableDeclarada *)nodo->nodo;
-        return enumAString1(elemento->tipoDato);
-    }
-    else if(nodo->tipo == FUNCION){
-        NodoFuncion *elemento = (NodoFuncion *)nodo->nodo;
-        Parametro *parametros = elemento->listaDeParametros;
-        char tipoDato[256];
-        snprintf(tipoDato, sizeof(tipoDato), "%s (*)(", enumAString1(elemento->retorno));
-        char *parametrosNuevaFuncion = imprimirParametrosSinIdentificador(parametros);
-                if (parametrosNuevaFuncion != NULL){
-                    // Aniadir los parametros al tipoDato
-                    snprintf(tipoDato + strlen(tipoDato), sizeof(tipoDato) - strlen(tipoDato), "%s)", parametrosNuevaFuncion);     
-                    free(parametrosNuevaFuncion); // Liberamos la memoria asignada
-                }
-                else{
-                    // Manejo de error en caso de que no se pueda imprimir parametros
-                    snprintf(tipoDato + strlen(tipoDato), sizeof(tipoDato) - strlen(tipoDato), "Error al obtener parametros'): %d:%d",
-                            nodo->linea, nodo->columna);
-                }
-        retorno = strdup(tipoDato);
-        return retorno;
-    }
-    return "Tipo desconocido";
-}
-
-void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int columna, NodoErroresSemanticos **listaErroresSemanticos){
-    char *tipoDato1 = extraerTipoDato(expresion1);
-    char *tipoDato2 = extraerTipoDato(expresion2);
-
-    if((!esMultiplicable(tipoDato1) || !esMultiplicable(tipoDato2))){
-        char mensaje[256];
-        const char *tipoDatoPrint1 =  extraerTipoDato2(expresion1);
-        const char *tipoDatoPrint2 = extraerTipoDato2(expresion2);
-        snprintf(mensaje, sizeof(mensaje), "Operandos invalidos del operador binario * (tienen '%s' y '%s')", tipoDatoPrint1, tipoDatoPrint2);
-        agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
-        // Liberar memoria después del uso
-        if (tipoDatoPrint1 != expresion1) free((void *)tipoDatoPrint1);
-        if (tipoDatoPrint2 != expresion2) free((void *)tipoDatoPrint2);
-    }
-}
-
+// VARIABLES DECLARADAS
 NodoVariableDeclarada *crearNodoVariableDeclarada(EspecificadorTipos tipoDato){
     NodoVariableDeclarada *nuevo = (NodoVariableDeclarada *)malloc(sizeof(NodoVariableDeclarada));
     nuevo->tipoDato = tipoDato;
     return nuevo;
-}
-
-void agregarIdentificadorTemporal(IdentificadorTemporal **listaTemporalIdentificadores, char *identificador, int linea, int columna){
-    IdentificadorTemporal *nuevo = (IdentificadorTemporal *)malloc(sizeof(IdentificadorTemporal));
-    if (nuevo == NULL){
-        printf("Error: no se pudo asignar memoria para el nuevo IdentificadorTemporal.\n");
-    }
-
-    // Asignar valores a los campos del nodo
-    nuevo->identificador = copiarCadena(identificador);
-    nuevo->linea = linea;
-    nuevo->columna = columna;
-    nuevo->siguiente = NULL;
-
-    // Agregar el nodo a la lista
-    if (*listaTemporalIdentificadores == NULL){
-        *listaTemporalIdentificadores = nuevo;
-    }
-    else{
-        IdentificadorTemporal *actual = *listaTemporalIdentificadores;
-        while (actual->siguiente != NULL){
-            actual = actual->siguiente;
-        }
-        actual->siguiente = nuevo;
-    }
-}
-
-void agregarListaVariables(IdentificadorTemporal *listaTemporalIdentificadores, EspecificadorTipos tipoDato){
-    IdentificadorTemporal* actual = listaTemporalIdentificadores;  // Apuntar al primer nodo de la lista
-
-    // Recorrer la lista mientras el nodo actual no sea NULL
-    while (actual != NULL){
-        agregarVariableDeclarada(&tablaSimbolos, &listaErroresSemanticos, actual->identificador, tipoDato, actual->linea, actual->columna);  // Pasar el nodo actual a la función
-        actual = actual->siguiente;  // Moverse al siguiente nodo
-    }
 }
 
 void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *identificador, EspecificadorTipos tipoDato, int linea, int columna){
@@ -1091,25 +970,6 @@ void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos
     }
 }
 
-void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores){
-    bool estaSiendoDeclarada = false;
-    IdentificadorTemporal* actual = listaTemporalIdentificadores;
-    while (actual != NULL){
-        if (strcmp(actual->identificador, identificador) == 0){
-            estaSiendoDeclarada = true;
-        }
-        actual = actual->siguiente;  // Moverse al siguiente nodo
-    }
-    if (!estaSiendoDeclarada){
-        NodoSimbolo *nodoPrevio = buscar_simbolo(identificador);
-        if (nodoPrevio == NULL && strcmp(contextoActual,"main")==0){
-            char mensaje[256];
-            snprintf(mensaje, sizeof(mensaje), "'%s' sin declarar", identificador);
-            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
-        }
-    }
-}
-
 void imprimirVariables(NodoSimbolo *lista){
     NodoSimbolo *actual = lista;
 
@@ -1134,8 +994,62 @@ void imprimirVariables(NodoSimbolo *lista){
     }
 }
 
+void agregarIdentificadorTemporal(IdentificadorTemporal **listaTemporalIdentificadores, char *identificador, int linea, int columna){
+    IdentificadorTemporal *nuevo = (IdentificadorTemporal *)malloc(sizeof(IdentificadorTemporal));
+    if (nuevo == NULL){
+        printf("Error: no se pudo asignar memoria para el nuevo IdentificadorTemporal.\n");
+    }
+
+    // Asignar valores a los campos del nodo
+    nuevo->identificador = copiarCadena(identificador);
+    nuevo->linea = linea;
+    nuevo->columna = columna;
+    nuevo->siguiente = NULL;
+
+    // Agregar el nodo a la lista
+    if (*listaTemporalIdentificadores == NULL){
+        *listaTemporalIdentificadores = nuevo;
+    }
+    else{
+        IdentificadorTemporal *actual = *listaTemporalIdentificadores;
+        while (actual->siguiente != NULL){
+            actual = actual->siguiente;
+        }
+        actual->siguiente = nuevo;
+    }
+}
+
+void agregarListaVariables(IdentificadorTemporal *listaTemporalIdentificadores, EspecificadorTipos tipoDato){
+    IdentificadorTemporal* actual = listaTemporalIdentificadores;  // Apuntar al primer nodo de la lista
+
+    // Recorrer la lista mientras el nodo actual no sea NULL
+    while (actual != NULL){
+        agregarVariableDeclarada(&tablaSimbolos, &listaErroresSemanticos, actual->identificador, tipoDato, actual->linea, actual->columna);  // Pasar el nodo actual a la funcion
+        actual = actual->siguiente;  // Moverse al siguiente nodo
+    }
+}
+
+void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores){
+    bool estaSiendoDeclarada = false;
+    IdentificadorTemporal* actual = listaTemporalIdentificadores;
+    while (actual != NULL){
+        if (strcmp(actual->identificador, identificador) == 0){
+            estaSiendoDeclarada = true;
+        }
+        actual = actual->siguiente;  // Moverse al siguiente nodo
+    }
+    if (!estaSiendoDeclarada){
+        NodoSimbolo *nodoPrevio = buscar_simbolo(identificador);
+        if (nodoPrevio == NULL && strcmp(contextoActual,"main")==0){
+            char mensaje[256];
+            snprintf(mensaje, sizeof(mensaje), "'%s' sin declarar", identificador);
+            agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
+        }
+    }
+}
+
 const char *enumAString1(EspecificadorTipos tipoDato){
-    // Asigna memoria para el buffer dinámico
+    // Asigna memoria para el buffer dinamico
     char *buffer = (char *)malloc(150 * sizeof(char));
     if (buffer == NULL){
         fprintf(stderr, "Error: No se pudo asignar memoria para el buffer.\n");
@@ -1205,6 +1119,81 @@ char *enumAString2(EspecificadorTipos tipoDato){
 }
 
 
+// FUNCIONES AUXILIARES DE UTILIDAD
+char *copiarCadena(const char *str){
+    if (str == NULL){ // Verifica si la cadena es NULL
+        return NULL; // Devuelve NULL si la cadena de entrada es NULL
+    }
+
+    size_t len = strlen(str);                // Obtiene la longitud de la cadena de entrada
+    char *copiado = (char *)malloc(len + 1); // Asigna memoria para la nueva cadena
+    if (copiado != NULL){
+        strcpy(copiado, str); // Copia el contenido de la cadena de entrada a la nueva cadena
+    }
+    return copiado; // Devuelve la nueva cadena
+}
+
+
+EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b){
+    EspecificadorTipos inicial = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
+    if (a.esTipoDato != VACIO_TIPODATO)
+        inicial.esTipoDato = a.esTipoDato;
+    if (a.esAlmacenamiento != VACIO_ESPALMAC)
+        inicial.esAlmacenamiento = a.esAlmacenamiento;
+    if (a.esCalificador != VACIO_CALIFICADORTIPO)
+        inicial.esCalificador = a.esCalificador;
+
+    if (b.esTipoDato != VACIO_TIPODATO)
+        inicial.esTipoDato = b.esTipoDato;
+    if (b.esAlmacenamiento != VACIO_ESPALMAC)
+        inicial.esAlmacenamiento = b.esAlmacenamiento;
+    if (b.esCalificador != VACIO_CALIFICADORTIPO)
+        inicial.esCalificador = b.esCalificador;
+
+    return inicial;
+}
+
+expresionPrimaria buscarTipoDeDato(char* nombre){
+    NodoSimbolo *nodo = buscar_simbolo(nombre);
+    if (nodo != NULL){
+        if (nodo->tipo == VARIABLE){
+            NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodo->nodo;
+            switch(var->tipoDato.esTipoDato){
+                //CONSTANTES --> enum CONSTANTE_EXPRESIONPRIMARIA
+                case FLOAT_TIPODATO:
+                case INT_TIPODATO:
+                case CHAR_TIPODATO:
+                case DOUBLE_TIPODATO:
+                case UNSIGNED_INT_TIPODATO:
+                case LONG_TIPODATO:
+                case SHORT_TIPODATO:                
+                case UNSIGNED_LONG_TIPODATO:                                
+                case UNSIGNED_SHORT_TIPODATO:
+                    return CONSTANTE_EXPRESIONPRIMARIA;
+                    break;  
+                //////////////////////
+                /*case VOID_TIPODATO:
+                break;
+                                          
+                case VACIO_TIPODATO:
+                break;
+                */
+                default:
+                    printf("ERROR: no se encontro el tipo expresion primaria para el tipo de dato de la variable %s\n", nombre);
+                    break;
+            }
+        }
+        /*else if (nodo->tipo == FUNCION){
+            return;
+        }*/
+    } 
+    else{ 
+        printf("buscarTipoDeDato: Error: '%s' no fue declarado.\n", nombre); 
+    }
+}
+
+
+
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 // Rutinas semanticas
@@ -1228,10 +1217,10 @@ char *enumAString2(EspecificadorTipos tipoDato){
         return TIPO_ERROR;  // Multiplicacion no soporta strings
     }
     return TIPO_ERROR;  // Devuelve error si no coincide con las reglas
-}*/
+}
 
 // Insercion de simbolo en la tabla
-/*int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo){
+int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo){
     NodoSimbolo *simbolo_existente = buscar_simbolo(nombre);
     if (simbolo_existente){
         // Ya existe un simbolo con ese nombre
@@ -1246,10 +1235,10 @@ char *enumAString2(EspecificadorTipos tipoDato){
     nuevo_simbolo->siguiente = tablaSimbolos;
     tablaSimbolos = nuevo_simbolo;
     return 0;
-}*/
+}
 
 // Validacion de operaciones especificas
-/*int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador){
+int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador){
     if (!simbolo1 || !simbolo2){
         printf("Error: Uno o ambos operandos no estan declarados.\n");
         return -1;
@@ -1287,17 +1276,17 @@ int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_
         return -1;
     }
     return 0;
-}*/
+}
 
 // Se recibe el tipo de dato de la funcion y se llama a la funcion copiarCadena
-/*void inicializarTipoRetorno(const char *tipo){
+void inicializarTipoRetorno(const char *tipo){
     tipoReturnEsperado = copiarCadena(tipo);
-}*/
+}
 
 // Se recibe el tipo de dato del return encontrado junto con su fila y columna
 // fila y columna funcionan ok
 // No se esta recibiendo el tipo de dato del return, si no que se recibe un char* con la cadena del return. Ya sea identificador, literal cadena o constante.
-/*void registrarReturn(const char *tipo, int linea, int columna) {
+void registrarReturn(const char *tipo, int linea, int columna) {
     if (tipoReturnEncontrado == NULL) {
         tipoReturnEncontrado = (TipoRetorno *)malloc(sizeof(TipoRetorno));
     }
@@ -1305,11 +1294,11 @@ int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_
     tipoReturnEncontrado->linea = linea;
     tipoReturnEncontrado->columna = columna+1;
     tipoReturnEncontrado->siguiente = NULL;
-}*/
+}
 
 // Se valida si el tipo de dato del return y de la funcion son el mismo y se genera accion dependiendo el caso.
 // Al ser un strcmp, se esta comparando dos cadenas char*, no segun su valor semantico.
-/*void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos) {
+void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos) {
     if (tipoReturnEsperado != NULL && tipoReturnEncontrado->tipoDato != NULL) {
         if (strcmp(tipoReturnEsperado, tipoReturnEncontrado->tipoDato) != 0) {
             char mensaje[256];
@@ -1327,7 +1316,7 @@ char* obtenerTipoIdentificador(const char *identificador) {
     if (simbolo) {
         if (simbolo->tipo == FUNCION) {
             NodoFuncion *func = (NodoFuncion *)simbolo->nodo;
-            return func->retorno;  // Retorna el tipo de retorno de la función, como "void (*)(void)"
+            return func->retorno;  // Retorna el tipo de retorno de la funcion, como "void (*)(void)"
         } else if (simbolo->tipo == VARIABLE) {
             NodoVariableDeclarada *var = (NodoVariableDeclarada *)simbolo->nodo;
             return var->tipoDato;  // Retorna el tipo de dato de la variable
@@ -1352,12 +1341,12 @@ int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
 // //validacion de asignacion 
 // // Funcion para verificar que sea L-Modificable 
 // bool esValorModificable(NodoSimbolo *simbolo) {
-//     // Verificar si el símbolo es una variable
+//     // Verificar si el simbolo es una variable
 //     // if (simbolo->tipo != VARIABLE) {
 //     //     return false;  // No es una variable, por lo tanto, no es modificable
 //     // }
 
-//     // Obtener la información de tipo del símbolo
+//     // Obtener la informacion de tipo del simbolo
 //     NodoVariableDeclarada *variable = (NodoVariableDeclarada *)simbolo->nodo;
 
 //     // Verificar si tiene el calificador const
@@ -1371,7 +1360,7 @@ int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
 
 // void validarAsignacion(NodoErroresSemanticos **listaErroresSemanticos, NodoSimbolo *simboloLadoIzq,  EspecificadorTipos tipoLadoDer, bool esValorModificable, int linea, int columna) {
 
-//     // 1. Validar incompatibilidad de tipos en la inicialización
+//     // 1. Validar incompatibilidad de tipos en la inicializacion
 // //este no estoy seguro si funciona el resto , creo que si 
 //     NodoVariableDeclarada *variable = (NodoVariableDeclarada *)simboloLadoIzq->nodo;
 //     // if (variable->tipoDato.esTipoDato != tipoLadoDer.esTipoDato) {
@@ -1380,7 +1369,7 @@ int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
 //     //     agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
 //     // }
 
-//     // 2. Validar reasignación de variable const
+//     // 2. Validar reasignacion de variable const
 //     if (variable->tipoDato.esCalificador == CONST_CALIFICADORTIPO) {
 //         char mensaje[256];
 //         snprintf(mensaje, sizeof(mensaje),"%d:%d: Asignacion de la variable de solo lectura '%s'", linea, columna, simboloLadoIzq->nombre);

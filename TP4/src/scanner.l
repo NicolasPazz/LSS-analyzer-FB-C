@@ -104,7 +104,6 @@ volatile                                                                    {con
                     agregarCadenaNoReconocida(&listaCadenasNoReconocidas, yytext, yylloc.last_line, yylloc.first_column); 
                     yylloc.last_column += yyleng;
                     BEGIN(INITIAL); 
-                    //return NO_RECONOCIDO;
                 }
 }
     /*Fin de archivo*/

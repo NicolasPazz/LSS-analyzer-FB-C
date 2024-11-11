@@ -14,13 +14,6 @@ typedef struct YYLTYPE{
   int last_column;
 } YYLTYPE;
 
-typedef struct NodoErroresSemanticos {
-    char *mensaje;
-    int linea;
-    int columna;
-    struct NodoErroresSemanticos *siguiente;
-} NodoErroresSemanticos;
-
 #define INICIO_CONTEO_LINEA 1
 #define INICIO_CONTEO_COLUMNA 1
 
@@ -29,67 +22,71 @@ void inicializarUbicacion(void);
 void reinicializarUbicacion(void);
 
 
-// Declaracion de enum para armar un arbol de identificacion de tipos de datos. Sirve para la comparativa del return con la funcion.
- 
- //desarrolamos ya identificamos que es tipo IDENTIFICADOR
- //con ese IDENTIFICADOR Vamos a la tabla de simbolos
-typedef struct ElementosParametro{
-    char * elemento;
-    struct ElementosParametro *siguiente;
-}ElementosParametro;
- typedef enum tipoDato{
-    VACIO_TIPODATO,
+// ESTRUCTURAS DE DATOS Y VARIABLES GLOBALES
+    // SUFIJO
+    typedef enum tipoDato{
+        VACIO_TIPODATO,
 
-    CHAR_TIPODATO,
-    VOID_TIPODATO,
-    DOUBLE_TIPODATO,
-    FLOAT_TIPODATO,
+        CHAR_TIPODATO,
+        VOID_TIPODATO,
+        DOUBLE_TIPODATO,
+        FLOAT_TIPODATO,
 
-    INT_TIPODATO,
-    UNSIGNED_INT_TIPODATO,
-    
-    LONG_TIPODATO,             
-    UNSIGNED_LONG_TIPODATO,    
+        INT_TIPODATO,
+        UNSIGNED_INT_TIPODATO,
+        
+        LONG_TIPODATO,             
+        UNSIGNED_LONG_TIPODATO,    
 
-    SHORT_TIPODATO,             
-    UNSIGNED_SHORT_TIPODATO   
-}tipoDato;
+        SHORT_TIPODATO,             
+        UNSIGNED_SHORT_TIPODATO   
+    }tipoDato;
 
-   typedef enum especificadorAlmacenamiento{
-    AUTO_ESPALMAC,
-    REGISTER_ESPALMAC,
-    STATIC_ESPALMAC,
-    EXTERN_ESPALMAC,
-    TYPEDEF_ESPALMAC,
-    VACIO_ESPALMAC
-  }especificadorAlmacenamiento;
+    extern const char* especificadorTiposString[];
+    typedef enum especificadorAlmacenamiento{
+        AUTO_ESPALMAC,
+        REGISTER_ESPALMAC,
+        STATIC_ESPALMAC,
+        EXTERN_ESPALMAC,
+        TYPEDEF_ESPALMAC,
+        VACIO_ESPALMAC
+    }especificadorAlmacenamiento;
 
- typedef enum calificadorTipo{
-    CONST_CALIFICADORTIPO,
-    VOLATILE_CALIFICADORTIPO,
-    VACIO_CALIFICADORTIPO
- }calificadorTipo;
+    extern const char* especificadorAlmacenamientoString[];
 
- typedef enum expresionPrimaria{
+    typedef enum calificadorTipo{
+        CONST_CALIFICADORTIPO,
+        VOLATILE_CALIFICADORTIPO,
+        VACIO_CALIFICADORTIPO
+    }calificadorTipo;
+
+    extern const char* calificadorTipoString[];
+
+typedef enum expresionPrimaria{
     IDENTIFICADOR_EXPRESIONPRIMARIA,
     CONSTANTE_EXPRESIONPRIMARIA,
-    VACIA_EXPRESIONPRIMARIA, //NULL EL return
+    VACIA_EXPRESIONPRIMARIA,
     CADENA_EXPRESIONPRIMARIA      
- }expresionPrimaria;
+}expresionPrimaria;
 
- typedef struct ExpresionesTipo{
+extern expresionPrimaria tipoResultanteEvExpresion;
+
+expresionPrimaria buscarTipoDeDato(char* nombre);
+
+typedef struct ExpresionesTipo{
     expresionPrimaria tipoExpresion;
     
- }ExpresionesTipo;
+}ExpresionesTipo;
  
-
- extern expresionPrimaria tipoResultanteEvExpresion;
-
- typedef struct EspecificadorTipos{
+typedef struct EspecificadorTipos{
     tipoDato esTipoDato;
     especificadorAlmacenamiento esAlmacenamiento;
     calificadorTipo esCalificador;
- }EspecificadorTipos;
+}EspecificadorTipos;
+
+extern EspecificadorTipos tipoRetorno;
+
+EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b);
 
 typedef struct IdentificadorTemporal {
     char *identificador;
@@ -101,8 +98,16 @@ typedef struct IdentificadorTemporal {
 extern IdentificadorTemporal *listaTemporalIdentificadores;
 extern char *contextoActual;
 
+typedef enum tipoFuncion{
+    DEFINICION_FUNCION,
+    DECLARACION_FUNCION,
+    OTRO
+}tipoFuncion;
 
-// Tabla de simbolos
+extern const char *tipoFuncionString[];
+
+
+// TABLA DE SIMBOLOS
  typedef enum tipoSimbolo{
     VARIABLE,
     FUNCION
@@ -119,64 +124,41 @@ typedef struct NodoSimbolo{
 
 extern NodoSimbolo* tablaSimbolos;
 
-typedef enum tipoFuncion{
-    DEFINICION_FUNCION,
-    DECLARACION_FUNCION,
-    OTRO
-}tipoFuncion;
+NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, int linea, int columna, void *nodo);
 
-// VARIABLES DECLARADAS
-typedef struct NodoVariableDeclarada {
-  EspecificadorTipos  tipoDato;    
-} NodoVariableDeclarada;
+NodoSimbolo *buscar_simbolo(char *nombre);
 
-void imprimirVariables(NodoSimbolo *lista);
+void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos);
 
-void liberarVariablesDeclaradas(NodoVariableDeclarada *lista);
 
-extern NodoSimbolo* listaVariablesDeclaradas;
-
-// FUNCIONES
-typedef struct Parametro {
-    EspecificadorTipos especificadorDeclaracion;
-    char *identificador;
+// CADENAS NO RECONOCIDAS - ERRORES LEXICOS
+typedef struct NodoCadenaNoReconocida {
+    char *cadenaNoReconocida;
     int linea;
     int columna;
-    struct Parametro *siguiente;
-} Parametro;
+    struct NodoCadenaNoReconocida *siguiente;
+} NodoCadenaNoReconocida;
 
-typedef struct NodoFuncion {
-    EspecificadorTipos retorno;
-    Parametro *listaDeParametros;
-    tipoFuncion tipogramatica;
-    struct NodoFuncion *siguiente;
-} NodoFuncion;
+extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
 
-NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos retorno, tipoFuncion tipogramatica);
-void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo**nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna);
-NodoSimbolo* fueDefinidaAntes(NodoSimbolo *tablaSimbolos, char* nombre);
-void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador, int linea, int columna);
+NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *cadenaNoReconocida, int linea, int columna);
 
-char* unirParametros(const char* param1, const char* param2);
+void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *cadenaNoReconocida, int linea, int columna);
 
-void imprimirFunciones(NodoSimbolo *lista);
-char* imprimirParametros(Parametro *listaDeParametros);
-char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros);
-void liberarFunciones(NodoFuncion *lista);
+void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
-extern NodoSimbolo* listaFunciones;
+void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
 
-extern Parametro* listaDeParametros;
-extern Parametro* listaDeParametrosInvocacion;
 
-extern NodoSimbolo* nodoGenericoFuncion;
-
-// ESTRUCTURAS NO RECONOCIDAS
+// ESTRUCTURAS NO RECONOCIDAS - ERRORES SINTACTICOS
 typedef struct NodoErrorSintactico {
     char *errorSintactico;
     int linea;
     struct NodoErrorSintactico *siguiente;
 } NodoErrorSintactico;
+
+extern NodoErrorSintactico* listaErrorSintactico;
+extern NodoErrorSintactico* listaSecuenciasLeidas;
 
 NodoErrorSintactico* crearNodoErrorSintactico(const char *errorSintactico, const int linea);
 
@@ -188,70 +170,146 @@ void imprimirErrorSintactico(NodoErrorSintactico *lista);
 
 void liberarErrorSintactico(NodoErrorSintactico *lista);
 
-extern NodoErrorSintactico* listaErrorSintactico;
+void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
 
-extern NodoErrorSintactico* listaSecuenciasLeidas;
 
-// CADENAS NO RECONOCIDAS
-typedef struct NodoCadenaNoReconocida {
-    char *cadenaNoReconocida;
+// ERRORES SEMANTICOS 
+typedef struct NodoErroresSemanticos {
+    char *mensaje;
     int linea;
     int columna;
-    struct NodoCadenaNoReconocida *siguiente;
-} NodoCadenaNoReconocida;
+    struct NodoErroresSemanticos *siguiente;
+} NodoErroresSemanticos;
 
-NodoCadenaNoReconocida* crearNodoCadenaNoReconocida(const char *cadenaNoReconocida, int linea, int columna);
+extern NodoErroresSemanticos* listaErroresSemanticos;
 
-void agregarCadenaNoReconocida(NodoCadenaNoReconocida **lista, const char *cadenaNoReconocida, int linea, int columna);
-
-void imprimirCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
-
-void liberarCadenasNoReconocidas(NodoCadenaNoReconocida *lista);
-
-NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, int linea, int columna, void *nodo);
-
-extern NodoCadenaNoReconocida* listaCadenasNoReconocidas;
-//void reiniciarListaParametros(char **listaParametros);
-
-
-//ERRORES SEMANTICOS 
-
-NodoErroresSemanticos* crearNodoErrorSemantico(const char *mensaje, const int linea, const int columna);
+NodoErroresSemanticos *crearNodoErroresSemanticos(const char *mensaje, const int linea, const int columna);
 
 void agregarErrorSemantico(NodoErroresSemanticos **lista, const char *mensaje, const int linea, const int columna);
 
 void imprimirErrorSemantico(NodoErroresSemanticos *lista);
 
-void liberarErrorSemantico(NodoErroresSemanticos *lista);
+/*void liberarErrorSemantico(NodoErroresSemanticos *lista);*/
 
-extern NodoErroresSemanticos* listaErroresSemanticos;
+bool esMultiplicable(char *expresion);
+
+char *extraerTipoDato(char *expresion);
+
+const char *extraerTipoDato2(char *expresion);
+
+void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int columna, NodoErroresSemanticos **listaErroresSemanticos);
+
+
+// PARAMETROS
+typedef struct Parametro {
+    EspecificadorTipos especificadorDeclaracion;
+    char *identificador;
+    int linea;
+    int columna;
+    struct Parametro *siguiente;
+} Parametro;
+
+extern Parametro* listaDeParametros;
+extern Parametro* listaDeParametrosInvocacion;
+
+typedef struct ElementosParametro{
+    char * elemento;
+    struct ElementosParametro *siguiente;
+}ElementosParametro;
+
+Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador, int linea, int columna);
+
+int contarArgumentos(Parametro *listaDeParametros);
+
+void agregarParametro(Parametro **listaDeParametros, EspecificadorTipos especificadorDeclaracion, char *identificador, int linea, int columna);
+
+char* imprimirParametros(Parametro *listaDeParametros);
+
+int validarListasDeParametros(Parametro* listaDeParametrosEncontrados, Parametro* listaDeParametrosInvocados);
+
+char *imprimirParametrosSinIdentificador(Parametro *listaDeParametros);
 
 
 // FUNCIONES
+typedef struct NodoFuncion {
+    EspecificadorTipos retorno;
+    Parametro *listaDeParametros;
+    tipoFuncion tipogramatica;
+    struct NodoFuncion *siguiente;
+} NodoFuncion;
 
-extern char* copiarCadena(const char *str);
+extern NodoSimbolo* listaFunciones;
+extern NodoSimbolo* nodoGenericoFuncion;
 
-//Rutinas
+NodoFuncion *crearNodoFuncion(Parametro *listaDeParametros, EspecificadorTipos retorno, tipoFuncion tipogramatica);
 
-// Define los tipos de datos posibles
-/*typedef enum {
-    TIPO_INT,
-    TIPO_FLOAT,
-    TIPO_ERROR
-     // Para manejar errores de tipo
-} Type;
+void agregarFuncion(NodoSimbolo **lista, NodoSimbolo **tablaSimbolos, EspecificadorTipos retorno, NodoSimbolo**nodoGenericoFuncion, const int linea, tipoFuncion tipogramatica, const int columna);
 
-// Declara la funcion check_type para usar en el control de tipos
-Type check_type(char *left, char *right, const int linea, const int columna);
+NodoSimbolo* fueDefinidaAntes(NodoSimbolo *tablaSimbolos, char* nombre);
 
-//estructura para saber tipo de dato en cada token
-typedef struct{
-    char tipo[20];
-    union{
-        int numero;
-        char cadena[100];
-    } valor;
-}TokenInfo;*/
+void imprimirFunciones(NodoSimbolo *lista);
+
+/*void liberarFunciones(NodoFuncion *lista);*/
+
+void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, Parametro *listaDeParametros, int linea, int columna, int cantidadDeParametros);
+
+void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *identificador, Parametro **listaDeParametros);
+
+char *asignarTipoDatoFuncion(char* identificador);
+
+void ValidarInicializacionVoid(char* tipoDato, int linea, int columna);
+
+
+// VARIABLES DECLARADAS
+typedef struct NodoVariableDeclarada {
+  EspecificadorTipos  tipoDato;    
+} NodoVariableDeclarada;
+
+extern NodoSimbolo* listaVariablesDeclaradas;
+
+NodoVariableDeclarada *crearNodoVariableDeclarada(EspecificadorTipos tipoDato);
+
+void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *identificador, EspecificadorTipos tipoDato, int linea, int columna);
+
+void imprimirVariables(NodoSimbolo *lista);
+
+/*void liberarVariablesDeclaradas(NodoVariableDeclarada *lista);*/
+
+void agregarIdentificadorTemporal(IdentificadorTemporal **listaTemporalIdentificadores, char *identificador, int linea, int columna);
+
+void agregarListaVariables(IdentificadorTemporal *listaTemporalIdentificadores, EspecificadorTipos tipoDato);
+
+void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores);
+
+const char *enumAString1(EspecificadorTipos tipoDato);
+
+char *enumAString2(EspecificadorTipos tipoDato);
+
+
+// FUNCIONES AUXILIARES DE UTILIDAD
+char* copiarCadena(const char *str);
+
+
+
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+// FUNCIONES SIN DEFINICION
+
+/*
+int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der);
+int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador) ;
+int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
+void inicializarTipoRetorno(const char *tipo) ;
+void registrarReturn(const char *tipo, int linea, int columna);
+void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos);
+char* obtenerTipoIdentificador(const char *identificador) ;
+
+//funciones de validacion de asignacion
+// bool esValorModificable(NodoSimbolo *simbolo);
+// void validarAsignacion(NodoErroresSemanticos **listaErroresSemanticos, NodoSimbolo *simboloLadoIzq,  EspecificadorTipos tipoLadoDer, bool esValorModificable, int linea, int columna) ;
+
+//funciones de validaciones de return
+//void validarSentenciaReturn(NodoErroresSemanticos **listaErroresSemanticos,  EspecificadorTipos tipoRetornoDeclarado, EspecificadorTipos tipoReturnSentencia,  int lineaReturn, int columnaReturn, int lineaDeclaracion, int columnaDeclaracion);
 
 //Rutinas
 
@@ -275,70 +333,34 @@ typedef struct{
     } valor;
 }TokenInfo;
 
-/*
+//Rutinas
+
+// Define los tipos de datos posibles
+typedef enum {
+    TIPO_INT,
+    TIPO_FLOAT,
+    TIPO_ERROR
+     // Para manejar errores de tipo
+} Type;
+
+// Declara la funcion check_type para usar en el control de tipos
+Type check_type(char *left, char *right, const int linea, const int columna);
+
+//estructura para saber tipo de dato en cada token
+typedef struct{
+    char tipo[20];
+    union{
+        int numero;
+        char cadena[100];
+    } valor;
+}TokenInfo;
+
 typedef struct {
-    char *tipoDato; // Tipo de dato de la expresión return
+    char *tipoDato; // Tipo de dato de la expresion return
     int linea;
     int columna;
    struct TipoRetorno *siguiente;
 } TipoRetorno;
-
-
 */
-// Variable global para almacenar el tipo de retorno esperado de la función
-extern EspecificadorTipos tipoRetorno;
-
-
-void concatenarLeido(NodoErrorSintactico **listaSecuenciasLeidas, const char *yytext, int linea);
-
-
-
-int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der);
-int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador) ;
-int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
-NodoSimbolo *buscar_simbolo(char *nombre);
-void validarInvocacionAFuncion(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, Parametro *listaDeParametros, int linea, int columna, int cantidadDeParametros);
-Parametro *crearNodoParametro(EspecificadorTipos especificadorDeclaracion, const char *identificador, int linea, int columna);
-void llenarNodoGenericoFuncion(NodoSimbolo **nodoGenericoFuncion, const char *identificador, Parametro **listaDeParametros);
-void imprimirTablaSimbolos(NodoSimbolo *tablaSimbolos);
-
-int validarListasDeParametros(Parametro* listaDeParametrosEncontrados, Parametro* listaDeParametrosInvocados);
-
-void inicializarTipoRetorno(const char *tipo) ;
-void registrarReturn(const char *tipo, int linea, int columna);
-void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos);
-
-EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b) ;
-
-NodoVariableDeclarada *crearNodoVariableDeclarada(EspecificadorTipos tipoDato);
-void agregarIdentificadorTemporal(IdentificadorTemporal **listaTemporalIdentificadores, char *identificador, int linea, int columna);
-void agregarListaVariables(IdentificadorTemporal *listaTemporalIdentificadores, EspecificadorTipos tipoDato);
-void agregarVariableDeclarada(NodoSimbolo **tablaSimbolos, NodoErroresSemanticos **listaErroresSemanticos, char *identificador, EspecificadorTipos tipoDato, int linea, int columna);
-void validarUsoDeVariable(NodoErroresSemanticos **listaErroresSemanticos, char *identificador, char *contextoActual, int linea, int columna, IdentificadorTemporal* listaTemporalIdentificadores);
-char *enumAString2(EspecificadorTipos tipoDato);
-const char *enumAString1(EspecificadorTipos tipoDato);
-bool esMultiplicable(char *expresion);
-char *extraerTipoDato(char *expresion);
-const char *extraerTipoDato2(char *expresion);
-void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int columna, NodoErroresSemanticos **listaErroresSemanticos);
-
-char* obtenerTipoIdentificador(const char *identificador) ;
-
-extern const char* especificadorTiposString[];
-extern const char* especificadorAlmacenamientoString[];
-extern const char* calificadorTipoString[];
-extern const char *tipoFuncionString[];
-int contarArgumentos(Parametro *listaDeParametros);
-expresionPrimaria buscarTipoDeDato(char* nombre);
-int contarArgumentos(Parametro *listaDeParametros);
-char *asignarTipoDatoFuncion(char* identificador);
-void ValidarInicializacionVoid(char* tipoDato, int linea, int columna);
-
-//funciones de validacion de asignacion
-// bool esValorModificable(NodoSimbolo *simbolo);
-// void validarAsignacion(NodoErroresSemanticos **listaErroresSemanticos, NodoSimbolo *simboloLadoIzq,  EspecificadorTipos tipoLadoDer, bool esValorModificable, int linea, int columna) ;
-
-//funciones de validaciones de return
-//void validarSentenciaReturn(NodoErroresSemanticos **listaErroresSemanticos,  EspecificadorTipos tipoRetornoDeclarado, EspecificadorTipos tipoReturnSentencia,  int lineaReturn, int columnaReturn, int lineaDeclaracion, int columnaDeclaracion);
 
 #endif
