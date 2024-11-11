@@ -25,6 +25,7 @@ EspecificadorTipos especificadorVacio = {.esTipoDato = VACIO_TIPODATO, .esAlmace
 int cantidadDeParametros = 0;
 char *contextoActual="";
 EspecificadorTipos tipoRetorno;
+EspecificadorTipos tipoDatoTemporal;
 
 #define DEBUG 0
 
@@ -100,7 +101,7 @@ expresion_primaria:
     | CONSTANTE_ENTERA                                                          { DBG_PRINT("expresion_primaria - CONSTANTE_ENTERA: %d\n", $1);  $$ = "int";}
     | CONSTANTE_REAL                                                            { DBG_PRINT("expresion_primaria - CONSTANTE_REAL: %f\n", $1); $$ = "float";}
     | CONSTANTE_CARACTER                                                        { DBG_PRINT("expresion_primaria - CONSTANTE_CARACTER: %d\n", $1); $$ = "char";}
-    | LITERAL_CADENA                                                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1); $$ = "char";}
+    | LITERAL_CADENA                                                            { DBG_PRINT("expresion_primaria - LITERAL_CADENA: %s\n", $1); $$ = "char *";}
     | '(' expresion ')'                                                         { DBG_PRINT("expresion_primaria - (EXP)\n"); $$ = "int";}
     ;
 expresion_postfija:
@@ -172,8 +173,8 @@ sufijo
     ;
 
 especificador_declaracion
-    : sufijo                                                                    { $$ = $1; DBG_PRINT("ESPECIFICADOR DECLARACION 1: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[$$.esTipoDato], especificadorAlmacenamientoString[$$.esAlmacenamiento], calificadorTipoString[$$.esCalificador]);}
-    | especificador_declaracion sufijo                                          { $$ = (combinarEspecificadorTipos($1, $2)); DBG_PRINT("ESPECIFICADOR DECLARACION 2: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[$$.esTipoDato], especificadorAlmacenamientoString[$$.esAlmacenamiento], calificadorTipoString[$$.esCalificador]); }
+    : sufijo                                                                    { $$ = $1; DBG_PRINT("ESPECIFICADOR DECLARACION 1: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[$$.esTipoDato], especificadorAlmacenamientoString[$$.esAlmacenamiento], calificadorTipoString[$$.esCalificador]); tipoDatoTemporal = $1;}
+    | especificador_declaracion sufijo                                          { $$ = (combinarEspecificadorTipos($1, $2)); DBG_PRINT("ESPECIFICADOR DECLARACION 2: Tipo de dato: %s, Almacenamiento: %s, Calificador: %s\n", especificadorTiposString[$$.esTipoDato], especificadorAlmacenamientoString[$$.esAlmacenamiento], calificadorTipoString[$$.esCalificador]); tipoDatoTemporal = (combinarEspecificadorTipos($1, $2));}
     ;
 
 sentencia:
@@ -287,7 +288,7 @@ return:
     ;
 
 declaracion
-    : especificador_declaracion lista_declaradores_variable ';'                 { agregarListaVariables(listaTemporalIdentificadores, $1); listaTemporalIdentificadores = NULL; /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, tipoRetorno, @1.first_line, @1.first_column, $1);*/ }
+    : especificador_declaracion lista_declaradores_variable ';'                 { /*agregarListaVariables(listaTemporalIdentificadores, $1); listaTemporalIdentificadores = NULL;*/ /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $3, tipoRetorno, @1.first_line, @1.first_column, $1);*/ }
     | especificador_declaracion lista_declaradores_funcion ';'                  { agregarFuncion(&listaFunciones, &tablaSimbolos, $1, &nodoGenericoFuncion, @1.first_line, DECLARACION_FUNCION, @2.first_column); DBG_PRINT("declaracion de funcion 3 %s %s\n", $1, $2); };
     ;
 
@@ -296,7 +297,7 @@ lista_declaradores_variable:
     | lista_declaradores_variable ',' declarador_variable                       { DBG_PRINT("lista_declaradores_variable\n"); }
     ;
 declarador_variable:
-    IDENTIFICADOR inicializacion_variable                                       { agregarIdentificadorTemporal(&listaTemporalIdentificadores, $1, @1.first_line, @1.first_column); /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.especificadorTipos,  @1.first_line, @1.first_column, yyval.sufijo); */DBG_PRINT("declarador_variable \n"); }
+    IDENTIFICADOR inicializacion_variable                                       { agregarVariableDeclarada(&tablaSimbolos, &listaErroresSemanticos, $1, tipoDatoTemporal, @1.first_line, @1.first_column)/*agregarIdentificadorTemporal(&listaTemporalIdentificadores, $1, @1.first_line, @1.first_column);*/ /*agregarVariableDeclarada(&listaVariablesDeclaradas, &tablaSimbolos, &listaErroresSemanticos, $1, yyval.especificadorTipos,  @1.first_line, @1.first_column, yyval.sufijo); */DBG_PRINT("declarador_variable \n"); }
     ;
 inicializacion_variable
     : /*VACIO*/
