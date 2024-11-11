@@ -130,7 +130,7 @@ expresion_or:
       expresion OP_OR expresion                   { DBG_PRINT("expresion_or\n"); } 
     ;
 expresion_de_asignacion:
-      expresion OP_ASIGNACION expresion           { ValidarInicializacionVoid($3, @2.first_line, @2.first_column); DBG_PRINT("expresion_de_asignacion\n"); }
+      expresion OP_ASIGNACION expresion           { ValidarInicializacionVoid($3, @2.first_line, @2.first_column);/*validarAsignacion(&listaErroresSemanticos, contextoActual, $1, $3, @2.first_line, @2.first_column);*/ ;DBG_PRINT("expresion_de_asignacion\n"); }
     ;
 lista_argumentos_invocacion
     : /*VACIO*/
@@ -282,8 +282,8 @@ break:
     BREAK ';'       { /*agregarSentencia(&listaSentencias, "break", @1.first_line, @1.first_column);*/ }
     ;
 return:
-      RETURN expresion ';'     { /*registrarReturn($2, @1.first_line, @1.last_column);*/ }
-    | RETURN ';'               { /*registrarReturn(NULL, @1.first_line,@1.last_column);*/ }
+      RETURN expresion ';'     { /*registrarReturn($2, @1.first_line, @1.last_column);/*validarSentenciaReturn(&listaErroresSemanticos, tipoRetorno, $2, @1.first_line, @1.last_column)*/ }
+    | RETURN ';'               { /*registrarReturn(NULL, @1.first_line,@1.last_column);/*validarSentenciaReturn(&listaErroresSemanticos, tipoRetorno, $2, @1.first_line, @1.last_column)*/ }
     ;
 
 declaracion
