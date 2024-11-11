@@ -71,8 +71,6 @@ typedef enum expresionPrimaria{
 
 extern expresionPrimaria tipoResultanteEvExpresion;
 
-expresionPrimaria buscarTipoDeDato(char* nombre);
-
 typedef struct ExpresionesTipo{
     expresionPrimaria tipoExpresion;
     
@@ -291,76 +289,12 @@ char* copiarCadena(const char *str);
 
 
 
-
 /*-------------------------------------------------------------------------------------------------------------------*/
-// FUNCIONES SIN DEFINICION
-
-/*
-int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der);
-int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador) ;
-int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo) ;
-void inicializarTipoRetorno(const char *tipo) ;
-void registrarReturn(const char *tipo, int linea, int columna);
-void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos);
-char* obtenerTipoIdentificador(const char *identificador) ;
-
 //funciones de validacion de asignacion
 // bool esValorModificable(NodoSimbolo *simbolo);
 // void validarAsignacion(NodoErroresSemanticos **listaErroresSemanticos, NodoSimbolo *simboloLadoIzq,  EspecificadorTipos tipoLadoDer, bool esValorModificable, int linea, int columna) ;
 
 //funciones de validaciones de return
 //void validarSentenciaReturn(NodoErroresSemanticos **listaErroresSemanticos,  EspecificadorTipos tipoRetornoDeclarado, EspecificadorTipos tipoReturnSentencia,  int lineaReturn, int columnaReturn, int lineaDeclaracion, int columnaDeclaracion);
-
-//Rutinas
-
-// Define los tipos de datos posibles
-typedef enum {
-    TIPO_INT,
-    TIPO_FLOAT,
-    TIPO_ERROR
-     // Para manejar errores de tipo
-} Type;
-
-// Declara la funcion check_type para usar en el control de tipos
-Type check_type(char *left, char *right, const int linea, const int columna);
-
-//estructura para saber tipo de dato en cada token
-typedef struct{
-    char tipo[20];
-    union{
-        int numero;
-        char cadena[100];
-    } valor;
-}TokenInfo;
-
-//Rutinas
-
-// Define los tipos de datos posibles
-typedef enum {
-    TIPO_INT,
-    TIPO_FLOAT,
-    TIPO_ERROR
-     // Para manejar errores de tipo
-} Type;
-
-// Declara la funcion check_type para usar en el control de tipos
-Type check_type(char *left, char *right, const int linea, const int columna);
-
-//estructura para saber tipo de dato en cada token
-typedef struct{
-    char tipo[20];
-    union{
-        int numero;
-        char cadena[100];
-    } valor;
-}TokenInfo;
-
-typedef struct {
-    char *tipoDato; // Tipo de dato de la expresion return
-    int linea;
-    int columna;
-   struct TipoRetorno *siguiente;
-} TipoRetorno;
-*/
 
 #endif

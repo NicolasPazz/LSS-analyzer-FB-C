@@ -55,6 +55,24 @@ const char *calificadorTipoString[] = {
     [VACIO_CALIFICADORTIPO] = "vacio"
 };
 
+EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b){
+    EspecificadorTipos inicial = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
+    if (a.esTipoDato != VACIO_TIPODATO)
+        inicial.esTipoDato = a.esTipoDato;
+    if (a.esAlmacenamiento != VACIO_ESPALMAC)
+        inicial.esAlmacenamiento = a.esAlmacenamiento;
+    if (a.esCalificador != VACIO_CALIFICADORTIPO)
+        inicial.esCalificador = a.esCalificador;
+
+    if (b.esTipoDato != VACIO_TIPODATO)
+        inicial.esTipoDato = b.esTipoDato;
+    if (b.esAlmacenamiento != VACIO_ESPALMAC)
+        inicial.esAlmacenamiento = b.esAlmacenamiento;
+    if (b.esCalificador != VACIO_CALIFICADORTIPO)
+        inicial.esCalificador = b.esCalificador;
+
+    return inicial;
+}
 
 // TABLA DE SIMBOLOS
 NodoSimbolo *crearNodoSimbolo(const char *nombre, tipoSimbolo tipo, int linea, int columna, void *nodo){
@@ -1134,210 +1152,8 @@ char *copiarCadena(const char *str){
 }
 
 
-EspecificadorTipos combinarEspecificadorTipos(EspecificadorTipos a, EspecificadorTipos b){
-    EspecificadorTipos inicial = (struct EspecificadorTipos){.esTipoDato = VACIO_TIPODATO, .esAlmacenamiento = VACIO_ESPALMAC, .esCalificador = VACIO_CALIFICADORTIPO};
-    if (a.esTipoDato != VACIO_TIPODATO)
-        inicial.esTipoDato = a.esTipoDato;
-    if (a.esAlmacenamiento != VACIO_ESPALMAC)
-        inicial.esAlmacenamiento = a.esAlmacenamiento;
-    if (a.esCalificador != VACIO_CALIFICADORTIPO)
-        inicial.esCalificador = a.esCalificador;
-
-    if (b.esTipoDato != VACIO_TIPODATO)
-        inicial.esTipoDato = b.esTipoDato;
-    if (b.esAlmacenamiento != VACIO_ESPALMAC)
-        inicial.esAlmacenamiento = b.esAlmacenamiento;
-    if (b.esCalificador != VACIO_CALIFICADORTIPO)
-        inicial.esCalificador = b.esCalificador;
-
-    return inicial;
-}
-
-expresionPrimaria buscarTipoDeDato(char* nombre){
-    NodoSimbolo *nodo = buscar_simbolo(nombre);
-    if (nodo != NULL){
-        if (nodo->tipo == VARIABLE){
-            NodoVariableDeclarada *var = (NodoVariableDeclarada *)nodo->nodo;
-            switch(var->tipoDato.esTipoDato){
-                //CONSTANTES --> enum CONSTANTE_EXPRESIONPRIMARIA
-                case FLOAT_TIPODATO:
-                case INT_TIPODATO:
-                case CHAR_TIPODATO:
-                case DOUBLE_TIPODATO:
-                case UNSIGNED_INT_TIPODATO:
-                case LONG_TIPODATO:
-                case SHORT_TIPODATO:                
-                case UNSIGNED_LONG_TIPODATO:                                
-                case UNSIGNED_SHORT_TIPODATO:
-                    return CONSTANTE_EXPRESIONPRIMARIA;
-                    break;  
-                //////////////////////
-                /*case VOID_TIPODATO:
-                break;
-                                          
-                case VACIO_TIPODATO:
-                break;
-                */
-                default:
-                    printf("ERROR: no se encontro el tipo expresion primaria para el tipo de dato de la variable %s\n", nombre);
-                    break;
-            }
-        }
-        /*else if (nodo->tipo == FUNCION){
-            return;
-        }*/
-    } 
-    else{ 
-        printf("buscarTipoDeDato: Error: '%s' no fue declarado.\n", nombre); 
-    }
-}
-
-
-
 
 /*-------------------------------------------------------------------------------------------------------------------*/
-// Rutinas semanticas
-// Validacion de tipos
-//  Implementa check_type para manejar los tokens
-/*Type check_type(char *token1, char *token2, const int linea, const int columna) {
-    // Define las reglas de tipo para multiplicacion (int * int = int, float * float = float, etc.)
-    if (strcmp(token1, "IDENTIFICADOR") == 0 || strcmp(token2, "IDENTIFICADOR") == 0) {
-        const char *mensaje = "Operandos invalidos del operador binario * (identificador)";
-        agregarErrorSemantico(&listaErrorSemantico, mensaje,linea,columna);
-        return TIPO_ERROR;
-    }
-     if (strcmp(token1, "CONSTANTE_ENTERA") == 0 || strcmp(token2, "CONSTANTE_ENTERA") == 0) {
-        return TIPO_INT;
-    } else  if ((strcmp(token1, "CONSTANTE_ENTERA") == 0 || strcmp(token2, "CONSTANTE_REAL") == 0) &&
-               (strcmp(token2, "CONSTANTE_ENTERA") == 0 || strcmp(token1, "CONSTANTE_REAL") == 0)) {
-        return TIPO_FLOAT;
-    } else if (strcmp(token1, "LITERAL_CADENA") == 0 || strcmp(token2, "LITERAL_CADENA") == 0) {
-        const char *mensaje = "Operandos invalidos del operador binario * (literal_cadena)";
-        agregarErrorSemantico(&listaErrorSemantico, mensaje, linea,columna);
-        return TIPO_ERROR;  // Multiplicacion no soporta strings
-    }
-    return TIPO_ERROR;  // Devuelve error si no coincide con las reglas
-}
-
-// Insercion de simbolo en la tabla
-int insertar_simbolo(char *nombre, tipoSimbolo tipo, void *nodo){
-    NodoSimbolo *simbolo_existente = buscar_simbolo(nombre);
-    if (simbolo_existente){
-        // Ya existe un simbolo con ese nombre
-
-        return -1;
-    }
-    // Inserta un nuevo simbolo
-    NodoSimbolo *nuevo_simbolo = malloc(sizeof(NodoSimbolo));
-    nuevo_simbolo->nombre = strdup(nombre);
-    nuevo_simbolo->tipo = tipo;
-    nuevo_simbolo->nodo = nodo;
-    nuevo_simbolo->siguiente = tablaSimbolos;
-    tablaSimbolos = nuevo_simbolo;
-    return 0;
-}
-
-// Validacion de operaciones especificas
-int validar_operacion(NodoSimbolo *simbolo1, NodoSimbolo *simbolo2, char operador){
-    if (!simbolo1 || !simbolo2){
-        printf("Error: Uno o ambos operandos no estan declarados.\n");
-        return -1;
-    }
-
-    switch (operador){
-    case '*':
-        if (simbolo1->tipo == VARIABLE && simbolo2->tipo == VARIABLE){
-            // Verifica si ambos son del tipo correcto (int, float, etc.)
-            // Por ejemplo, supongamos que nodo contiene el tipo real de la variable
-            // Typecasting y verificacion de tipos especificos (a ajustar segun implementacion)
-            if (*(int *)simbolo1->nodo != TIPO_INT || *(int *)simbolo2->nodo != TIPO_INT){
-                printf("Error: Operandos invalidos para '*'\n");
-                return -1;
-            }
-        }
-        break;
-        /// Oregarse aqui
-    }
-    return 0;
-}
-
-// Validacion de asignacion
-int validar_asignacion(NodoSimbolo *simbolo_lado_izq, NodoSimbolo *simbolo_lado_der){
-    if (!simbolo_lado_izq || !simbolo_lado_der){
-        printf("Error: Variable no declarada en la asignacion.\n");
-        return -1;
-    }
-    if (simbolo_lado_izq->tipo != VARIABLE || simbolo_lado_der->tipo != VARIABLE){
-        printf("Error: Asignacion solo permitida entre variables.\n");
-        return -1;
-    }
-    if (simbolo_lado_izq->nodo != simbolo_lado_der->nodo){
-        printf("Error: Tipos incompatibles en la asignacion.\n");
-        return -1;
-    }
-    return 0;
-}
-
-// Se recibe el tipo de dato de la funcion y se llama a la funcion copiarCadena
-void inicializarTipoRetorno(const char *tipo){
-    tipoReturnEsperado = copiarCadena(tipo);
-}
-
-// Se recibe el tipo de dato del return encontrado junto con su fila y columna
-// fila y columna funcionan ok
-// No se esta recibiendo el tipo de dato del return, si no que se recibe un char* con la cadena del return. Ya sea identificador, literal cadena o constante.
-void registrarReturn(const char *tipo, int linea, int columna) {
-    if (tipoReturnEncontrado == NULL) {
-        tipoReturnEncontrado = (TipoRetorno *)malloc(sizeof(TipoRetorno));
-    }
-    tipoReturnEncontrado->tipoDato = copiarCadena(tipo);
-    tipoReturnEncontrado->linea = linea;
-    tipoReturnEncontrado->columna = columna+1;
-    tipoReturnEncontrado->siguiente = NULL;
-}
-
-// Se valida si el tipo de dato del return y de la funcion son el mismo y se genera accion dependiendo el caso.
-// Al ser un strcmp, se esta comparando dos cadenas char*, no segun su valor semantico.
-void validarTipoReturn(NodoErroresSemanticos **listaErroresSemanticos) {
-    if (tipoReturnEsperado != NULL && tipoReturnEncontrado->tipoDato != NULL) {
-        if (strcmp(tipoReturnEsperado, tipoReturnEncontrado->tipoDato) != 0) {
-            char mensaje[256];
-            snprintf(mensaje, sizeof(mensaje), "Incompatibilidad de tipos al retornar el tipo '%s' pero se esperaba '%s'", tipoReturnEncontrado->tipoDato, tipoReturnEsperado);
-            agregarErrorSemantico(listaErroresSemanticos, mensaje, tipoReturnEncontrado->linea, tipoReturnEncontrado->columna);
-        }
-    }
-    free(tipoReturnEncontrado->tipoDato);
-    tipoReturnEncontrado->tipoDato = NULL;
-}
-
-
-char* obtenerTipoIdentificador(const char *identificador) {
-    NodoSimbolo *simbolo = buscar_simbolo(identificador);
-    if (simbolo) {
-        if (simbolo->tipo == FUNCION) {
-            NodoFuncion *func = (NodoFuncion *)simbolo->nodo;
-            return func->retorno;  // Retorna el tipo de retorno de la funcion, como "void (*)(void)"
-        } else if (simbolo->tipo == VARIABLE) {
-            NodoVariableDeclarada *var = (NodoVariableDeclarada *)simbolo->nodo;
-            return var->tipoDato;  // Retorna el tipo de dato de la variable
-        }
-    }
-    return NULL;
-}
-
-NodoVariableDeclarada
-
-int verificarTipoRetorno(tipoDato tipoFuncion, tipoDato tipoReturn) {
-    if (tipoReturn == tipoFuncion) {
-        return 1;
-    } else {
-        return 0;
-    }
-}*/ //puede ir algo por aca la validacion de tipos. En vez de return 1 o 0, se puede generar accion. 
-
-
-/*-------------------------------------------------------------------------------------------------------------------*/
-
 // //validacion de asignacion 
 // // Funcion para verificar que sea L-Modificable 
 // bool esValorModificable(NodoSimbolo *simbolo) {
