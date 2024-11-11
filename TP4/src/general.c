@@ -456,8 +456,8 @@ void validarMultiplicacion(char *expresion1, char *expresion2, int linea, int co
         snprintf(mensaje, sizeof(mensaje), "Operandos invalidos del operador binario * (tienen '%s' y '%s')", tipoDatoPrint1, tipoDatoPrint2);
         agregarErrorSemantico(listaErroresSemanticos, mensaje, linea, columna);
         // Liberar memoria despues del uso
-        if (tipoDatoPrint1 != expresion1) free((void *)tipoDatoPrint1);
-        if (tipoDatoPrint2 != expresion2) free((void *)tipoDatoPrint2);
+        //if (tipoDatoPrint1 != expresion1) free((void *)tipoDatoPrint1);
+        //if (tipoDatoPrint2 != expresion2) free((void *)tipoDatoPrint2);
     }
 }
 
