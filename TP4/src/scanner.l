@@ -8,6 +8,7 @@
 %x tokenNoReconocido
 
 %%
+
     /*Operadores*/
 "("                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return '(';}
 ")"                                                                         {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylloc.last_column += yyleng; return ')';}
@@ -79,7 +80,7 @@ volatile                                                                    {con
 \"([^\\\"]|\\[abfnrtv\\\'\"\?]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+)*\"             {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return LITERAL_CADENA;}
 
     /*Identificadores*/
-[a-zA-Z_][a-zA-Z0-9_]*                                                      {concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
+[a-zA-Z_][a-zA-Z0-9_]*                                                      {reinicializarUbicacion();concatenarLeido(&listaSecuenciasLeidas, yytext, yylloc.first_line); yylval.cadena = copiarCadena(yytext); yylloc.last_column += yyleng; return IDENTIFICADOR;}
 
     /*Espacio y tabulacion*/
 [\t]                                                                      {yylloc.first_column = yylloc.last_column += yyleng;}
